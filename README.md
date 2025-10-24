@@ -1,20 +1,20 @@
 # Blog rétro (old-school)
 
-Ce dépôt contient un petit blog statique en HTML/CSS/JS pur, au style des débuts d'internet, écrit en français avec plein de fautes d'orthographe pour l'humour.
+Ce dépôt contien un ptit blog static en HTML/CSS/JS pur, au stile des débuts d'internet, écris en francais avec plein de faute d'ortografe pour l'humour (comme demandé!).
 
 Fichiers principaux:
-- `index.html` - page d'accueil
-- `about.html` - à propos
-- `contact.html` - page de contact (formulaire factice)
-- `styles.css` - styles rétro
-- `script.js` - JS minimal (compteur visiteurs + gestion formulaire)
-- `assets/placeholder.svg` - image placeholder
+-- `index.html` - page d'acceuil
+-- `about.html` - a propros
+-- `contact.html` - page de contakt (formulaire factice)
+-- `styles.css` - styles retro
+-- `script.js` - JS minimal (compteur visiteurs + geston formulaire)
+-- `assets/placeholder.svg` - image placéholder
 
-Pour l'utiliser, ouvrez simplement `index.html` dans votre navigateur (double-clic). Pas besoin de serveur.
+Pour l'utilisé, ouvre simplement `index.html` dans ton navegateur (double-clic). Pas besoins de serveur.
 
-Améliorations possibles:
-- Ajouter des pages d'articles indépendantes
-- Ajouter un vrai backend pour le formulaire
-- Ajouter des gifs animés et icones 16x16
+Ameliorations possibl:
+- Ajouté des pages d'articles independents
+- Ajouté un vrais backend pour le formulair
+- Ajouté des gifs anime et icones 16x16
 
-Amusez-vous bien :) (avec des fautes)
+Amuse toi bien :) (avec plein de fautes d'ortografe)
