@@ -23,4 +23,21 @@
     "excerpt": "Une pitite liste de tips farfelu pour rigolér et peut-etre casser kelke chôse.",
     "tags": ["tips","humour","web"]
   }
+ ,
+  {
+    "id": "post4",
+    "title": "La nuit du modem",
+    "url": "post4.html",
+    "date": "2004-10-31",
+    "excerpt": "Une nuit ou le modem hurla, et ou j'ai ecouté des bruits d'internet comme des fantomes.",
+    "tags": ["modem","sons","nuit"]
+  },
+  {
+    "id": "post5",
+    "title": "Collection d'icones 16x16",
+    "url": "post5.html",
+    "date": "2005-06-12",
+    "excerpt": "Comment j'ai collectionné des petites icones et pourquoi c'est la meilleur hobby du monde.",
+    "tags": ["icons","collection","retro"]
+  }
 ]
