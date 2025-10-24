@@ -11,28 +11,25 @@
     <marquee class="banner">ARCHIVES - Tous les vieux posts</marquee>
   <h1 class="site-title">Arhives du blog</h1>
 
-  <p class="meta">Voila la liste de toux les posts disponible. Clique pour lires l'artcle complet (faites gaffe aux faute d'ortografe).</p>
+    <p class="meta">Voila la liste de toux les posts disponible. Clique pour lires l'artcle complet (faites gaffe aux faute d'ortografe).</p>
 
-    <div class="post">
-  <h2><a href="post1.html">Post 1 - Le començement</a></h2>
-  <p>Un souvenir nostaljik de l'ere des 486, modems bruiants et GIFs lourds. <em>Posté le 01/01/1999</em></p>
-  <p class="meta">Tags: #486 #retrow #geocities</p>
+    <!-- Search UI -->
+    <div id="search-area" style="width:80%; margin:8px auto 0; text-align:left;">
+      <label for="search-input">Recherche texte:</label>
+      <input id="search-input" type="text" placeholder="Tape un mot clef, ex: 486 ou retro" style="width:60%; padding:6px; margin-left:8px">
+      <button id="clear-filters" style="margin-left:8px; padding:6px">Tout effacer</button>
+
+      <div style="margin-top:10px;">Filtrer par tags:</div>
+      <div id="tag-filters" style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;"></div>
     </div>
 
-    <div class="post">
-  <h2><a href="post2.html">Post 2 - Ancore un post</a></h2>
-  <p>Recit humoristik de bidouillage hardwere: stickres, soudures et antenes en alou. <em>Posté le 02/02/2002</em></p>
-  <p class="meta">Tags: #harware #bricolage #486</p>
-    </div>
-
-    <div class="post">
-  <h2><a href="post3.html">Post 3 - Tips & Triks</a></h2>
-  <p>Une pitite liste de tips farfelu pour rigolér et peut-etre casser kelke chôse. <em>Posté le 03/03/2003</em></p>
-  <p class="meta">Tags: #tips #humour #web</p>
+    <div id="posts-list" style="width:80%; margin:12px auto; text-align:left;">
+      <!-- generated list -->
     </div>
 
     <hr style="width:80%">
     <p><a href="../index.html">← Retour à l'accueil</a></p>
+    <script src="./search.js" defer></script>
   </center>
 </body>
 </html>

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "post1",
+    "title": "Le començement",
+    "url": "post1.html",
+    "date": "1999-01-01",
+    "excerpt": "Un pitit recit de coment j'ai commencér a surfé sur le net avec mon ordi qui faisait trops de bruit.",
+    "tags": ["486","retro","nostalgie"]
+  },
+  {
+    "id": "post2",
+    "title": "Ancore un post",
+    "url": "post2.html",
+    "date": "2002-02-02",
+    "excerpt": "Recit humoristik de bidouillage hardwere: stickres, soudures et antenes en alou.",
+    "tags": ["hardware","bricolage","486"]
+  },
+  {
+    "id": "post3",
+    "title": "Tips & Triks",
+    "url": "post3.html",
+    "date": "2003-03-03",
+    "excerpt": "Une pitite liste de tips farfelu pour rigolér et peut-etre casser kelke chôse.",
+    "tags": ["tips","humour","web"]
+  }
+]
