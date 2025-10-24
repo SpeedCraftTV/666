@@ -67,3 +67,46 @@ body > * { position: relative; z-index: 1; }
 /* make marquee text blink a bit */
 marquee.banner { animation: pulse 4s ease-in-out infinite; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.9; } }
+
+/* Search & tag filter styling to match site theme */
+#search-area { width: 80%; margin: 8px auto 0; text-align: left; }
+#search-area label { color: #e6e6e6; margin-right: 6px; }
+#search-input { background: #0b0b0b; border: 2px solid #2b2b2b; color: #f2f2f2; padding: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.6) inset; }
+#search-input:focus { outline: none; box-shadow: 0 0 10px rgba(179,0,0,0.25); border-color: var(--accent); }
+
+/* Tag buttons */
+.tag-btn {
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid rgba(179,0,0,0.25);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95em;
+  border-radius: 4px;
+  transition: background 120ms ease, box-shadow 120ms ease, color 120ms ease;
+}
+.tag-btn:hover {
+  background: rgba(179,0,0,0.06);
+  box-shadow: 0 0 8px rgba(179,0,0,0.08);
+}
+.tag-btn.active {
+  background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+  color: #fff;
+  border-color: var(--accent-deep);
+  box-shadow: 0 0 18px rgba(179,0,0,0.22), 0 0 6px rgba(0,0,0,0.6) inset;
+}
+
+/* Clear filters button */
+#clear-filters {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(179,0,0,0.28);
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+#clear-filters:hover { background: rgba(179,0,0,0.06); box-shadow: 0 0 8px rgba(179,0,0,0.08); }
+
+/* Make generated post list items more compact and consistent */
+#posts-list .post { margin-bottom: 12px; }
