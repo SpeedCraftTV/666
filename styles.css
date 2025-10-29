@@ -2,7 +2,7 @@
 body {
   background: radial-gradient(ellipse at top left, #0b0b0b 0%, #000000 40%), linear-gradient(135deg, rgba(60,0,0,0.06), rgba(0,0,0,0));
   color: #e6e6e6;
-  font-family: 'Courier New', monospace;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
   line-height: 1.5;
   margin: 0;
 }
@@ -67,6 +67,27 @@ body > * { position: relative; z-index: 1; }
 /* make marquee text blink a bit */
 marquee.banner { animation: pulse 4s ease-in-out infinite; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.9; } }
+
+/* retro 'gif-like' banner simulated with CSS (blinking pixel effect) */
+.retro-gif {
+  width: 92%;
+  max-width: 900px;
+  height: 72px;
+  margin: 8px auto 12px;
+  background-image: repeating-linear-gradient(0deg, #140000 0 6px, #190000 6px 12px), repeating-linear-gradient(90deg, rgba(255,77,77,0.06) 0 2px, rgba(0,0,0,0.02) 2px 4px);
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 18px rgba(179,0,0,0.12) inset, 0 6px 18px rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: #ffb3b3; text-transform: uppercase; letter-spacing: 2px;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  image-rendering: pixelated;
+  animation: retro-blink 1.2s steps(2, end) infinite;
+}
+@keyframes retro-blink {
+  0% { opacity: 1; transform: translateY(0); }
+  50% { opacity: 0.65; transform: translateY(-1px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
 
 /* Search & tag filter styling to match site theme */
 #search-area { width: 80%; margin: 8px auto 0; text-align: left; }
