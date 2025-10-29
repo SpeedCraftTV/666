@@ -15,8 +15,8 @@
     const tags = Array.from(tagSet).sort();
     const container = q('#tag-filters');
     container.innerHTML = '';
-    const allBtn = document.createElement('button');
-    allBtn.textContent = 'Tous';
+  const allBtn = document.createElement('button');
+  allBtn.textContent = 'tout';
     allBtn.className = 'tag-btn active';
     allBtn.dataset.tag = '';
     container.appendChild(allBtn);
@@ -49,7 +49,7 @@
     const list = q('#posts-list');
     list.innerHTML = '';
     if (posts.length === 0) {
-      list.innerHTML = '<p>Aucun post trouvé.</p>';
+      list.innerHTML = '<p>aucun post trouvé... :c</p>';
       return;
     }
     posts.forEach(p => {
@@ -62,9 +62,9 @@
       title.appendChild(a);
       const ex = document.createElement('p');
       ex.textContent = p.excerpt;
-      const meta = document.createElement('p');
-      meta.className = 'meta';
-      meta.textContent = `Posté le ${p.date} — Tags: ${p.tags.join(', ')}`;
+  const meta = document.createElement('p');
+  meta.className = 'meta';
+  meta.textContent = `posté le ${p.date} — tags: ${p.tags.join(', ')}`;
       div.appendChild(title);
       div.appendChild(ex);
       div.appendChild(meta);
@@ -109,8 +109,8 @@
         applyFilters();
       });
     } catch (e) {
-      console.error('Erreur chargement posts/data.json', e);
-      q('#posts-list').innerHTML = '<p>Impossible de charger la liste des posts.</p>';
+  console.error('erreur chargement posts/data.json', e);
+  q('#posts-list').innerHTML = '<p>impossible de charger la liste des posts... brrr</p>';
     }
   });
 })();

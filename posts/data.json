@@ -1,43 +1,43 @@
 [
   {
     "id": "post1",
-    "title": "Le començement",
+    "title": "le començement",
     "url": "post1.html",
     "date": "1999-01-01",
-    "excerpt": "Un pitit recit de coment j'ai commencér a surfé sur le net avec mon ordi qui faisait trops de bruit.",
+    "excerpt": "un pitit recit de coment j'ai commencér a surfé sur le net avec mon ordi qui faisait trops de bruit.",
     "tags": ["486","retro","nostalgie"]
   },
   {
     "id": "post2",
-    "title": "Ancore un post",
+    "title": "ancore un post",
     "url": "post2.html",
     "date": "2002-02-02",
-    "excerpt": "Recit humoristik de bidouillage hardwere: stickres, soudures et antenes en alou.",
+    "excerpt": "recit humoristik de bidouillage hardwere: stickres, soudures et antenes en alou.",
     "tags": ["hardware","bricolage","486"]
   },
   {
     "id": "post3",
-    "title": "Tips & Triks",
+    "title": "tips & triks",
     "url": "post3.html",
     "date": "2003-03-03",
-    "excerpt": "Une pitite liste de tips farfelu pour rigolér et peut-etre casser kelke chôse.",
+    "excerpt": "une pitite liste de tips farfelu pour rigolér et peut-etre casser kelke chôse.",
     "tags": ["tips","humour","web"]
   }
  ,
   {
     "id": "post4",
-    "title": "La nuit du modem",
+    "title": "la nuit du modem",
     "url": "post4.html",
     "date": "2004-10-31",
-    "excerpt": "Une nuit ou le modem hurla, et ou j'ai ecouté des bruits d'internet comme des fantomes.",
+    "excerpt": "une nuit ou le modem hurla, et ou j'ai ecouté des bruits d'internet comme des fantomes.",
     "tags": ["modem","sons","nuit"]
   },
   {
     "id": "post5",
-    "title": "Collection d'icones 16x16",
+    "title": "collection d'icones 16x16",
     "url": "post5.html",
     "date": "2005-06-12",
-    "excerpt": "Comment j'ai collectionné des petites icones et pourquoi c'est la meilleur hobby du monde.",
+    "excerpt": "comment j'ai collectionné des petites icones et pourquoi c'est la meilleur hobby du monde.",
     "tags": ["icons","collection","retro"]
   }
 ]

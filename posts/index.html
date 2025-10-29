@@ -2,24 +2,26 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Archives - Mon Blogu</title>
+  <title>archives - mon blogu</title>
   <link rel="stylesheet" href="../styles.css">
   <script src="../script.js" defer></script>
 </head>
 <body>
   <center>
-    <marquee class="banner">ARCHIVES - Tous les vieux posts</marquee>
-  <h1 class="site-title">Arhives du blog</h1>
+    <marquee class="banner">archives - tous les vieux posts</marquee>
+  <h1 class="site-title">arhives du blog</h1>
 
-    <p class="meta">Voila la liste de toux les posts disponible. Clique pour lires l'artcle complet (faites gaffe aux faute d'ortografe).</p>
+  <p class="meta">voila la liste de toux les posts disponible. clique pour lires l'artcle complet (faites gaffe aux faute d'ortografe).</p>
 
-    <!-- Search UI -->
+  <p><a href="../index.html">← retour à l'accueil</a></p>
+
+  <!-- Search UI -->
     <div id="search-area" style="width:80%; margin:8px auto 0; text-align:left;">
-      <label for="search-input">Recherche texte:</label>
-      <input id="search-input" type="text" placeholder="Tape un mot clef, ex: 486 ou retro" style="width:60%; padding:6px; margin-left:8px">
-      <button id="clear-filters" style="margin-left:8px; padding:6px">Tout effacer</button>
+  <label for="search-input">recherche texte:</label>
+  <input id="search-input" type="text" placeholder="tape un mot clef, ex: 486 ou retro" style="width:60%; padding:6px; margin-left:8px">
+  <button id="clear-filters" style="margin-left:8px; padding:6px">tout effacer</button>
 
-      <div style="margin-top:10px;">Filtrer par tags:</div>
+  <div style="margin-top:10px;">filtrer par tags:</div>
       <div id="tag-filters" style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;"></div>
     </div>
 
@@ -27,8 +29,7 @@
       <!-- generated list -->
     </div>
 
-    <hr style="width:80%">
-    <p><a href="../index.html">← Retour à l'accueil</a></p>
+  <hr style="width:80%">
     <script src="./search.js" defer></script>
   </center>
 </body>

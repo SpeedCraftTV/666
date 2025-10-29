@@ -1,20 +1,20 @@
-# Blog rétro (old-school)
+# blog retro (old-school)
 
-Ce dépôt contien un ptit blog static en HTML/CSS/JS pur, au stile des débuts d'internet, écris en francais avec plein de faute d'ortografe pour l'humour (comme demandé!).
+ce depot contien mon ptit blog super retro en html/css/js, ecris come par un kikoo pour le fun lol 😜
 
-Fichiers principaux:
--- `index.html` - page d'acceuil
+fichiers principaux:
+-- `index.html` - page d'acceuil (kikoo)
 -- `about.html` - a propros
--- `contact.html` - page de contakt (formulaire factice)
+-- `contact.html` - page de contakt (formulaire bidon)
 -- `styles.css` - styles retro
--- `script.js` - JS minimal (compteur visiteurs + geston formulaire)
+-- `script.js` - js minimal (compteur visiteurs + form qui dit kikoo)
 -- `assets/placeholder.svg` - image placéholder
 
-Pour l'utilisé, ouvre simplement `index.html` dans ton navegateur (double-clic). Pas besoins de serveur.
+pour l'utilisé, ouvre `index.html` dans ton navegador (double-clic). pas besoin de serveur mais tu peux si tu veux :)
 
-Ameliorations possibl:
-- Ajouté des pages d'articles independents
-- Ajouté un vrais backend pour le formulair
-- Ajouté des gifs anime et icones 16x16
+ameliorations possibl:
+- ajouter des pages d'articles encore plus kikoo
+- ajouter un backend pour recevoir de vrai messages (ou pas)
+- mettre des gifs animés et plein d'icones 16x16
 
-Amuse toi bien :) (avec plein de fautes d'ortografe)
+amuse toi bien ♥ (fautes garanties)

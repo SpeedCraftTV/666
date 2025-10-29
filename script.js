@@ -17,9 +17,9 @@
     if (!form) return;
     form.addEventListener('submit', function(ev){
       ev.preventDefault();
-      const nom = form.elements['nom'].value || '(inconnu)';
-      // intentionnaly plein de faute pour l'humour
-      alert('Merci ' + nom + '! Ton message a bien été (presque) envoyé. On te repondras bientot.');
+  const nom = form.elements['nom'].value || '(inconnu)';
+  // style kikoo pour le message
+  alert('kikoo ' + nom + ' !! ton messaj a bien eté (preske) envoyé ♡ on te repondras bientot lol ^^');
       form.reset();
     });
   });
