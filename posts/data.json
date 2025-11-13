@@ -5,7 +5,8 @@
     "url": "post1.html",
     "date": "1999-01-01",
     "excerpt": "un pitit recit de coment j'ai commencér a surfé sur le net avec mon ordi qui faisait trops de bruit.",
-    "tags": ["486","retro","nostalgie"]
+    "tags": ["486","retro","nostalgie"],
+    "thumb": "../assets/stock1.svg"
   },
   {
     "id": "post2",
@@ -13,7 +14,8 @@
     "url": "post2.html",
     "date": "2002-02-02",
     "excerpt": "recit humoristik de bidouillage hardwere: stickres, soudures et antenes en alou.",
-    "tags": ["hardware","bricolage","486"]
+    "tags": ["hardware","bricolage","486"],
+    "thumb": "../assets/stock2.svg"
   },
   {
     "id": "post3",
@@ -21,7 +23,8 @@
     "url": "post3.html",
     "date": "2003-03-03",
     "excerpt": "une pitite liste de tips farfelu pour rigolér et peut-etre casser kelke chôse.",
-    "tags": ["tips","humour","web"]
+    "tags": ["tips","humour","web"],
+    "thumb": "../assets/stock3.svg"
   }
  ,
   {
@@ -30,7 +33,8 @@
     "url": "post4.html",
     "date": "2004-10-31",
     "excerpt": "une nuit ou le modem hurla, et ou j'ai ecouté des bruits d'internet comme des fantomes.",
-    "tags": ["modem","sons","nuit"]
+    "tags": ["modem","sons","nuit"],
+    "thumb": "../assets/img_pixabay1.jpg"
   },
   {
     "id": "post5",
@@ -38,6 +42,54 @@
     "url": "post5.html",
     "date": "2005-06-12",
     "excerpt": "comment j'ai collectionné des petites icones et pourquoi c'est la meilleur hobby du monde.",
-    "tags": ["icons","collection","retro"]
+    "tags": ["icons","collection","retro"],
+    "thumb": "../assets/stock1.svg"
+  }
+ ,
+  {
+    "id": "post6",
+    "title": "trollolol: la quete du pixel perdu",
+    "url": "post6.html",
+    "date": "2006-07-07",
+    "excerpt": "kikoo j'ai perdu 1 pixel et c'etait le drame. petites astuces pour le retrouver.",
+    "tags": ["troll","kikoo","pixel"],
+    "thumb": "../assets/img_pexels1.jpg"
+  },
+  {
+    "id": "post7",
+    "title": "les memes interdits",
+    "url": "post7.html",
+    "date": "2007-08-08",
+    "excerpt": "des memes tro drole qu'on devrais pa montré a grand-mere. conseils pour partage discret et planque.",
+    "tags": ["meme","humour","interdit"],
+    "thumb": "../assets/img_pixabay1.jpg"
+  }
+ ,
+  {
+    "id": "post8",
+    "title": "la photo qui parle",
+    "url": "post8.html",
+    "date": "2008-09-09",
+    "excerpt": "kikou j'ai une photo qui ma ecri, trop flippant et tro marrant.",
+    "tags": ["photo","kikoo","weird"],
+    "thumb": "../assets/img_unsplash1.jpg"
+  },
+  {
+    "id": "post9",
+    "title": "fail hardware #epik",
+    "url": "post9.html",
+    "date": "2009-10-10",
+    "excerpt": "j'ai cassé ma carte mere en branchant le clavier a l'envers. fail epik et photos.",
+    "tags": ["hardware","fail","epik"],
+    "thumb": "../assets/img_pexels1.jpg"
+  },
+  {
+    "id": "post10",
+    "title": "le guide du kikoo",
+    "url": "post10.html",
+    "date": "2010-11-11",
+    "excerpt": "comment ecrire kom un pro du kikoo: oublie la gramaire et invente des motz.",
+    "tags": ["kikoo","typo","lol"],
+    "thumb": "../assets/img_pixabay1.jpg"
   }
 ]

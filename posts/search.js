@@ -55,6 +55,17 @@
     posts.forEach(p => {
       const div = document.createElement('div');
       div.className = 'post';
+      // thumbnail (if provided)
+      if (p.thumb) {
+        const img = document.createElement('img');
+        img.src = p.thumb;
+        img.alt = p.title + ' thumbnail';
+        img.style.maxWidth = '120px';
+        img.style.marginRight = '10px';
+        img.style.float = 'left';
+        img.style.border = '3px solid #222';
+        div.appendChild(img);
+      }
       const title = document.createElement('h2');
       const a = document.createElement('a');
       a.href = p.url;
@@ -68,6 +79,10 @@
       div.appendChild(title);
       div.appendChild(ex);
       div.appendChild(meta);
+      // clear float
+      const clear = document.createElement('div');
+      clear.style.clear = 'both';
+      div.appendChild(clear);
       list.appendChild(div);
     });
   }
