@@ -3,9 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>contact - mon blogu</title>
+		<title>Contacter Mini Castor</title>
 		<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-		<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23b30000'/><text x='8' y='12' font-size='10' text-anchor='middle' fill='%23ffffff' font-family='monospace'>:)</text></svg>" />
+		<link rel="icon" type="image/svg+xml" href="assets/beaver.svg" />
 		<link rel="stylesheet" href="styles.css" />
 		<script src="script.js" defer></script>
 		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
@@ -14,33 +14,41 @@
 	</head>
 	<body>
 		<center>
-			<h1 class="site-title">contacte moi (ou envois un castor)</h1>
+			<h1 class="site-title">contacter Mini Castor</h1>
 
-			<form id="contact-form">
+			<form id="contact-form" class="contact-form">
+				<p>Une proposition, une question ou une offre à négocier ? Écris-moi. Ton message sera envoyé directement à ma boîte de réception.</p>
 				<table class="contact-table">
 					<tr>
-						<td>nom:</td>
-						<td><input type="text" name="nom" required /></td>
+						<td><label for="contact-name">Pseudo ou nom :</label></td>
+						<td><input id="contact-name" type="text" name="nom" maxlength="80" autocomplete="name" required /></td>
 					</tr>
 					<tr>
-						<td>email:</td>
-						<td><input type="email" name="email" required /></td>
+						<td><label for="contact-email">E-mail :</label></td>
+						<td><input id="contact-email" type="email" name="email" maxlength="254" autocomplete="email" required /></td>
 					</tr>
 					<tr>
-						<td>message:</td>
-						<td><textarea name="message" rows="6" cols="40" required></textarea></td>
+						<td><label for="contact-message">Message :</label></td>
+						<td><textarea id="contact-message" name="message" rows="6" maxlength="5000" required></textarea></td>
 					</tr>
 					<tr>
 						<td></td>
-						<td><input type="submit" value="envoyé!!" /></td>
+						<td><input type="submit" value="Envoyer le message" /></td>
+					</tr>
+					<tr class="contact-honeypot" aria-hidden="true">
+						<td><label for="contact-company">Entreprise</label></td>
+						<td><input id="contact-company" name="company" type="text" tabindex="-1" autocomplete="off" /></td>
 					</tr>
 				</table>
+				<p class="contact-privacy">Ton nom, ton e-mail et ton message seront transmis à Mini Castor pour qu’il puisse te répondre. Ils ne seront pas publiés.</p>
+				<p data-contact-status role="status" aria-live="polite"></p>
 			</form>
 
-			<p>ou envois un mail a: <a href="mailto:admin@example.com">minicastorbot@gmail.com</a></p>
+			<p>Tu peux aussi écrire directement à <a href="mailto:minicastorbot@gmail.com">minicastorbot@gmail.com</a>.</p>
 
 			<p>
-				<a href="index.html">retour a l'accueuil</a></p>	
+				<a href="index.html">Retour à l’accueil</a>
+			</p>
 		</center>
 	</body>
 </html>

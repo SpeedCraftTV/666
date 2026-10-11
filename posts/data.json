@@ -1,95 +1,95 @@
 [
   {
     "id": "post1",
-    "title": "le començement",
+    "title": "Ma première tirelire",
     "url": "post1.html",
     "date": "2025-01-01",
-    "excerpt": "un pitit recit de coment j'ai commencér a surfé sur le net avec mon ordi qui faisait trops de bruit.",
-    "tags": ["486","retro","nostalgie"],
+    "excerpt": "Mini Castor découvre le web rétro et transforme sa curiosité en première idée de petite entreprise.",
+    "tags": ["486","rétro","tirelire"],
     "thumb": "../assets/stock1.svg"
   },
   {
     "id": "post2",
-    "title": "ancore un post",
+    "title": "L’atelier des bonnes affaires",
     "url": "post2.html",
     "date": "2025-02-02",
-    "excerpt": "recit humoristik de bidouillage hardwere: stickres, soudures et antenes en alou.",
-    "tags": ["hardware","bricolage","486"],
+    "excerpt": "Un vieil ordinateur, une réparation futée et le premier client de Mini Castor.",
+    "tags": ["ordinateur","atelier","commerce"],
     "thumb": "../assets/stock2.svg"
   },
   {
     "id": "post3",
-    "title": "tips & triks",
+    "title": "L’art de négocier sur le web",
     "url": "post3.html",
     "date": "2025-03-03",
-    "excerpt": "une pitite liste de tips farfelu pour rigolér et peut-etre casser kelke chôse.",
-    "tags": ["tips","humour","web"],
+    "excerpt": "Les astuces de Mini Castor pour comparer, négocier et repérer les bonnes affaires.",
+    "tags": ["conseils","business","web"],
     "thumb": "../assets/stock3.svg"
   }
  ,
   {
     "id": "post4",
-    "title": "la nuit du modem",
+    "title": "La panne qui devint une occasion",
     "url": "post4.html",
     "date": "2025-10-31",
-    "excerpt": "une nuit ou le modem hurla, et ou j'ai ecouté des bruits d'internet comme des fantomes.",
-    "tags": ["modem","sons","nuit"],
+    "excerpt": "Une panne de modem se transforme en occasion inattendue pour Mini Castor.",
+    "tags": ["modem","inventivité","business"],
     "thumb": "../assets/img_pixabay1.jpg"
   },
   {
     "id": "post5",
-    "title": "collection d'icones 16x16",
+    "title": "La collection qui vaut de l’or",
     "url": "post5.html",
     "date": "2026-06-12",
-    "excerpt": "comment j'ai collectionné des petites icones et pourquoi c'est la meilleur hobby du monde.",
-    "tags": ["icons","collection","retro"],
+    "excerpt": "Mini Castor organise sa collection d’icônes et apprend à estimer leur valeur.",
+    "tags": ["icônes","collection","rétro"],
     "thumb": "../assets/stock1.svg"
   }
  ,
   {
     "id": "post6",
-    "title": "trollolol: la quete du pixel perdu",
+    "title": "À la recherche du pixel perdu",
     "url": "post6.html",
     "date": "2026-07-07",
-    "excerpt": "kikoo j'ai perdu 1 pixel et c'etait le drame. petites astuces pour le retrouver.",
-    "tags": ["troll","kikoo","pixel"],
+    "excerpt": "Un pixel semble avoir disparu de l’écran de Mini Castor : une enquête commence.",
+    "tags": ["enquête","pixel","ordinateur"],
     "thumb": "../assets/img_pexels1.jpg"
   },
   {
     "id": "post7",
-    "title": "les memes interdits",
+    "title": "La négociation des mèmes",
     "url": "post7.html",
     "date": "2026-08-08",
-    "excerpt": "des memes tro drole qu'on devrais pa montré a grand-mere. conseils pour partage discret et planque.",
-    "tags": ["meme","humour","interdit"],
+    "excerpt": "Mini Castor négocie les droits d’un mème populaire pour financer un club de dessin.",
+    "tags": ["mèmes","humour","négociation"],
     "thumb": "../assets/img_pixabay1.jpg"
   }
  ,
   {
     "id": "post8",
-    "title": "la photo qui parle",
+    "title": "La photo qui répondait",
     "url": "post8.html",
     "date": "2026-09-09",
-    "excerpt": "kikou j'ai une photo qui ma ecri, trop flippant et tro marrant.",
-    "tags": ["photo","kikoo","weird"],
+    "excerpt": "Une photo semble répondre à Mini Castor et lui donne une idée de boutique.",
+    "tags": ["photo","mystère","boutique"],
     "thumb": "../assets/img_unsplash1.jpg"
   },
   {
     "id": "post9",
-    "title": "fail hardware #epik",
+    "title": "La panne qui m’a appris à investir",
     "url": "post9.html",
     "date": "2026-10-10",
-    "excerpt": "j'ai cassé ma carte mere en branchant le clavier a l'envers. fail epik et photos.",
-    "tags": ["hardware","fail","epik"],
+    "excerpt": "Après un achat inadapté, Mini Castor apprend à budgéter et à mieux préparer ses projets.",
+    "tags": ["ordinateur","budget","leçon"],
     "thumb": "../assets/img_pexels1.jpg"
   },
   {
     "id": "post10",
-    "title": "le guide du kikoo",
+    "title": "Le guide du petit entrepreneur",
     "url": "post10.html",
     "date": "2026-10-11",
-    "excerpt": "comment ecrire kom un pro du kikoo: oublie la gramaire et invente des motz.",
-    "tags": ["kikoo","typo","lol"],
+    "excerpt": "Les conseils de Mini Castor pour lancer un projet, écouter ses clients et négocier avec tact.",
+    "tags": ["entrepreneuriat","conseils","business"],
     "thumb": "../assets/img_pixabay1.jpg"
   }
 ]

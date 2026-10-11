@@ -16,16 +16,16 @@
   const accountPanels = new Set();
   const refreshCallbacks = new Set();
   const postTitles = {
-    post1: 'le commencement',
-    post2: 'encore un post',
-    post3: 'tips & tricks',
-    post4: 'la nuit du modem',
-    post5: "collection d'icones 16x16",
-    post6: 'trollolol: la quete du pixel perdu',
-    post7: 'les memes interdits',
-    post8: 'la photo qui parle',
-    post9: 'fail hardware #epik',
-    post10: 'le guide du kikoo',
+    post1: 'Ma première tirelire',
+    post2: 'L’atelier des bonnes affaires',
+    post3: 'L’art de négocier sur le web',
+    post4: 'La panne qui devint une occasion',
+    post5: 'La collection qui vaut de l’or',
+    post6: 'À la recherche du pixel perdu',
+    post7: 'La négociation des mèmes',
+    post8: 'La photo qui répondait',
+    post9: 'La panne qui m’a appris à investir',
+    post10: 'Le guide du petit entrepreneur',
   };
 
   function getSiteRedirectUrl() {

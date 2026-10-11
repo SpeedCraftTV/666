@@ -1,4 +1,4 @@
-// Comportement minimal: compteur de visiteurs (stocké en localStorage) et gestion du form contact
+// Comportement du site : compteur local et envoi du formulaire de contact.
 (function(){
   // compteur
   try {
@@ -72,16 +72,49 @@
     } catch(e) {}
   });
 
-  // form
   document.addEventListener('DOMContentLoaded', function(){
     const form = document.getElementById('contact-form');
     if (!form) return;
-    form.addEventListener('submit', function(ev){
+    const status = form.querySelector('[data-contact-status]');
+    const submit = form.querySelector('[type="submit"]');
+    form.addEventListener('submit', async function(ev){
       ev.preventDefault();
-  const nom = form.elements['nom'].value || '(inconnu)';
-  // style kikoo pour le message
-  alert('kikoo ' + nom + ' !! ton messaj a bien eté (preske) envoyé ♡ on te repondras bientot lol ^^');
-      form.reset();
+      if (!window.BLOG_SUPABASE?.url || !window.BLOG_SUPABASE?.anonKey) {
+        status.textContent = 'Le formulaire est indisponible : la configuration Supabase manque.';
+        return;
+      }
+
+      submit.disabled = true;
+      status.textContent = 'Envoi du message…';
+      try {
+        const response = await fetch(
+          `${window.BLOG_SUPABASE.url.replace(/\/$/, '')}/functions/v1/contact-message`,
+          {
+            method: 'POST',
+            headers: {
+              apikey: window.BLOG_SUPABASE.anonKey,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name: form.elements.nom.value.trim(),
+              email: form.elements.email.value.trim(),
+              message: form.elements.message.value.trim(),
+              company: form.elements.company.value,
+            }),
+          },
+        );
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || 'Le message n’a pas pu être envoyé.');
+        }
+        form.reset();
+        status.textContent = 'Message envoyé à Mini Castor. Merci !';
+      } catch (error) {
+        console.error('Envoi du formulaire de contact impossible.', error);
+        status.textContent = `${error.message} Tu peux aussi écrire directement à minicastorbot@gmail.com.`;
+      } finally {
+        submit.disabled = false;
+      }
     });
   });
 })();

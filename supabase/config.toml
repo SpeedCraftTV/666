@@ -2,3 +2,6 @@ project_id = "efdylqbvoqgmgfnzlqxj"
 
 [functions.report-comment]
 verify_jwt = false
+
+[functions.contact-message]
+verify_jwt = false

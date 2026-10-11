@@ -47,6 +47,12 @@ marquee.banner { display: inline-block; padding: 10px 14px; background: linear-g
 
 .about-table, .contact-table { margin-top: 12px; border-collapse: collapse; }
 .about-table td, .contact-table td { padding: 8px 12px; border: 1px solid #2b2b2b; background: #0b0b0b; color: #dcdcdc; }
+.contact-form { width: min(90%, 680px); margin: 16px auto; }
+.contact-form .contact-table { width: 100%; }
+.contact-form input:not([type="submit"]), .contact-form textarea { box-sizing: border-box; width: 100%; }
+.contact-honeypot { display: none !important; }
+.contact-privacy, [data-contact-status] { font-size: 0.85em; color: #aaa; }
+input[type="submit"]:disabled { cursor: wait; opacity: 0.65; }
 
 footer { margin-top: 18px; color: #9a9a9a; }
 

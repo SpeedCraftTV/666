@@ -1,24 +1,24 @@
-# blog retro (old-school)
+# Mini Castor — blog rétro
 
-ce depot contien mon ptit blog super retro en html/css/js, ecris come par un kikoo pour le fun lol 😜
+Ce dépôt contient le blog rétro de Mini Castor, un castor futé, entrepreneur et passionné par les pommes, les tirelires et les bonnes négociations.
 
-fichiers principaux:
--- `index.html` - page d'acceuil (kikoo)
--- `about.html` - a propros
--- `contact.html` - page de contakt (formulaire bidon)
+Fichiers principaux :
+-- `index.html` - page d'accueil
+-- `about.html` - présentation de Mini Castor
+-- `contact.html` - formulaire de contact
 -- `styles.css` - styles retro
--- `script.js` - js minimal (compteur visiteurs + form qui dit kikoo)
--- `assets/placeholder.svg` - image placéholder
+-- `script.js` - compteur de visiteurs et formulaire de contact
+-- `assets/beaver.svg` - portrait et icône de Mini Castor
 -- `comments.html` et `comments.js` - commentaires, votes et signalements
 -- `comments-config.js` et `supabase-setup.sql` - configuration du stockage Supabase
 
-pour l'utiliser, les pages statiques peuvent etre ouvertes directement. les archives et les commentaires partagés demandent toutefois un serveur web.
+Pour l'utiliser, les pages statiques peuvent être ouvertes directement. Les archives et les commentaires partagés demandent toutefois un serveur web.
 
-pour lancer rapidement le site localement dans VS Code :
+Pour lancer rapidement le site localement dans VS Code :
 1. ouvre la palette de commandes et lance `Tasks: Run Task` puis `Serve blog local`, ou
 2. lance `Run and Debug` puis `Ouvrir le blog`.
 
-le serveur tourne sur `http://localhost:8000` et peut etre relance manuellement apres un redemarrage de VS Code avec la meme commande. le script `start-local-server.ps1` demarre le site en tache de fond sans fenetre visible et ouvre automatiquement le navigateur.
+Le serveur tourne sur `http://localhost:8000` et peut être relancé manuellement après un redémarrage de VS Code avec la même commande. Le script `start-local-server.ps1` démarre le site en tâche de fond sans fenêtre visible et ouvre automatiquement le navigateur.
 
 ## publication gratuite avec GitHub Pages
 
@@ -35,6 +35,12 @@ les commentaires, votes et signalements utilisent Supabase :
 5. dans **Supabase → Edge Functions → Secrets**, ajoute `RESEND_API_KEY` (cle API Resend), `RESEND_FROM_EMAIL` (expediteur sur le domaine verifie, ex. `Blog <signalements@speedcrafttv.com>`), `REPORTS_INBOX_EMAIL` (adresse qui recoit les signalements) et `RATE_LIMIT_SECRET` (une valeur aleatoire longue). Ne publie jamais ces valeurs dans le depot. Supabase fournit automatiquement `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` aux fonctions.
 6. installe la [CLI Supabase](https://supabase.com/docs/guides/cli), lance `supabase login` dans un terminal local, puis execute `.\deploy-report-comment.ps1` depuis la racine du depot. Le script publie la fonction `report-comment` sur le projet configure dans `supabase/config.toml`.
 7. ouvre le site publie sur GitHub Pages et teste un signalement. La fonction applique ses validations et une limite d'un envoi par adresse IP par minute ; un signalement valide est enregistre puis envoie un e-mail a l'adresse de reception et une copie au signalant.
+
+### formulaire de contact
+
+Le formulaire envoie le nom, l'adresse e-mail et le message à `minicastorbot@gmail.com` via une fonction Supabase Edge et Resend. Le message reste privé et l'adresse saisie sert uniquement d'adresse de réponse. La fonction réutilise `RESEND_API_KEY`, `RESEND_FROM_EMAIL` et `RATE_LIMIT_SECRET` déjà configurés ci-dessus ; aucun secret n'est ajouté au site.
+
+Après `supabase login`, exécute `.\deploy-contact-message.ps1` à la racine pour publier `contact-message`. Aucun SQL supplémentaire n'est requis : elle réutilise la limite d'envoi par adresse IP créée par `supabase-setup.sql`. Le formulaire confirme l'envoi seulement si Resend l'accepte ; sinon, il affiche une erreur et conserve le message saisi. L'envoi réel nécessite cette fonction déployée et les secrets Resend configurés.
 
 ### comptes visiteurs
 
@@ -55,9 +61,8 @@ les utilisateurs de l'ancien site peuvent creer un compte ; les anciens commenta
 
 les commentaires sont publics et publiés immédiatement. un signalement est conservé dans `blog_comment_reports`, envoyé à l'adresse de réception et une copie est envoyée à l'adresse du compte qui l'a soumis. informe les visiteurs de cet usage de leurs données et définis une durée de conservation adaptée. chaque compte ne peut voter et signaler qu'une fois par commentaire.
 
-ameliorations possibl:
-- ajouter des pages d'articles encore plus kikoo
-- ajouter un backend pour recevoir de vrai messages (ou pas)
-- mettre des gifs animés et plein d'icones 16x16
+Idées pour la suite :
+- ajouter d'autres aventures de Mini Castor
+- enrichir les illustrations et les icônes rétro
 
-amuse toi bien ♥ (fautes garanties)
+Amuse-toi bien !
