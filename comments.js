@@ -30,6 +30,10 @@
     post11: 'Yaki et les hochets qui font dring',
   };
 
+  function getPostUrl(postId) {
+    return new URL(`posts/${encodeURIComponent(postId)}.html`, siteBaseUrl).href;
+  }
+
   function getSiteRedirectUrl() {
     if (['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)) {
       return productionSiteUrl;
@@ -1033,7 +1037,11 @@
     const heading = document.createElement('h2');
     heading.textContent = 'Signaler ce commentaire';
     const details = document.createElement('p');
-    details.textContent = `Article : ${postTitles[comment.post_id] || comment.post_id}`;
+    details.append('Article : ');
+    const postLink = document.createElement('a');
+    postLink.href = getPostUrl(comment.post_id);
+    postLink.textContent = postTitles[comment.post_id] || comment.post_id;
+    details.appendChild(postLink);
     const messageLabel = document.createElement('label');
     messageLabel.textContent = 'Pourquoi signales-tu ce commentaire ?';
     const messageInput = document.createElement('textarea');
@@ -1161,7 +1169,10 @@
     comments.forEach((comment) => {
       if (grouped && comment.post_id !== previousPostId) {
         const postTitle = document.createElement('h2');
-        postTitle.textContent = postTitles[comment.post_id] || comment.post_id;
+        const postLink = document.createElement('a');
+        postLink.href = getPostUrl(comment.post_id);
+        postLink.textContent = postTitles[comment.post_id] || comment.post_id;
+        postTitle.appendChild(postLink);
         container.appendChild(postTitle);
         previousPostId = comment.post_id;
       }
@@ -1313,7 +1324,7 @@
       const replyForm = createReplyForm(comment, refresh, true);
       const postLink = document.createElement('a');
       postLink.className = 'comment-parent-link';
-      postLink.href = `posts/${comment.post_id}.html`;
+      postLink.href = getPostUrl(comment.post_id);
       postLink.textContent = 'Retour à l’article';
       container.append(
         article,
