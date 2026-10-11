@@ -9,6 +9,11 @@
   function q(sel) { return document.querySelector(sel); }
   function qa(sel) { return Array.from(document.querySelectorAll(sel)); }
 
+  function formatDate(date) {
+    const [year, month, day] = date.split('-');
+    return `${day}/${month}/${year}`;
+  }
+
   function renderTags(posts) {
     const tagSet = new Set();
     posts.forEach(p => p.tags.forEach(t => tagSet.add(t)));
@@ -75,7 +80,7 @@
       ex.textContent = p.excerpt;
   const meta = document.createElement('p');
   meta.className = 'meta';
-  meta.textContent = `posté le ${p.date} — tags: ${p.tags.join(', ')}`;
+  meta.textContent = `posté le ${formatDate(p.date)} — tags: ${p.tags.join(', ')}`;
       div.appendChild(title);
       div.appendChild(ex);
       div.appendChild(meta);

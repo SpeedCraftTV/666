@@ -1,38 +1,40 @@
 <!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <title>archives - mon blogu</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23b30000'/><text x='8' y='12' font-size='10' text-anchor='middle' fill='%23ffffff' font-family='monospace'>:)</text></svg>">
-  <link rel="stylesheet" href="../styles.css">
-  <script src="../script.js" defer></script>
-</head>
-<body>
-  <center>
-    <marquee class="banner">archives - tous les vieux posts</marquee>
-  <h1 class="site-title">arhives du blog</h1>
+	<head>
+		<meta charset="utf-8" />
+		<title>archives - mon blogu</title>
+		<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+		<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23b30000'/><text x='8' y='12' font-size='10' text-anchor='middle' fill='%23ffffff' font-family='monospace'>:)</text></svg>" />
+		<link rel="stylesheet" href="../styles.css" />
+		<script src="../script.js" defer></script>
+	</head>
+	<body>
+		<center>
+			<marquee class="banner">archives - tous les vieux posts</marquee>
+			<h1 class="site-title">arhives du blog</h1>
 
-  <p class="meta">voila la liste de toux les posts disponible. clique pour lires l'artcle complet (faites gaffe aux faute d'ortografe).</p>
+			<p class="meta">voila la liste de toux les posts disponible. clique pour lires l'artcle complet (faites gaffe aux faute d'ortografe).</p>
 
-  <p><a href="../index.html">← retour à l'accueil</a></p>
+			<p><a href="../index.html">← retour à l'accueil</a>
+				<a href="../contact.html">contact</a>
+			</p>
 
-  <!-- Search UI -->
-    <div id="search-area" style="width:80%; margin:8px auto 0; text-align:left;">
-  <label for="search-input">recherche texte:</label>
-  <input id="search-input" type="text" placeholder="tape un mot clef, ex: 486 ou retro" style="width:60%; padding:6px; margin-left:8px">
-  <button id="clear-filters" style="margin-left:8px; padding:6px">tout effacer</button>
+			<!-- Search UI -->
+			<div id="search-area" style="width: 80%; margin: 8px auto 0; text-align: left">
+				<label for="search-input">recherche texte:</label>
+				<input id="search-input" type="text" placeholder="tape un mot clef, ex: 486 ou retro" style="width: 60%; padding: 6px; margin-left: 8px" />
+				<button id="clear-filters" style="margin-left: 8px; padding: 6px">tout effacer</button>
 
-  <div style="margin-top:10px;">filtrer par tags:</div>
-      <div id="tag-filters" style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;"></div>
-    </div>
+				<div style="margin-top: 10px">filtrer par tags:</div>
+				<div id="tag-filters" style="margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap"></div>
+			</div>
 
-    <div id="posts-list" style="width:80%; margin:12px auto; text-align:left;">
-      <!-- generated list -->
-    </div>
+			<div id="posts-list" style="width: 80%; margin: 12px auto; text-align: left">
+				<!-- generated list -->
+			</div>
 
-  <hr style="width:80%">
-    <script src="./search.js" defer></script>
-  </center>
-</body>
+			<hr style="width: 80%" />
+			<script src="./search.js" defer></script>
+		</center>
+	</body>
 </html>
