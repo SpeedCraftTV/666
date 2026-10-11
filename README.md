@@ -1,4 +1,4 @@
-# Mini Castor — blog rétro
+# Mini Castor | blog rétro
 
 Ce dépôt contient le blog rétro de Mini Castor, un castor futé, entrepreneur et passionné par les pommes, les tirelires et les bonnes négociations.
 
@@ -61,7 +61,7 @@ pour activer les comptes sur un projet deja en service, suis cet ordre :
 
 les utilisateurs de l'ancien site peuvent creer un compte ; les anciens commentaires et votes restent visibles, mais leur historique de vote ne peut pas etre rattache a un compte.
 
-les commentaires et réponses sont publics et publiés immédiatement. jusqu'à trois réponses sont affichées sous chaque commentaire ; à partir de quatre, un lien ouvre `replies.html` avec toute la discussion et un accès direct à l'accueil. un signalement est conservé dans `blog_comment_reports`, envoyé à l'adresse de réception et une copie est envoyée à l'adresse du compte qui l'a soumis. informe les visiteurs de cet usage de leurs données et définis une durée de conservation adaptée. chaque compte ne peut voter et signaler qu'une fois par commentaire.
+les commentaires et réponses sont publics et publiés immédiatement. jusqu'à trois réponses directes sont affichées sous chaque commentaire ; un lien permet d'ouvrir toute la discussion, quel que soit son nombre de réponses. dans `replies.html`, chaque réponse peut recevoir une réponse à son tour, sans limite de profondeur, et la page propose un retour à l'accueil. un signalement est conservé dans `blog_comment_reports`, envoyé à l'adresse de réception et une copie est envoyée à l'adresse du compte qui l'a soumis. informe les visiteurs de cet usage de leurs données et définis une durée de conservation adaptée. chaque compte ne peut voter et signaler qu'une fois par commentaire.
 
 Idées pour la suite :
 - ajouter d'autres aventures de Mini Castor

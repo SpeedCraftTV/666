@@ -2,7 +2,7 @@
 body {
   background: radial-gradient(ellipse at top left, #0b0b0b 0%, #000000 40%), linear-gradient(135deg, rgba(60,0,0,0.06), rgba(0,0,0,0));
   color: #e6e6e6;
-  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-family: Arial, Helvetica, sans-serif;
   line-height: 1.5;
   margin: 0;
 }
@@ -100,7 +100,7 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
   box-shadow: 0 0 18px rgba(179,0,0,0.12) inset, 0 6px 18px rgba(0,0,0,0.6);
   display: flex; align-items: center; justify-content: center;
   font-size: 18px; color: #ffb3b3; text-transform: uppercase; letter-spacing: 2px;
-  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-family: 'Courier New', Courier, monospace;
   image-rendering: pixelated;
   animation: retro-blink 1.2s steps(2, end) infinite;
 }
@@ -386,7 +386,7 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 }
 .all-replies-heading { margin-top: 24px; font-size: 18px; }
 .all-replies-list { margin-bottom: 16px; }
-.comment-reply { margin-left: 14px; }
+.comment-reply { margin-left: calc(min(var(--reply-depth, 0), 4) * 12px); }
 .replies-page > .reply-form { margin: 16px 0; }
 
 html {
@@ -596,7 +596,7 @@ hr {
   .reply-form { margin-left: 4px; padding: 10px; }
   .replies-navigation { width: 100%; }
   .replies-page { width: 100%; }
-  .comment-reply { margin-left: 4px; }
+  .comment-reply { margin-left: calc(min(var(--reply-depth, 0), 3) * 6px); }
 
   .account-page {
     margin-top: 12px;

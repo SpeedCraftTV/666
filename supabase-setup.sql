@@ -28,11 +28,16 @@ create table if not exists public.blog_comment_reports (
 create table if not exists public.blog_comment_replies (
   id uuid primary key default gen_random_uuid(),
   comment_id uuid not null references public.blog_comments(id) on delete cascade,
+  parent_reply_id uuid references public.blog_comment_replies(id) on delete cascade,
   user_id uuid not null references auth.users(id) on delete cascade,
   author_name text not null check (char_length(btrim(author_name)) between 1 and 40),
   body text not null check (char_length(btrim(body)) between 1 and 500),
   created_at timestamptz not null default now()
 );
+
+alter table public.blog_comment_replies
+  add column if not exists parent_reply_id uuid
+  references public.blog_comment_replies(id) on delete cascade;
 
 alter table public.blog_comments
   add column if not exists user_id uuid references auth.users(id) on delete set null;
@@ -47,6 +52,10 @@ alter table public.blog_comment_replies enable row level security;
 
 create index if not exists blog_comment_replies_comment_created_idx
   on public.blog_comment_replies (comment_id, created_at, id);
+
+create index if not exists blog_comment_replies_parent_created_idx
+  on public.blog_comment_replies (parent_reply_id, created_at, id)
+  where parent_reply_id is not null;
 
 create unique index if not exists blog_comment_votes_comment_user_idx
   on public.blog_comment_votes (comment_id, user_id)
@@ -113,7 +122,15 @@ create policy "authenticated users can add comment replies"
     and char_length(btrim(body)) between 1 and 500
     and exists (
       select 1 from public.blog_comments
-      where id = comment_id
+      where blog_comments.id = blog_comment_replies.comment_id
+    )
+    and (
+      parent_reply_id is null
+      or exists (
+        select 1 from public.blog_comment_replies as parent
+        where parent.id = blog_comment_replies.parent_reply_id
+          and parent.comment_id = blog_comment_replies.comment_id
+      )
     )
   );
 
@@ -184,9 +201,9 @@ grant update (vote) on public.blog_comment_votes to authenticated;
 grant delete on public.blog_comment_votes to authenticated;
 revoke all on public.blog_comment_reports from anon, authenticated;
 revoke all on public.blog_comment_replies from public, anon, authenticated;
-grant select (id, comment_id, author_name, body, created_at)
+grant select (id, comment_id, parent_reply_id, author_name, body, created_at)
   on public.blog_comment_replies to anon, authenticated;
-grant insert (comment_id, user_id, author_name, body)
+grant insert (comment_id, parent_reply_id, user_id, author_name, body)
   on public.blog_comment_replies to authenticated;
 grant select on public.blog_comments to service_role;
 grant insert on public.blog_comment_reports to service_role;
@@ -219,35 +236,44 @@ begin
     )
     select
       comments.id,
-      count(replies.id),
+      reply_counts.reply_count,
       coalesce(
-        jsonb_agg(
-          jsonb_build_object(
-            'id', replies.id,
-            'author_name', replies.author_name,
-            'body', replies.body,
-            'created_at', replies.created_at
-          )
-          order by replies.created_at, replies.id
-        ) filter (where replies.id is not null and replies.reply_rank <= 3),
+        reply_previews.previews,
         '[]'::jsonb
       )
     from requested_comments
     join public.blog_comments as comments
       on comments.id = requested_comments.id
     left join lateral (
-      select
-        comment_replies.id,
-        comment_replies.author_name,
-        comment_replies.body,
-        comment_replies.created_at,
-        row_number() over (
-          order by comment_replies.created_at, comment_replies.id
-        ) as reply_rank
+      select count(*) as reply_count
       from public.blog_comment_replies as comment_replies
       where comment_replies.comment_id = comments.id
-    ) as replies on true
-    group by comments.id;
+    ) as reply_counts on true
+    left join lateral (
+      select jsonb_agg(
+        jsonb_build_object(
+          'id', top_replies.id,
+          'author_name', top_replies.author_name,
+          'body', top_replies.body,
+          'created_at', top_replies.created_at,
+          'parent_reply_id', top_replies.parent_reply_id
+        )
+        order by top_replies.created_at, top_replies.id
+      ) as previews
+      from (
+        select
+          comment_replies.id,
+          comment_replies.author_name,
+          comment_replies.body,
+          comment_replies.created_at,
+          comment_replies.parent_reply_id
+        from public.blog_comment_replies as comment_replies
+        where comment_replies.comment_id = comments.id
+          and comment_replies.parent_reply_id is null
+        order by comment_replies.created_at, comment_replies.id
+        limit 3
+      ) as top_replies
+    ) as reply_previews on true;
 end;
 $$;
 

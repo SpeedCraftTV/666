@@ -170,9 +170,10 @@
     return window.location.pathname.includes('/posts/') ? '../' : './';
   }
 
-  function getRepliesPageUrl(comment) {
+  function getRepliesPageUrl(comment, replyId = null) {
     const url = new URL(`${rootPrefixForCurrentPage()}replies.html`, window.location.href);
     url.searchParams.set('comment', comment.id);
+    if (replyId) url.searchParams.set('reply', replyId);
     return url.href;
   }
 
@@ -621,13 +622,20 @@
     return new Date(value).toLocaleString('fr-FR');
   }
 
-  function createReplyForm(comment, onSubmitted, initiallyVisible = false) {
+  function createReplyForm(
+    comment,
+    onSubmitted,
+    initiallyVisible = false,
+    parentReply = null,
+  ) {
     const form = document.createElement('form');
     form.className = 'comment-form reply-form';
     form.hidden = !initiallyVisible;
 
     const label = document.createElement('label');
-    label.textContent = 'Ta réponse :';
+    label.textContent = parentReply
+      ? `Ta réponse à ${parentReply.author_name} :`
+      : 'Ta réponse :';
     const input = document.createElement('textarea');
     input.name = 'body';
     input.maxLength = 500;
@@ -661,6 +669,7 @@
           headers: { Prefer: 'return=minimal' },
           body: JSON.stringify({
             comment_id: comment.id,
+            parent_reply_id: parentReply?.id || null,
             author_name: getNickname(currentUser),
             body,
             user_id: currentUser.id,
@@ -695,7 +704,7 @@
     card.className = 'visitor-comment';
 
     const heading = document.createElement('h3');
-    heading.textContent = `${comment.author_name} — ${formatDate(comment.created_at)}`;
+    heading.textContent = `${comment.author_name} | ${formatDate(comment.created_at)}`;
     card.appendChild(heading);
 
     const body = document.createElement('p');
@@ -749,7 +758,7 @@
     replyButton.type = 'button';
     replyButton.className = 'comment-action reply-toggle';
     replyButton.textContent = 'Répondre';
-    const replyForm = createReplyForm(comment, refresh);
+    const replyForm = createReplyForm(comment, refresh, false);
     replyButton.addEventListener('click', async () => {
       if (!await requireAccount()) return;
       replyForm.hidden = !replyForm.hidden;
@@ -772,17 +781,23 @@
         preview.className = 'comment-reply-preview';
         const replyHeading = document.createElement('h5');
         replyHeading.textContent =
-          `${reply.author_name} — ${formatDate(reply.created_at)}`;
+          `${reply.author_name} | ${formatDate(reply.created_at)}`;
         const replyBody = document.createElement('p');
         replyBody.textContent = reply.body;
-        preview.append(replyHeading, replyBody);
+        const replyLink = document.createElement('a');
+        replyLink.className = 'comment-action reply-toggle';
+        replyLink.href = getRepliesPageUrl(comment, reply.id);
+        replyLink.textContent = 'Répondre';
+        preview.append(replyHeading, replyBody, replyLink);
         replies.appendChild(preview);
       });
-      if (replyData.count > replyPreviewLimit) {
+      if (replyData.count > 0) {
         const viewAll = document.createElement('a');
         viewAll.className = 'view-all-replies';
         viewAll.href = getRepliesPageUrl(comment);
-        viewAll.textContent = `Voir les ${replyData.count} réponses`;
+        viewAll.textContent = replyData.count > replyPreviewLimit
+          ? `Voir les ${replyData.count} réponses`
+          : 'Ouvrir la discussion';
         replies.appendChild(viewAll);
       }
       card.appendChild(replies);
@@ -1028,7 +1043,9 @@
   }
 
   async function renderRepliesPage(container) {
-    const commentId = new URLSearchParams(window.location.search).get('comment');
+    const params = new URLSearchParams(window.location.search);
+    const commentId = params.get('comment');
+    const focusedReplyId = params.get('reply');
     const status = createStatus(container);
     if (!commentId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(commentId)) {
       status.textContent = 'Le lien vers ce commentaire est invalide.';
@@ -1049,7 +1066,7 @@
       article.className = 'visitor-comment replies-parent-comment';
       const commentHeading = document.createElement('h2');
       commentHeading.textContent =
-        `Commentaire de ${comment.author_name} — ${formatDate(comment.created_at)}`;
+        `Commentaire de ${comment.author_name} | ${formatDate(comment.created_at)}`;
       const commentBody = document.createElement('p');
       commentBody.textContent = comment.body;
       article.append(commentHeading, commentBody);
@@ -1059,9 +1076,10 @@
       repliesHeading.textContent = 'Toutes les réponses';
       const repliesList = document.createElement('div');
       repliesList.className = 'all-replies-list';
+      let focusedReplyForm = null;
       const refresh = async () => {
         const query = new URLSearchParams({
-          select: 'id,author_name,body,created_at',
+          select: 'id,parent_reply_id,author_name,body,created_at',
           comment_id: `eq.${comment.id}`,
           order: 'created_at.asc,id.asc',
         });
@@ -1073,15 +1091,60 @@
           repliesList.appendChild(empty);
           return;
         }
-        replies.forEach((reply) => {
+
+        const repliesById = new Map(replies.map((reply) => [
+          reply.id,
+          { ...reply, children: [] },
+        ]));
+        const rootReplies = [];
+        repliesById.forEach((reply) => {
+          const parent = reply.parent_reply_id
+            ? repliesById.get(reply.parent_reply_id)
+            : null;
+          if (parent) parent.children.push(reply);
+          else rootReplies.push(reply);
+        });
+
+        const pendingReplies = rootReplies
+          .slice()
+          .reverse()
+          .map((reply) => ({ reply, depth: 0 }));
+        const renderedReplies = [];
+        while (pendingReplies.length) {
+          const { reply, depth } = pendingReplies.pop();
+          renderedReplies.push({ reply, depth });
+          for (let index = reply.children.length - 1; index >= 0; index -= 1) {
+            pendingReplies.push({
+              reply: reply.children[index],
+              depth: depth + 1,
+            });
+          }
+        }
+
+        renderedReplies.forEach(({ reply, depth }) => {
           const replyCard = document.createElement('article');
           replyCard.className = 'visitor-comment comment-reply';
+          replyCard.style.setProperty('--reply-depth', Math.min(depth, 4));
           const heading = document.createElement('h3');
           heading.textContent =
-            `${reply.author_name} — ${formatDate(reply.created_at)}`;
+            `${reply.author_name} | ${formatDate(reply.created_at)}`;
           const body = document.createElement('p');
           body.textContent = reply.body;
-          replyCard.append(heading, body);
+          const actions = document.createElement('div');
+          actions.className = 'comment-actions';
+          const replyButton = document.createElement('button');
+          replyButton.type = 'button';
+          replyButton.className = 'comment-action reply-toggle';
+          replyButton.textContent = 'Répondre';
+          const replyForm = createReplyForm(comment, refresh, reply.id === focusedReplyId, reply);
+          if (reply.id === focusedReplyId) focusedReplyForm = replyForm;
+          replyButton.addEventListener('click', async () => {
+            if (!await requireAccount()) return;
+            replyForm.hidden = !replyForm.hidden;
+            if (!replyForm.hidden) replyForm.querySelector('textarea').focus();
+          });
+          actions.appendChild(replyButton);
+          replyCard.append(heading, body, actions, replyForm);
           repliesList.appendChild(replyCard);
         });
       };
@@ -1099,6 +1162,10 @@
         postLink,
       );
       await refresh();
+      if (focusedReplyForm) {
+        focusedReplyForm.scrollIntoView({ block: 'center' });
+        focusedReplyForm.querySelector('textarea').focus();
+      }
       status.textContent = '';
     } catch (error) {
       console.error('Impossible de charger les réponses.', error);

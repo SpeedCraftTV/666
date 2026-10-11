@@ -1,4 +1,4 @@
-// posts/search.js — client-side search by text + tag filters
+// posts/search.js - client-side search by text + tag filters
 (function () {
   async function loadData() {
     const res = await fetch('data.json');
@@ -78,9 +78,9 @@
       title.appendChild(a);
       const ex = document.createElement('p');
       ex.textContent = p.excerpt;
-  const meta = document.createElement('p');
-  meta.className = 'meta';
-  meta.textContent = `Posté le ${formatDate(p.date)} — Tags : ${p.tags.join(', ')}`;
+      const meta = document.createElement('p');
+      meta.className = 'meta';
+      meta.textContent = `Posté le ${formatDate(p.date)} | Tags : ${p.tags.join(', ')}`;
       div.appendChild(title);
       div.appendChild(ex);
       div.appendChild(meta);
@@ -110,7 +110,7 @@
       const tagMatch = activeTags.length === 0 || activeTags.every(t => p.tags.includes(t));
       return textMatch && tagMatch;
     });
-    // sort by date desc
+    // Sort from newest to oldest.
     filtered.sort((a,b) => b.date.localeCompare(a.date));
     renderList(filtered);
   }
@@ -118,7 +118,7 @@
   // init
   window.addEventListener('DOMContentLoaded', async function () {
     try {
-      POSTS = await loadData();
+      POSTS = (await loadData()).sort((a, b) => b.date.localeCompare(a.date));
       renderTags(POSTS);
       renderList(POSTS);
       q('#search-input').addEventListener('input', () => applyFilters());
@@ -129,8 +129,8 @@
         applyFilters();
       });
     } catch (e) {
-  console.error('Erreur de chargement de posts/data.json', e);
-  q('#posts-list').innerHTML = '<p>Impossible de charger la liste des posts... Brrr.</p>';
+      console.error('Erreur de chargement de posts/data.json', e);
+      q('#posts-list').innerHTML = '<p>Impossible de charger la liste des posts... Brrr.</p>';
     }
   });
 })();
