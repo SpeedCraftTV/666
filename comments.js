@@ -85,14 +85,12 @@
       return;
     }
 
-    const message = document.createElement('span');
-    message.textContent = 'la lecture reste libre ; un compte est nécessaire pour participer.';
     const signIn = document.createElement('button');
     signIn.type = 'button';
     signIn.className = 'comment-action';
     signIn.textContent = 'créer un compte / se connecter';
     signIn.addEventListener('click', openAccountDialog);
-    panel.append(message, signIn);
+    panel.append(signIn);
   }
 
   function createSiteNavigation() {

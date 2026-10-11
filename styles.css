@@ -219,8 +219,220 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 .comments-page { margin-top: 18px; }
 .comments-page .comments-list > h2 { margin-top: 28px; font: bold 18px 'Courier New', monospace; }
 
-@media (max-width: 600px) {
-  .comments-widget { width: 94%; padding: 12px; }
-  .site-navigation { width: 96%; gap: 6px; }
-  .account-panel { margin-left: 0; padding-left: 0; }
+html {
+  box-sizing: border-box;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+*, *::before, *::after { box-sizing: inherit; }
+
+body {
+  overflow-x: hidden;
+  font-size: clamp(12px, 1vw, 15px);
+}
+
+center {
+  width: 100%;
+  margin: 20px auto 0;
+  padding: 0 16px;
+}
+
+.site-title {
+  max-width: 1100px;
+  margin: 20px auto;
+  padding: 0 12px;
+  font-size: clamp(1.4rem, 3vw, 2.25rem);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.site-navigation {
+  width: min(1200px, 100%);
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.site-navigation > a,
+.site-navigation .comment-action {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 3px;
+  font: 14px 'Courier New', monospace;
+  text-align: center;
+}
+
+.site-navigation > a {
+  background: linear-gradient(180deg, #160000, #090000);
+}
+
+.site-navigation > a:hover,
+.site-navigation > a:focus-visible {
+  color: #fff;
+  background: #300000;
+}
+
+.account-panel {
+  margin-left: auto;
+  padding-left: 8px;
+}
+
+.post,
+.comments-widget {
+  width: min(900px, 100%);
+}
+
+#search-area,
+#posts-list {
+  width: min(900px, 100%) !important;
+}
+
+.post {
+  padding: clamp(12px, 2.5vw, 24px);
+  overflow-wrap: anywhere;
+}
+
+.post h2 {
+  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  line-height: 1.4;
+}
+
+.retro-gif {
+  width: min(900px, 100%);
+  min-height: 72px;
+  height: auto;
+  padding: 12px;
+  font-size: clamp(12px, 2.5vw, 18px);
+  line-height: 1.5;
+  letter-spacing: clamp(0px, 0.3vw, 2px);
+  overflow-wrap: anywhere;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+.about-table,
+.contact-table {
+  max-width: 100%;
+}
+
+.contact-table input,
+.contact-table textarea {
+  max-width: 100%;
+}
+
+#search-area {
+  padding: 0 12px;
+}
+
+#search-input {
+  max-width: 100%;
+}
+
+button,
+input[type="submit"] {
+  min-height: 40px;
+  touch-action: manipulation;
+}
+
+hr {
+  max-width: 100%;
+}
+
+.report-dialog {
+  max-width: calc(100vw - 24px);
+  padding: clamp(12px, 3vw, 24px);
+}
+
+@media (max-width: 760px) {
+  body { font-size: 13px; }
+
+  center {
+    margin-top: 12px;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .site-navigation {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    margin: 12px auto 18px;
+  }
+
+  .site-navigation > a {
+    width: 100%;
+    padding: 8px 6px;
+    font-size: 14px;
+  }
+
+  .account-panel {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site-navigation .account-panel > * {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .post,
+  .comments-widget,
+  #search-area,
+  #posts-list {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .post { margin-top: 12px; }
+  .comments-widget { padding: 12px; }
+  .about-table, .contact-table { width: 100%; }
+  .about-table td, .contact-table td { padding: 8px; }
+  .contact-table,
+  .contact-table tbody,
+  .contact-table tr,
+  .contact-table td {
+    display: block;
+    width: 100%;
+  }
+  .contact-table tr { margin-bottom: 10px; }
+  .contact-table td:empty { display: none; }
+  .contact-table textarea { width: 100%; }
+
+  #search-area { padding: 0; }
+  #search-area input[type="text"] { width: 100% !important; margin: 8px 0 !important; }
+  #search-area button { margin-left: 0 !important; }
+
+  .comment-form button,
+  .comment-action,
+  .comment-actions button {
+    min-height: 44px;
+  }
+
+  .comment-actions { gap: 8px; }
+}
+
+@media (max-width: 380px) {
+  body { font-size: 12px; }
+  center { padding-right: 8px; padding-left: 8px; }
+  .site-navigation { gap: 6px; }
+  .site-navigation > a,
+  .site-navigation .comment-action {
+    padding: 7px 4px;
+    font-size: 13px;
+  }
+  .retro-gif { min-height: 56px; }
+  .post, .comments-widget { padding: 10px; }
+  .about-table td, .contact-table td { padding: 6px; }
 }
