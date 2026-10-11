@@ -27,6 +27,7 @@
     post8: 'La photo qui répondait',
     post9: 'La panne qui m’a appris à investir',
     post10: 'Le guide du petit entrepreneur',
+    post11: 'Yaki et les hochets qui font dring',
   };
 
   function getSiteRedirectUrl() {
@@ -530,6 +531,139 @@
     return false;
   }
 
+  function createCharacterCounter(input, limit = 256) {
+    const counter = document.createElement('output');
+    counter.className = 'character-counter';
+    counter.setAttribute('aria-live', 'polite');
+    const update = () => {
+      const remaining = limit - input.value.length;
+      counter.textContent =
+        `${input.value.length} / ${limit} caractères (${remaining} restants)`;
+    };
+    input.addEventListener('input', update);
+    update();
+    return counter;
+  }
+
+  function createContentOwnerActions(item, table, refresh, label) {
+    if (!currentUser || item.user_id !== currentUser.id) return null;
+
+    const actions = document.createElement('div');
+    actions.className = 'comment-actions comment-owner-actions';
+    const editButton = document.createElement('button');
+    editButton.type = 'button';
+    editButton.className = 'comment-action';
+    editButton.textContent = 'Modifier';
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'comment-action comment-delete-action';
+    deleteButton.textContent = 'Supprimer';
+
+    const form = document.createElement('form');
+    form.className = 'comment-form comment-edit-form';
+    form.hidden = true;
+    const fieldLabel = document.createElement('label');
+    fieldLabel.textContent = `Modifier ${label} :`;
+    const input = document.createElement('textarea');
+    input.name = 'body';
+    input.maxLength = 256;
+    input.rows = 4;
+    input.required = true;
+    input.value = item.body;
+    fieldLabel.append(input, createCharacterCounter(input));
+
+    const formActions = document.createElement('div');
+    formActions.className = 'comment-actions';
+    const saveButton = document.createElement('button');
+    saveButton.type = 'submit';
+    saveButton.textContent = 'Enregistrer';
+    const cancelButton = document.createElement('button');
+    cancelButton.type = 'button';
+    cancelButton.className = 'comment-action';
+    cancelButton.textContent = 'Annuler';
+    const status = createStatus(form);
+    cancelButton.addEventListener('click', () => {
+      form.hidden = true;
+      input.value = item.body;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      status.textContent = '';
+    });
+    formActions.append(saveButton, cancelButton);
+    form.append(fieldLabel, formActions, status);
+
+    editButton.addEventListener('click', () => {
+      form.hidden = !form.hidden;
+      if (!form.hidden) input.focus();
+    });
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const body = input.value.trim();
+      if (!body) {
+        status.textContent = 'Écris un texte avant de l’enregistrer.';
+        return;
+      }
+      saveButton.disabled = true;
+      try {
+        const updated = await request(`${table}?id=eq.${encodeURIComponent(item.id)}&select=id`, {
+          method: 'PATCH',
+          headers: { Prefer: 'return=representation' },
+          body: JSON.stringify({ body }),
+        });
+        if (!updated.length) {
+          throw new Error('Ce contenu ne t’appartient plus ou il n’existe plus.');
+        }
+      } catch (error) {
+        console.error(`Impossible de modifier ${label}.`, error);
+        status.textContent = `Modification impossible : ${error.message}`;
+        saveButton.disabled = false;
+        return;
+      }
+      try {
+        await refresh();
+      } catch (error) {
+        console.error(`${label} modifié, mais impossible d’actualiser la liste.`, error);
+        status.textContent = `Modification enregistrée. Recharge la page pour actualiser la liste.`;
+      } finally {
+        saveButton.disabled = false;
+      }
+    });
+
+    deleteButton.addEventListener('click', async () => {
+      const confirmation = table === 'blog_comments'
+        ? 'Supprimer ce commentaire et toutes ses réponses ? Cette action est définitive.'
+        : 'Supprimer cette réponse ? Les réponses reçues resteront dans la discussion.';
+      if (!window.confirm(confirmation)) return;
+      deleteButton.disabled = true;
+      try {
+        const deleted = await request(`${table}?id=eq.${encodeURIComponent(item.id)}&select=id`, {
+          method: 'DELETE',
+          headers: { Prefer: 'return=representation' },
+        });
+        if (!deleted.length) {
+          throw new Error('Ce contenu ne t’appartient plus ou il n’existe plus.');
+        }
+      } catch (error) {
+        console.error(`Impossible de supprimer ${label}.`, error);
+        form.hidden = false;
+        status.textContent = `Suppression impossible : ${error.message}`;
+        deleteButton.disabled = false;
+        return;
+      }
+      try {
+        await refresh();
+      } catch (error) {
+        console.error(`${label} supprimé, mais impossible d’actualiser la liste.`, error);
+        form.hidden = false;
+        status.textContent = 'Suppression enregistrée. Recharge la page pour actualiser la liste.';
+      } finally {
+        deleteButton.disabled = false;
+      }
+    });
+
+    actions.append(editButton, deleteButton, form);
+    return actions;
+  }
+
   function createCommentForm(postId, onSubmitted, includePostSelect) {
     const form = document.createElement('form');
     form.className = 'comment-form';
@@ -558,7 +692,7 @@
     bodyInput.maxLength = 256;
     bodyInput.rows = 4;
     bodyInput.required = true;
-    bodyLabel.appendChild(bodyInput);
+    bodyLabel.append(bodyInput, createCharacterCounter(bodyInput));
 
     const submit = document.createElement('button');
     submit.type = 'submit';
@@ -566,6 +700,11 @@
     form.append(bodyLabel, submit);
 
     const status = createStatus(form);
+    form.addEventListener('reset', () => {
+      window.setTimeout(() => {
+        bodyInput.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    });
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!await requireAccount()) {
@@ -641,7 +780,7 @@
     input.maxLength = 256;
     input.rows = 3;
     input.required = true;
-    label.appendChild(input);
+    label.append(input, createCharacterCounter(input));
 
     const actions = document.createElement('div');
     actions.className = 'comment-actions';
@@ -650,8 +789,11 @@
     submit.textContent = 'Publier la réponse';
     const status = createStatus(form);
     actions.appendChild(submit);
-    form.append(label, actions);
+    form.append(label, actions, status);
 
+    form.addEventListener('reset', () => {
+      window.setTimeout(() => input.dispatchEvent(new Event('input', { bubbles: true })));
+    });
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!await requireAccount()) return;
@@ -711,6 +853,13 @@
     body.className = 'comment-body';
     body.textContent = comment.body;
     card.appendChild(body);
+    const ownerActions = createContentOwnerActions(
+      comment,
+      'blog_comments',
+      refresh,
+      'ton commentaire',
+    );
+    if (ownerActions) card.appendChild(ownerActions);
 
     const votes = comment.blog_comment_votes || [];
     const upCount = votes.filter((item) => item.vote === 1).length;
@@ -982,7 +1131,7 @@
   async function loadComments(postId) {
     const filters = postId ? `&post_id=eq.${encodeURIComponent(postId)}` : '';
     return request(
-      `blog_comments?select=id,post_id,author_name,body,created_at,blog_comment_votes(vote)&order=created_at.desc${filters}`,
+      `blog_comments?select=id,post_id,author_name,body,created_at${currentUser ? ',user_id' : ''},blog_comment_votes(vote)&order=created_at.desc${filters}`,
     );
   }
 
@@ -1056,7 +1205,7 @@
 
     try {
       const comments = await request(
-        `blog_comments?select=id,post_id,author_name,body,created_at&id=eq.${commentId}&limit=1`,
+        `blog_comments?select=id,post_id,author_name,body,created_at${currentUser ? ',user_id' : ''}&id=eq.${commentId}&limit=1`,
       );
       const comment = comments[0];
       if (!comment) {
@@ -1082,7 +1231,7 @@
       let focusedReplyForm = null;
       const refresh = async () => {
         const query = new URLSearchParams({
-          select: 'id,parent_reply_id,author_name,body,created_at',
+          select: `id,parent_reply_id,author_name,body,created_at${currentUser ? ',user_id' : ''}`,
           comment_id: `eq.${comment.id}`,
           order: 'created_at.asc,id.asc',
         });
@@ -1134,6 +1283,12 @@
           const body = document.createElement('p');
           body.className = 'comment-body';
           body.textContent = reply.body;
+          const ownerActions = createContentOwnerActions(
+            reply,
+            'blog_comment_replies',
+            refresh,
+            'ta réponse',
+          );
           const actions = document.createElement('div');
           actions.className = 'comment-actions';
           const replyButton = document.createElement('button');
@@ -1148,7 +1303,9 @@
             if (!replyForm.hidden) replyForm.querySelector('textarea').focus();
           });
           actions.appendChild(replyButton);
-          replyCard.append(heading, body, actions, replyForm);
+          replyCard.append(heading, body);
+          if (ownerActions) replyCard.appendChild(ownerActions);
+          replyCard.append(actions, replyForm);
           repliesList.appendChild(replyCard);
         });
       };

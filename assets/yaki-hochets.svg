@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520">
+  <rect width="800" height="520" rx="20" fill="#111"/>
+  <rect x="18" y="18" width="764" height="484" rx="12" fill="#170707" stroke="#b30000" stroke-width="5"/>
+  <ellipse cx="405" cy="452" rx="235" ry="27" fill="#310b0b"/>
+  <path d="M260 224c-18-80 30-148 108-154 28-48 98-48 129 0 78 6 123 74 105 154 29 45 22 138-19 178-46 44-247 46-301 0-42-37-53-130-22-178Z" fill="#777"/>
+  <path d="M290 110c-15-92 17-102 55-53l34 54-75 41Zm220 1 35-54c39-50 70-38 54 53l-16 42-73-41Z" fill="#777" stroke="#aaa" stroke-width="5"/>
+  <path d="m309 104 30-28 20 44-48 27Zm192 16 21-44 30 28-2 43Z" fill="#68bfff"/>
+  <path d="M293 268c28-43 68-49 99-13l-10 70c-41 21-78 8-89-22Zm174-13c31-36 72-30 100 13l-1 35c-12 30-49 43-90 22Z" fill="#111"/>
+  <circle cx="348" cy="273" r="14" fill="#8bd0ff"/>
+  <circle cx="513" cy="273" r="14" fill="#8bd0ff"/>
+  <circle cx="348" cy="273" r="6" fill="#050505"/>
+  <circle cx="513" cy="273" r="6" fill="#050505"/>
+  <path d="M412 300c-19 16-18 31 2 35l23-4-9-26Z" fill="#080808"/>
+  <path d="M369 344c28 19 69 20 98 0" fill="none" stroke="#333" stroke-width="7" stroke-linecap="round"/>
+  <path d="M360 371c-79 14-101 54-79 74 22 18 65-7 101-27m112-47c79 14 101 54 79 74-22 18-65-7-101-27" fill="none" stroke="#777" stroke-width="30" stroke-linecap="round"/>
+  <path d="M286 424c-32 30-53 55-39 64 12 8 49-4 78-27m187-37c32 30 53 55 39 64-12 8-49-4-78-27" fill="none" stroke="#eee" stroke-width="24" stroke-linecap="round"/>
+  <path d="M325 386c-5 23-4 50 9 73 35 32 108 38 145 0 13-23 14-50 9-73-36 21-127 21-163 0Z" fill="#eee"/>
+  <path d="M293 405c-52 0-76 39-62 53 14 14 55 4 91-17m193-36c52 0 76 39 62 53-14 14-55 4-91-17" fill="none" stroke="#777" stroke-width="23" stroke-linecap="round"/>
+  <path d="M246 457c-25-4-36-25-17-35 24-13 52 8 61 21m265 14c25-4 36-25 17-35-24-13-52 8-61 21" fill="none" stroke="#eee" stroke-width="18" stroke-linecap="round"/>
+  <g transform="translate(190 379) rotate(-18)">
+    <path d="M0 0v-82" stroke="#c8a36a" stroke-width="12" stroke-linecap="round"/>
+    <path d="M0-126 13-98l31 5-22 22 5 31L0-55l-27 15 5-31-22-22 31-5Z" fill="#ffcb45" stroke="#fff0a3" stroke-width="5"/>
+    <circle cx="0" cy="-85" r="7" fill="#ff7777"/>
+  </g>
+  <g transform="translate(610 382) rotate(18)">
+    <path d="M0 0v-76" stroke="#c8a36a" stroke-width="12" stroke-linecap="round"/>
+    <path d="M-46-77c0-33 20-53 46-53s46 20 46 53Z" fill="#d75252" stroke="#ffb0a0" stroke-width="5"/>
+    <path d="M-31-77c0-25 13-38 31-38s31 13 31 38" fill="#f08a68"/>
+    <path d="M-36-75v15m18-15v15m18-15v15m18-15v15" stroke="#ffe2b0" stroke-width="6" stroke-linecap="round"/>
+    <path d="M-39-59h78v15c0 24-17 41-39 41s-39-17-39-41Z" fill="#f1d9a4" stroke="#fff0cf" stroke-width="5"/>
+  </g>
+  <text x="400" y="482" fill="#ff6868" text-anchor="middle" font-family="Courier New, monospace" font-size="26" font-weight="bold">YAKI ET SES HOCHETS</text>
+</svg>

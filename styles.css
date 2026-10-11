@@ -2,7 +2,7 @@
 body {
   background: radial-gradient(ellipse at top left, #0b0b0b 0%, #000000 40%), linear-gradient(135deg, rgba(60,0,0,0.06), rgba(0,0,0,0));
   color: #e6e6e6;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Courier New', Courier, monospace;
   line-height: 1.5;
   margin: 0;
 }
@@ -165,6 +165,13 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 .comments-widget h2 { color: #ff4d4d; }
 .comment-form { display: grid; gap: 10px; margin-bottom: 18px; }
 .comment-form label { display: grid; gap: 6px; }
+.character-counter {
+  display: block;
+  margin-top: -5px;
+  color: #aaa;
+  font: 12px 'Courier New', Courier, monospace;
+  text-align: right;
+}
 .comment-form input, .comment-form textarea, .comment-form select {
   width: 100%;
   box-sizing: border-box;
@@ -195,6 +202,12 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 }
 .visitor-comment h3 { margin-top: 0; font: bold 14px 'Courier New', monospace; }
 .comment-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.visitor-comment > .comment-actions { margin-top: 14px; }
+.comment-owner-actions { margin: 12px 0; }
+.comment-edit-form { flex-basis: 100%; width: 100%; margin: 4px 0 0; }
+.comment-edit-form[hidden] { display: none; }
+.comment-delete-action { border-color: #a33; background: #310000; }
+.comment-owner-actions .comment-edit-form .comments-status { margin: 0; }
 .account-panel {
   display: flex;
   flex-wrap: wrap;
@@ -355,6 +368,23 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 .comment-body {
   overflow-wrap: anywhere;
   white-space: pre-wrap;
+}
+.post-image {
+  width: min(100%, 760px);
+  margin: 12px auto 20px;
+}
+.post-image img {
+  display: block;
+  width: 100%;
+  max-height: 480px;
+  object-fit: cover;
+  border: 3px solid #5d1111;
+}
+.post-image figcaption {
+  margin-top: 6px;
+  color: #aaa;
+  font-size: 0.8em;
+  text-align: right;
 }
 .view-all-replies,
 .comment-parent-link {

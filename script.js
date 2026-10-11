@@ -75,6 +75,16 @@
   document.addEventListener('DOMContentLoaded', function(){
     const form = document.getElementById('contact-form');
     if (!form) return;
+    const message = form.elements.message;
+    const characterCount = form.querySelector('[data-character-count="contact-message"]');
+    const updateCharacterCount = () => {
+      const remaining = message.maxLength - message.value.length;
+      characterCount.textContent =
+        `${message.value.length} / ${message.maxLength} caractères (${remaining} restants)`;
+    };
+    message.addEventListener('input', updateCharacterCount);
+    form.addEventListener('reset', () => window.setTimeout(updateCharacterCount));
+    updateCharacterCount();
     const status = form.querySelector('[data-contact-status]');
     const submit = form.querySelector('[type="submit"]');
     form.addEventListener('submit', async function(ev){

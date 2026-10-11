@@ -1,10 +1,16 @@
 create table if not exists public.blog_comments (
   id uuid primary key default gen_random_uuid(),
-  post_id text not null check (post_id ~ '^post([1-9]|10)$'),
+  post_id text not null check (post_id ~ '^post([1-9]|1[01])$'),
   author_name text not null check (char_length(btrim(author_name)) between 1 and 40),
   body text not null check (char_length(btrim(body)) between 1 and 500),
   created_at timestamptz not null default now()
 );
+
+alter table public.blog_comments
+  drop constraint if exists blog_comments_post_id_check;
+alter table public.blog_comments
+  add constraint blog_comments_post_id_check
+  check (post_id ~ '^post([1-9]|1[01])$') not valid;
 
 create table if not exists public.blog_comment_votes (
   id uuid primary key default gen_random_uuid(),
@@ -52,6 +58,13 @@ alter table public.blog_comment_replies
 alter table public.blog_comment_replies
   add column if not exists parent_reply_id uuid
   references public.blog_comment_replies(id) on delete cascade;
+
+alter table public.blog_comment_replies
+  drop constraint if exists blog_comment_replies_parent_reply_id_fkey;
+alter table public.blog_comment_replies
+  add constraint blog_comment_replies_parent_reply_id_fkey
+  foreign key (parent_reply_id)
+  references public.blog_comment_replies(id) on delete set null;
 
 alter table public.blog_comments
   add column if not exists user_id uuid references auth.users(id) on delete set null;
@@ -160,7 +173,7 @@ create policy "authenticated users can add comments"
   to authenticated
   with check (
     auth.uid() = user_id
-    and post_id ~ '^post([1-9]|10)$'
+    and post_id ~ '^post([1-9]|1[01])$'
     and char_length(btrim(author_name)) between 1 and 40
     and author_name = left(coalesce(
       nullif(btrim(auth.jwt() -> 'user_metadata' ->> 'nickname'), ''),
@@ -170,6 +183,40 @@ create policy "authenticated users can add comments"
     )
     and char_length(btrim(body)) between 1 and 256
   );
+
+drop policy if exists "users can edit their own comments" on public.blog_comments;
+create policy "users can edit their own comments"
+  on public.blog_comments for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (
+    auth.uid() = user_id
+    and char_length(btrim(body)) between 1 and 256
+  );
+
+drop policy if exists "users can delete their own comments" on public.blog_comments;
+create policy "users can delete their own comments"
+  on public.blog_comments for delete
+  to authenticated
+  using (auth.uid() = user_id);
+
+drop policy if exists "users can edit their own replies"
+  on public.blog_comment_replies;
+create policy "users can edit their own replies"
+  on public.blog_comment_replies for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (
+    auth.uid() = user_id
+    and char_length(btrim(body)) between 1 and 256
+  );
+
+drop policy if exists "users can delete their own replies"
+  on public.blog_comment_replies;
+create policy "users can delete their own replies"
+  on public.blog_comment_replies for delete
+  to authenticated
+  using (auth.uid() = user_id);
 
 drop policy if exists "visitors can vote" on public.blog_comment_votes;
 drop policy if exists "authenticated users can vote" on public.blog_comment_votes;
@@ -204,9 +251,13 @@ create policy "vote totals are public"
 drop policy if exists "visitors can report comments" on public.blog_comment_reports;
 
 revoke select, insert on public.blog_comments from public, anon, authenticated;
+revoke update, delete on public.blog_comments from public, anon, authenticated;
 grant select (id, post_id, author_name, body, created_at)
   on public.blog_comments to anon, authenticated;
+grant select (user_id) on public.blog_comments to authenticated;
 grant insert (post_id, author_name, body, user_id) on public.blog_comments to authenticated;
+grant update (body) on public.blog_comments to authenticated;
+grant delete on public.blog_comments to authenticated;
 revoke select, insert, update, delete on public.blog_comment_votes from public, anon, authenticated;
 grant select (comment_id, vote) on public.blog_comment_votes to anon;
 grant select (comment_id, user_id, vote) on public.blog_comment_votes to authenticated;
@@ -217,8 +268,11 @@ revoke all on public.blog_comment_reports from anon, authenticated;
 revoke all on public.blog_comment_replies from public, anon, authenticated;
 grant select (id, comment_id, parent_reply_id, author_name, body, created_at)
   on public.blog_comment_replies to anon, authenticated;
+grant select (user_id) on public.blog_comment_replies to authenticated;
 grant insert (comment_id, parent_reply_id, user_id, author_name, body)
   on public.blog_comment_replies to authenticated;
+grant update (body) on public.blog_comment_replies to authenticated;
+grant delete on public.blog_comment_replies to authenticated;
 grant select on public.blog_comments to service_role;
 grant insert on public.blog_comment_reports to service_role;
 

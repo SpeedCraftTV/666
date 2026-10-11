@@ -28,7 +28,10 @@
 					</tr>
 					<tr>
 						<td><label for="contact-message">Message :</label></td>
-						<td><textarea id="contact-message" name="message" rows="6" maxlength="1024" required></textarea></td>
+						<td>
+							<textarea id="contact-message" name="message" rows="6" maxlength="1024" data-character-limit="1024" required></textarea>
+							<output class="character-counter" data-character-count="contact-message" aria-live="polite">0 / 1024 caractères (1024 restants)</output>
+						</td>
 					</tr>
 					<tr>
 						<td></td>
