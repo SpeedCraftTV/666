@@ -82,7 +82,7 @@ Deno.serve(async (request) => {
     name.length < 1 || name.length > 80 ||
     email.length > 254 ||
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-    message.length < 1 || message.length > 5000
+    message.length < 1 || message.length > 1024
   ) {
     return jsonResponse(400, {
       error: "Vérifie le nom, l’adresse e-mail et le message.",

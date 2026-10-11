@@ -352,6 +352,10 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 }
 .comment-reply-preview p,
 .comment-reply p { margin: 0; }
+.comment-body {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
 .view-all-replies,
 .comment-parent-link {
   display: inline-flex;

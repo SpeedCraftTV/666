@@ -555,7 +555,7 @@
     bodyLabel.textContent = 'Ton commentaire :';
     const bodyInput = document.createElement('textarea');
     bodyInput.name = 'body';
-    bodyInput.maxLength = 500;
+    bodyInput.maxLength = 256;
     bodyInput.rows = 4;
     bodyInput.required = true;
     bodyLabel.appendChild(bodyInput);
@@ -638,7 +638,7 @@
       : 'Ta réponse :';
     const input = document.createElement('textarea');
     input.name = 'body';
-    input.maxLength = 500;
+    input.maxLength = 256;
     input.rows = 3;
     input.required = true;
     label.appendChild(input);
@@ -708,6 +708,7 @@
     card.appendChild(heading);
 
     const body = document.createElement('p');
+    body.className = 'comment-body';
     body.textContent = comment.body;
     card.appendChild(body);
 
@@ -783,6 +784,7 @@
         replyHeading.textContent =
           `${reply.author_name} | ${formatDate(reply.created_at)}`;
         const replyBody = document.createElement('p');
+        replyBody.className = 'comment-body';
         replyBody.textContent = reply.body;
         const replyLink = document.createElement('a');
         replyLink.className = 'comment-action reply-toggle';
@@ -1068,6 +1070,7 @@
       commentHeading.textContent =
         `Commentaire de ${comment.author_name} | ${formatDate(comment.created_at)}`;
       const commentBody = document.createElement('p');
+      commentBody.className = 'comment-body';
       commentBody.textContent = comment.body;
       article.append(commentHeading, commentBody);
 
@@ -1129,6 +1132,7 @@
           heading.textContent =
             `${reply.author_name} | ${formatDate(reply.created_at)}`;
           const body = document.createElement('p');
+          body.className = 'comment-body';
           body.textContent = reply.body;
           const actions = document.createElement('div');
           actions.className = 'comment-actions';

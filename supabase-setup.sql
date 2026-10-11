@@ -35,6 +35,20 @@ create table if not exists public.blog_comment_replies (
   created_at timestamptz not null default now()
 );
 
+alter table public.blog_comments
+  drop constraint if exists blog_comments_body_check,
+  drop constraint if exists blog_comments_body_length_check;
+alter table public.blog_comments
+  add constraint blog_comments_body_length_check
+  check (char_length(btrim(body)) between 1 and 256) not valid;
+
+alter table public.blog_comment_replies
+  drop constraint if exists blog_comment_replies_body_check,
+  drop constraint if exists blog_comment_replies_body_length_check;
+alter table public.blog_comment_replies
+  add constraint blog_comment_replies_body_length_check
+  check (char_length(btrim(body)) between 1 and 256) not valid;
+
 alter table public.blog_comment_replies
   add column if not exists parent_reply_id uuid
   references public.blog_comment_replies(id) on delete cascade;
@@ -119,7 +133,7 @@ create policy "authenticated users can add comment replies"
       nullif(btrim(auth.jwt() -> 'user_metadata' ->> 'nickname'), ''),
       split_part(auth.jwt() ->> 'email', '@', 1)
     ), 40)
-    and char_length(btrim(body)) between 1 and 500
+    and char_length(btrim(body)) between 1 and 256
     and exists (
       select 1 from public.blog_comments
       where blog_comments.id = blog_comment_replies.comment_id
@@ -154,7 +168,7 @@ create policy "authenticated users can add comments"
     ),
       40
     )
-    and char_length(btrim(body)) between 1 and 500
+    and char_length(btrim(body)) between 1 and 256
   );
 
 drop policy if exists "visitors can vote" on public.blog_comment_votes;
