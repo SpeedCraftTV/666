@@ -2,8 +2,10 @@ const allowedOrigins = new Set([
   "https://speedcrafttv.github.io",
   "http://localhost:8000",
   "http://localhost:8765",
+  "http://localhost:5500",
   "http://127.0.0.1:8000",
   "http://127.0.0.1:8765",
+  "http://127.0.0.1:5500",
 ]);
 
 function corsHeaders(origin: string | null): HeadersInit {

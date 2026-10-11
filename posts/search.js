@@ -21,7 +21,7 @@
     const container = q('#tag-filters');
     container.innerHTML = '';
   const allBtn = document.createElement('button');
-  allBtn.textContent = 'tout';
+  allBtn.textContent = 'Tout';
     allBtn.className = 'tag-btn active';
     allBtn.dataset.tag = '';
     container.appendChild(allBtn);
@@ -54,7 +54,7 @@
     const list = q('#posts-list');
     list.innerHTML = '';
     if (posts.length === 0) {
-      list.innerHTML = '<p>aucun post trouvé... :c</p>';
+      list.innerHTML = '<p>Aucun post trouvé... :c</p>';
       return;
     }
     posts.forEach(p => {
@@ -80,7 +80,7 @@
       ex.textContent = p.excerpt;
   const meta = document.createElement('p');
   meta.className = 'meta';
-  meta.textContent = `posté le ${formatDate(p.date)} — tags: ${p.tags.join(', ')}`;
+  meta.textContent = `Posté le ${formatDate(p.date)} — Tags : ${p.tags.join(', ')}`;
       div.appendChild(title);
       div.appendChild(ex);
       div.appendChild(meta);
@@ -129,8 +129,8 @@
         applyFilters();
       });
     } catch (e) {
-  console.error('erreur chargement posts/data.json', e);
-  q('#posts-list').innerHTML = '<p>impossible de charger la liste des posts... brrr</p>';
+  console.error('Erreur de chargement de posts/data.json', e);
+  q('#posts-list').innerHTML = '<p>Impossible de charger la liste des posts... Brrr.</p>';
     }
   });
 })();

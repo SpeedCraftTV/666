@@ -137,20 +137,20 @@
     panel.replaceChildren();
     if (currentUser) {
       const identity = document.createElement('span');
-      identity.textContent = `connecté·e : ${getNickname(currentUser)}`;
+      identity.textContent = `Connecté·e : ${getNickname(currentUser)}`;
       const manageAccount = document.createElement('a');
       manageAccount.href = `${rootPrefixForCurrentPage()}account.html`;
       manageAccount.className = 'comment-action account-button';
-      manageAccount.textContent = 'compte';
+      manageAccount.textContent = 'Compte';
       const logout = document.createElement('button');
       logout.type = 'button';
       logout.className = 'comment-action';
-      logout.textContent = 'se déconnecter';
+      logout.textContent = 'Se déconnecter';
       logout.addEventListener('click', async () => {
         const { error } = await authClient.auth.signOut();
         if (error) {
           console.error('Impossible de se déconnecter.', error);
-          window.alert(`déconnexion impossible : ${error.message}`);
+          window.alert(`Déconnexion impossible : ${error.message}`);
         }
       });
       panel.append(identity, manageAccount, logout);
@@ -160,7 +160,7 @@
     const signIn = document.createElement('button');
     signIn.type = 'button';
     signIn.className = 'comment-action';
-    signIn.textContent = 'créer un compte / se connecter';
+    signIn.textContent = 'Créer un compte / se connecter';
     signIn.addEventListener('click', openAccountDialog);
     panel.append(signIn);
   }
@@ -175,13 +175,13 @@
     const rootPrefix = rootPrefixForCurrentPage();
     const navigation = document.createElement('nav');
     navigation.className = 'site-navigation';
-    navigation.setAttribute('aria-label', 'navigation principale');
+    navigation.setAttribute('aria-label', 'Navigation principale');
     [
-      ['accueil', 'index.html'],
-      ['à propos', 'about.html'],
-      ['contact', 'contact.html'],
-      ['posts', 'posts/index.html'],
-      ['commentaires', 'comments.html'],
+      ['Accueil', 'index.html'],
+      ['À propos', 'about.html'],
+      ['Contact', 'contact.html'],
+      ['Posts', 'posts/index.html'],
+      ['Commentaires', 'comments.html'],
     ].forEach(([label, path]) => {
       const link = document.createElement('a');
       link.href = `${rootPrefix}${path}`;
@@ -203,7 +203,7 @@
   function openAccountDialog() {
     if (!authClient) {
       window.alert(
-        'le service de comptes n’est pas disponible. recharge la page ou réessaie plus tard.',
+        'Le service de comptes n’est pas disponible. Recharge la page ou réessaie plus tard.',
       );
       return;
     }
@@ -221,7 +221,7 @@
       button.textContent = label;
       button.addEventListener('click', async () => {
         button.disabled = true;
-        status.textContent = `connexion avec ${provider === 'google' ? 'Google' : 'Discord'}...`;
+        status.textContent = `Connexion avec ${provider === 'google' ? 'Google' : 'Discord'}...`;
         try {
           const { error } = await authClient.auth.signInWithOAuth({
             provider,
@@ -233,7 +233,7 @@
           if (error) throw error;
         } catch (error) {
           console.error(`Connexion ${provider} impossible.`, error);
-          status.textContent = `connexion ${provider} impossible : ${error.message}`;
+          status.textContent = `Connexion ${provider} impossible : ${error.message}`;
           button.disabled = false;
         }
       });
@@ -242,14 +242,14 @@
     const oauthButtons = document.createElement('div');
     oauthButtons.className = 'oauth-buttons';
     oauthButtons.append(
-      createOAuthButton('google', 'continuer avec Google'),
-      createOAuthButton('discord', 'continuer avec Discord', 'identify email'),
+        createOAuthButton('google', 'Continuer avec Google'),
+        createOAuthButton('discord', 'Continuer avec Discord', 'identify email'),
     );
     const divider = document.createElement('p');
     divider.className = 'account-dialog-divider';
-    divider.textContent = 'ou avec ton e-mail';
+    divider.textContent = 'Ou avec ton e-mail';
     const nicknameLabel = document.createElement('label');
-    nicknameLabel.textContent = 'ton pseudo :';
+    nicknameLabel.textContent = 'Ton pseudo :';
     const nicknameInput = document.createElement('input');
     nicknameInput.name = 'nickname';
     nicknameInput.type = 'text';
@@ -257,7 +257,7 @@
     nicknameInput.autocomplete = 'nickname';
     nicknameLabel.appendChild(nicknameInput);
     const emailLabel = document.createElement('label');
-    emailLabel.textContent = 'ton e-mail :';
+    emailLabel.textContent = 'Ton e-mail :';
     const emailInput = document.createElement('input');
     emailInput.name = 'email';
     emailInput.type = 'email';
@@ -265,7 +265,7 @@
     emailInput.autocomplete = 'email';
     emailLabel.appendChild(emailInput);
     const passwordLabel = document.createElement('label');
-    passwordLabel.textContent = 'mot de passe (8 caractères minimum) :';
+    passwordLabel.textContent = 'Mot de passe (8 caractères minimum) :';
     const passwordInput = document.createElement('input');
     passwordInput.name = 'password';
     passwordInput.type = 'password';
@@ -280,20 +280,20 @@
     const cancel = document.createElement('button');
     cancel.type = 'button';
     cancel.className = 'comment-action';
-    cancel.textContent = 'annuler';
+    cancel.textContent = 'Annuler';
     cancel.addEventListener('click', () => dialog.close());
     let mode = 'signup';
 
     function setMode(nextMode) {
       mode = nextMode;
       const creatingAccount = mode === 'signup';
-      heading.textContent = creatingAccount ? 'créer un compte' : 'se connecter';
+      heading.textContent = creatingAccount ? 'Créer un compte' : 'Se connecter';
       nicknameLabel.hidden = !creatingAccount;
       nicknameInput.required = creatingAccount;
       passwordInput.minLength = creatingAccount ? 8 : 1;
       passwordInput.autocomplete = creatingAccount ? 'new-password' : 'current-password';
-      submit.textContent = creatingAccount ? 'créer le compte' : 'se connecter';
-      switchMode.textContent = creatingAccount ? 'j’ai déjà un compte' : 'créer un compte';
+      submit.textContent = creatingAccount ? 'Créer le compte' : 'Se connecter';
+      switchMode.textContent = creatingAccount ? 'J’ai déjà un compte' : 'Créer un compte';
       status.textContent = '';
     }
 
@@ -317,7 +317,7 @@
       const email = emailInput.value.trim();
       const password = passwordInput.value;
       submit.disabled = true;
-      status.textContent = mode === 'signup' ? 'création du compte...' : 'connexion...';
+      status.textContent = mode === 'signup' ? 'Création du compte...' : 'Connexion...';
       try {
         const result = mode === 'signup'
           ? await authClient.auth.signUp({
@@ -332,14 +332,14 @@
         if (result.error) throw result.error;
         if (mode === 'signup' && !result.data.session) {
           setMode('signin');
-          status.textContent = 'compte créé. confirme ton adresse avec le lien reçu par e-mail, puis connecte-toi.';
+          status.textContent = 'Compte créé. Confirme ton adresse avec le lien reçu par e-mail, puis connecte-toi.';
           return;
         }
-        status.textContent = 'connecté·e !';
+        status.textContent = 'Connecté·e !';
         dialog.close();
       } catch (error) {
         console.error('Authentification impossible.', error);
-        status.textContent = `opération impossible : ${error.message}`;
+        status.textContent = `Opération impossible : ${error.message}`;
       } finally {
         submit.disabled = false;
       }
@@ -369,16 +369,32 @@
     if (!container) return;
     container.replaceChildren();
 
+    const header = document.createElement('header');
+    header.className = 'account-page-header';
+    const heading = document.createElement('h2');
+    heading.textContent = currentUser ? 'Paramètres du compte' : 'Gérer mon compte';
+    const introduction = document.createElement('p');
+    introduction.textContent = currentUser
+      ? 'Gère ton adresse e-mail et les services utilisés pour te connecter.'
+      : 'Connecte-toi pour gérer ton compte et tes méthodes de connexion.';
+    header.append(heading, introduction);
+    container.appendChild(header);
+
     if (!currentUser) {
+      const loginCard = document.createElement('section');
+      loginCard.className = 'account-login-card';
+      const loginHeading = document.createElement('h3');
+      loginHeading.textContent = 'Connexion';
       const message = document.createElement('p');
       message.textContent =
-        'connecte-toi pour gérer ton compte et relier tes identités Google ou Discord.';
+        'Connecte-toi pour associer Google ou Discord et retrouver ton compte plus facilement.';
       const login = document.createElement('button');
       login.type = 'button';
       login.className = 'comment-action';
-      login.textContent = 'créer un compte / se connecter';
+      login.textContent = 'Créer un compte / se connecter';
       login.addEventListener('click', openAccountDialog);
-      container.append(message, login);
+      loginCard.append(loginHeading, message, login);
+      container.appendChild(loginCard);
       if (accountMessage) {
         const status = createStatus(container);
         status.classList.add('account-error');
@@ -391,19 +407,33 @@
       const message = document.createElement('p');
       message.setAttribute('role', 'status');
       message.textContent = accountIdentityError ||
-        'chargement des identités du compte...';
+        'Chargement des identités du compte...';
+      message.className = 'account-loading';
       container.appendChild(message);
       return;
     }
 
+    const accountSummary = document.createElement('section');
+    accountSummary.className = 'account-summary';
+    const emailHeading = document.createElement('h3');
+    emailHeading.textContent = 'Adresse e-mail';
     const email = document.createElement('p');
     email.className = 'account-email';
     email.textContent = currentUser.email
-      ? `adresse du compte : ${currentUser.email}`
-      : 'aucune adresse e-mail associée à ce compte.';
+      ? `Adresse du compte : ${currentUser.email}`
+      : 'Aucune adresse e-mail associée à ce compte.';
+    accountSummary.append(emailHeading, email);
+    container.appendChild(accountSummary);
+
+    const providersHeading = document.createElement('h3');
+    providersHeading.className = 'account-section-title';
+    providersHeading.textContent = 'Méthodes de connexion';
     const explanation = document.createElement('p');
+    explanation.className = 'account-section-description';
     explanation.textContent =
-      'Relie Google ou Discord pour te connecter avec ces services. Tu peux retirer une identité puis la relier à nouveau plus tard.';
+      'Associe Google ou Discord pour te connecter avec ces services. Tu peux retirer une méthode si une autre reste disponible.';
+    const providerList = document.createElement('div');
+    providerList.className = 'account-provider-list';
     const status = createStatus(container);
     if (accountMessage) {
       status.classList.add('account-error');
@@ -420,15 +450,18 @@
       const title = document.createElement('h3');
       title.textContent = provider === 'google' ? 'Google' : 'Discord';
       const providerStatus = document.createElement('p');
+      providerStatus.className = identity
+        ? 'account-provider-status is-linked'
+        : 'account-provider-status';
       providerStatus.textContent = identity
-        ? 'Ce compte est relié.'
-        : 'Aucun compte relié.';
+        ? 'Compte associé'
+        : 'Aucun compte associé';
       const action = document.createElement('button');
       action.type = 'button';
       action.className = 'comment-action';
 
       if (identity) {
-        action.textContent = `délier ${title.textContent}`;
+        action.textContent = `Délier ${title.textContent}`;
         const cannotUnlinkLastIdentity = linkedIdentities.length <= 1;
         action.disabled = cannotUnlinkLastIdentity;
         if (cannotUnlinkLastIdentity) {
@@ -437,7 +470,7 @@
         }
         action.addEventListener('click', async () => {
           action.disabled = true;
-          status.textContent = `déliaison de ${title.textContent}...`;
+          status.textContent = `Déliaison de ${title.textContent}...`;
           let identityUnlinked = false;
           try {
             const { error } = await authClient.auth.unlinkIdentity(identity);
@@ -448,16 +481,16 @@
           } catch (error) {
             console.error(`Impossible de délier ${provider}.`, error);
             status.textContent = identityUnlinked
-              ? 'identité déliée, mais son état n’a pas pu être actualisé. recharge la page.'
-              : `déliaison impossible : ${error.message}`;
+              ? 'Identité déliée, mais son état n’a pas pu être actualisé. Recharge la page.'
+              : `Déliaison impossible : ${error.message}`;
             if (!identityUnlinked) action.disabled = false;
           }
         });
       } else {
-        action.textContent = 'relier ce compte';
+        action.textContent = 'Relier ce compte';
         action.addEventListener('click', async () => {
           action.disabled = true;
-          status.textContent = `redirection vers ${title.textContent}...`;
+          status.textContent = `Redirection vers ${title.textContent}...`;
           try {
             sessionStorage.setItem(pendingIdentityLinkKey, provider);
             const { error } = await authClient.auth.linkIdentity({
@@ -478,9 +511,9 @@
         });
       }
       section.append(title, providerStatus, action);
-      container.appendChild(section);
+      providerList.appendChild(section);
     });
-    container.prepend(email, explanation);
+    container.append(providersHeading, explanation, providerList);
   }
 
   async function requireAccount() {
@@ -495,7 +528,7 @@
 
     if (includePostSelect) {
       const postLabel = document.createElement('label');
-      postLabel.textContent = 'article :';
+      postLabel.textContent = 'Article :';
       postLabel.htmlFor = 'comment-post-select';
       const postSelect = document.createElement('select');
       postSelect.name = 'post_id';
@@ -511,7 +544,7 @@
     }
 
     const bodyLabel = document.createElement('label');
-    bodyLabel.textContent = 'ton commentaire :';
+    bodyLabel.textContent = 'Ton commentaire :';
     const bodyInput = document.createElement('textarea');
     bodyInput.name = 'body';
     bodyInput.maxLength = 500;
@@ -521,14 +554,14 @@
 
     const submit = document.createElement('button');
     submit.type = 'submit';
-    submit.textContent = 'publier le commentaire';
+    submit.textContent = 'Publier le commentaire';
     form.append(bodyLabel, submit);
 
     const status = createStatus(form);
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!await requireAccount()) {
-        status.textContent = 'connecte-toi ou crée un compte pour commenter.';
+        status.textContent = 'Connecte-toi ou crée un compte pour commenter.';
         return;
       }
       const formData = new FormData(form);
@@ -536,12 +569,12 @@
       const authorName = getNickname(currentUser);
       const body = String(formData.get('body') || '').trim();
       if (!authorName || !body) {
-        status.textContent = 'ajoute un pseudo et un commentaire avant de publier.';
+        status.textContent = 'Ajoute un pseudo et un commentaire avant de publier.';
         return;
       }
 
       submit.disabled = true;
-      status.textContent = 'publication en cours...';
+      status.textContent = 'Publication en cours...';
       try {
         await request('blog_comments', {
           method: 'POST',
@@ -555,13 +588,13 @@
         });
       } catch (error) {
         console.error('Impossible de publier le commentaire.', error);
-        status.textContent = 'publication impossible. verifie la configuration Supabase et réessaie.';
+        status.textContent = 'Publication impossible. Vérifie la configuration Supabase et réessaie.';
         submit.disabled = false;
         return;
       }
 
       form.reset();
-      status.textContent = 'commentaire publié !';
+      status.textContent = 'Commentaire publié !';
       try {
         await onSubmitted();
       } catch (error) {
@@ -569,7 +602,7 @@
           'Le commentaire a été publié, mais la liste n’a pas pu être actualisée.',
           error,
         );
-        status.textContent = 'commentaire publié ! recharge la page pour actualiser la liste.';
+        status.textContent = 'Commentaire publié ! Recharge la page pour actualiser la liste.';
       } finally {
         submit.disabled = false;
       }
@@ -606,7 +639,7 @@
     upButton.textContent = `⬆️ ${upCount}`;
     upButton.setAttribute(
       'aria-label',
-      `aimer ce commentaire, ${upCount} likes`,
+      `Aimer ce commentaire, ${upCount} likes`,
     );
 
     const downButton = document.createElement('button');
@@ -615,7 +648,7 @@
     downButton.textContent = `⬇️ ${downCount}`;
     downButton.setAttribute(
       'aria-label',
-      `ne pas aimer ce commentaire, ${downCount} dislikes`,
+      `Ne pas aimer ce commentaire, ${downCount} dislikes`,
     );
     upButton.addEventListener('click', async () => {
       if (await requireAccount()) {
@@ -631,7 +664,7 @@
     const reportButton = document.createElement('button');
     reportButton.type = 'button';
     reportButton.className = 'comment-action report-action';
-    reportButton.textContent = 'signaler aussi';
+    reportButton.textContent = 'Signaler aussi';
     reportButton.addEventListener('click', async () => {
       if (await requireAccount()) report(comment);
     });
@@ -687,7 +720,7 @@
       }
     } catch (error) {
       console.error('Impossible d’enregistrer le vote.', error);
-      window.alert(`vote impossible : ${error.message}`);
+      window.alert(`Vote impossible : ${error.message}`);
       return;
     } finally {
       buttons.forEach((button) => {
@@ -703,7 +736,7 @@
         error,
       );
       window.alert(
-        'vote mis à jour. recharge la page pour actualiser le total.',
+        'Vote mis à jour. Recharge la page pour actualiser le total.',
       );
     }
   }
@@ -715,11 +748,11 @@
     form.className = 'comment-form';
 
     const heading = document.createElement('h2');
-    heading.textContent = 'signaler ce commentaire';
+    heading.textContent = 'Signaler ce commentaire';
     const details = document.createElement('p');
-    details.textContent = `article : ${postTitles[comment.post_id] || comment.post_id}`;
+    details.textContent = `Article : ${postTitles[comment.post_id] || comment.post_id}`;
     const messageLabel = document.createElement('label');
-    messageLabel.textContent = 'pourquoi signales-tu ce commentaire ?';
+    messageLabel.textContent = 'Pourquoi signales-tu ce commentaire ?';
     const messageInput = document.createElement('textarea');
     messageInput.name = 'message';
     messageInput.required = true;
@@ -739,42 +772,42 @@
       consentCheckbox,
       document.createTextNode(
         accountEmail
-          ? `j’accepte que mon pseudo et l’adresse ${accountEmail} soient utilisés pour traiter ce signalement et m’envoyer une copie par e-mail.`
-          : 'une adresse e-mail vérifiée est nécessaire pour signaler un commentaire et recevoir une copie.',
+          ? `J’accepte que mon pseudo et l’adresse ${accountEmail} soient utilisés pour traiter ce signalement et m’envoyer une copie par e-mail.`
+          : 'Une adresse e-mail vérifiée est nécessaire pour signaler un commentaire et recevoir une copie.',
       ),
     );
     const buttons = document.createElement('div');
     buttons.className = 'comment-actions';
     const submit = document.createElement('button');
     submit.type = 'submit';
-    submit.textContent = 'envoyer le signalement';
+    submit.textContent = 'Envoyer le signalement';
     submit.disabled = !accountEmail;
     const cancel = document.createElement('button');
     cancel.type = 'button';
     cancel.className = 'comment-action';
-    cancel.textContent = 'annuler';
+    cancel.textContent = 'Annuler';
     cancel.addEventListener('click', () => dialog.close());
     buttons.append(submit, cancel);
     form.append(messageLabel, consent, buttons);
     if (!accountEmail) {
-      status.textContent = 'aucune adresse e-mail vérifiée n’est associée à ce compte. connecte-toi avec Google ou une adresse e-mail pour signaler.';
+      status.textContent = 'Aucune adresse e-mail vérifiée n’est associée à ce compte. Connecte-toi avec Google ou une adresse e-mail pour signaler.';
     }
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!supabaseUrl || !anonKey) {
-        status.textContent = 'connexion Supabase non configurée.';
+        status.textContent = 'Connexion Supabase non configurée.';
         return;
       }
 
       submit.disabled = true;
-      status.textContent = 'envoi du signalement...';
+      status.textContent = 'Envoi du signalement...';
       try {
         const { data: sessionData, error: sessionError } = await authClient.auth
           .getSession();
         if (sessionError) throw sessionError;
         if (!sessionData.session) {
-          throw new Error('ta session a expiré. reconnecte-toi puis réessaie.');
+          throw new Error('Ta session a expiré. Reconnecte-toi puis réessaie.');
         }
         const formData = new FormData(form);
         const response = await fetch(
@@ -796,12 +829,12 @@
         if (!response.ok) {
           throw new Error(result.error || `Supabase (${response.status})`);
         }
-        status.textContent = 'signalement envoyé ! une copie a été envoyée à ton adresse de compte.';
+        status.textContent = 'Signalement envoyé ! Une copie a été envoyée à ton adresse de compte.';
         submit.disabled = true;
         setTimeout(() => dialog.close(), 1800);
       } catch (error) {
         console.error('Impossible de signaler le commentaire.', error);
-        status.textContent = `signalement impossible : ${error.message}`;
+        status.textContent = `Signalement impossible : ${error.message}`;
         submit.disabled = false;
       }
     });
@@ -836,7 +869,7 @@
     container.replaceChildren();
     if (!comments.length) {
       const empty = document.createElement('p');
-      empty.textContent = 'pas encore de commentaire... sois le premier !';
+      empty.textContent = 'Pas encore de commentaire... Sois le premier !';
       container.appendChild(empty);
       return;
     }
@@ -855,7 +888,7 @@
 
   async function initialize(container, postId, includePostSelect) {
     const heading = document.createElement('h2');
-    heading.textContent = includePostSelect ? 'tous les commentaires' : 'commentaires des visiteurs';
+    heading.textContent = includePostSelect ? 'Tous les commentaires' : 'Commentaires des visiteurs';
     container.appendChild(heading);
 
     const list = document.createElement('div');
@@ -880,7 +913,7 @@
       }
       renderList(list, comments, refresh, includePostSelect);
       status.textContent = voteStateUnavailable
-        ? 'les commentaires sont affichés, mais tes votes personnels sont temporairement indisponibles.'
+        ? 'Les commentaires sont affichés, mais tes votes personnels sont temporairement indisponibles.'
         : '';
     }
 
@@ -894,7 +927,7 @@
     } catch (error) {
       console.error('Impossible de charger les commentaires.', error);
       status.textContent =
-        'impossible de charger les commentaires depuis Supabase. vérifie ta connexion internet puis recharge la page.';
+        'Impossible de charger les commentaires depuis Supabase. Vérifie ta connexion internet puis recharge la page.';
     }
   }
 
@@ -930,7 +963,7 @@
               refreshCurrentUser().then(renderAccountPage).catch((error) => {
                 console.error('Impossible de charger les identités du compte.', error);
                 accountIdentityError =
-                  'impossible de charger les identités. recharge la page ou réessaie.';
+                  'Impossible de charger les identités. Recharge la page ou réessaie.';
                 renderAccountPage();
               });
             }, 0);
@@ -956,7 +989,7 @@
       } catch (error) {
         console.error('Impossible de charger les identités du compte.', error);
         accountIdentityError =
-          'impossible de charger les identités. recharge la page ou réessaie.';
+          'Impossible de charger les identités. Recharge la page ou réessaie.';
       }
     }
     renderAccountPage();
