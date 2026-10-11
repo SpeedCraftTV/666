@@ -32,6 +32,15 @@
     return siteBaseUrl.href;
   }
 
+  function getAccountRedirectUrl() {
+    const baseUrl = ['localhost', '127.0.0.1', '::1'].includes(
+        window.location.hostname,
+      )
+      ? productionSiteUrl
+      : siteBaseUrl.href;
+    return new URL('account.html', baseUrl).href;
+  }
+
   function getNickname(user) {
     const metadata = user?.user_metadata || {};
     const nickname = typeof metadata.nickname === 'string' ? metadata.nickname.trim() : '';
@@ -81,11 +90,10 @@
     if (currentUser) {
       const identity = document.createElement('span');
       identity.textContent = `connecté·e : ${getNickname(currentUser)}`;
-      const manageAccount = document.createElement('button');
-      manageAccount.type = 'button';
+      const manageAccount = document.createElement('a');
+      manageAccount.href = `${rootPrefixForCurrentPage()}account.html`;
       manageAccount.className = 'comment-action account-button';
       manageAccount.textContent = 'compte';
-      manageAccount.addEventListener('click', openAccountManagementDialog);
       const logout = document.createElement('button');
       logout.type = 'button';
       logout.className = 'comment-action';
@@ -109,10 +117,14 @@
     panel.append(signIn);
   }
 
+  function rootPrefixForCurrentPage() {
+    return window.location.pathname.includes('/posts/') ? '../' : './';
+  }
+
   function createSiteNavigation() {
     if (document.querySelector('.site-navigation')) return;
 
-    const rootPrefix = window.location.pathname.includes('/posts/') ? '../' : './';
+    const rootPrefix = rootPrefixForCurrentPage();
     const navigation = document.createElement('nav');
     navigation.className = 'site-navigation';
     navigation.setAttribute('aria-label', 'navigation principale');
@@ -292,81 +304,107 @@
     dialog.showModal();
   }
 
-  function openAccountManagementDialog() {
-    if (!currentUser) return;
+  async function refreshCurrentUser() {
+    const { data, error } = await authClient.auth.getUser();
+    if (error) throw error;
+    currentUser = data.user;
+    accountPanels.forEach(renderAccountPanel);
+  }
 
-    const dialog = document.createElement('dialog');
-    dialog.className = 'report-dialog account-dialog';
-    const heading = document.createElement('h2');
-    heading.textContent = 'mon compte';
+  function renderAccountPage() {
+    const container = document.querySelector('[data-account-page]');
+    if (!container) return;
+    container.replaceChildren();
+
+    if (!currentUser) {
+      const message = document.createElement('p');
+      message.textContent =
+        'connecte-toi pour gérer ton compte et relier tes identités Google ou Discord.';
+      const login = document.createElement('button');
+      login.type = 'button';
+      login.className = 'comment-action';
+      login.textContent = 'créer un compte / se connecter';
+      login.addEventListener('click', openAccountDialog);
+      container.append(message, login);
+      return;
+    }
+
     const email = document.createElement('p');
     email.className = 'account-email';
     email.textContent = currentUser.email
       ? `adresse du compte : ${currentUser.email}`
       : 'aucune adresse e-mail associée à ce compte.';
-    const description = document.createElement('p');
-    description.textContent =
-      'relie Google ou Discord pour pouvoir te connecter avec l’un ou l’autre.';
-    const identityList = document.createElement('ul');
-    identityList.className = 'linked-identities';
-    const linkedProviders = new Set(
-      (currentUser.identities || []).map((identity) => identity.provider),
-    );
+    const explanation = document.createElement('p');
+    explanation.textContent =
+      'Relie Google ou Discord pour te connecter avec ces services. Tu peux retirer une identité puis la relier à nouveau plus tard.';
+    const status = createStatus(container);
+    const linkedIdentities = currentUser.identities || [];
+
     ['google', 'discord'].forEach((provider) => {
-      const item = document.createElement('li');
-      const label = provider === 'google' ? 'Google' : 'Discord';
-      item.textContent = linkedProviders.has(provider)
-        ? `${label} : compte relié`
-        : `${label} : non relié`;
-      identityList.appendChild(item);
-    });
-    const status = createStatus(dialog);
-    const actions = document.createElement('div');
-    actions.className = 'comment-actions';
+      const identity = linkedIdentities.find((item) =>
+        item.provider === provider
+      );
+      const section = document.createElement('section');
+      section.className = 'account-provider';
+      const title = document.createElement('h3');
+      title.textContent = provider === 'google' ? 'Google' : 'Discord';
+      const providerStatus = document.createElement('p');
+      providerStatus.textContent = identity
+        ? 'Ce compte est relié.'
+        : 'Aucun compte relié.';
+      const action = document.createElement('button');
+      action.type = 'button';
+      action.className = 'comment-action';
 
-    function createLinkButton(provider) {
-      if (linkedProviders.has(provider)) return;
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'comment-action';
-      button.textContent = provider === 'google'
-        ? 'relier Google'
-        : 'relier Discord';
-      button.addEventListener('click', async () => {
-        button.disabled = true;
-        status.textContent = `redirection vers ${provider === 'google' ? 'Google' : 'Discord'}...`;
-        try {
-          sessionStorage.setItem(pendingIdentityLinkKey, provider);
-          const { error } = await authClient.auth.linkIdentity({
-            provider,
-            options: {
-              redirectTo: getSiteRedirectUrl(),
-              ...(provider === 'discord' ? { scopes: 'identify email' } : {}),
-            },
-          });
-          if (error) throw error;
-        } catch (error) {
-          sessionStorage.removeItem(pendingIdentityLinkKey);
-          console.error(`Impossible de relier le compte ${provider}.`, error);
-          status.textContent = `liaison impossible : ${error.message}`;
-          button.disabled = false;
+      if (identity) {
+        action.textContent = `délier ${title.textContent}`;
+        const cannotUnlinkLastIdentity = linkedIdentities.length <= 1;
+        action.disabled = cannotUnlinkLastIdentity;
+        if (cannotUnlinkLastIdentity) {
+          providerStatus.textContent =
+            'C’est ta seule méthode de connexion. Relie une autre méthode avant de la délier.';
         }
-      });
-      actions.appendChild(button);
-    }
-
-    createLinkButton('google');
-    createLinkButton('discord');
-    const close = document.createElement('button');
-    close.type = 'button';
-    close.className = 'comment-action';
-    close.textContent = 'fermer';
-    close.addEventListener('click', () => dialog.close());
-    actions.appendChild(close);
-    dialog.append(heading, email, description, identityList, status, actions);
-    dialog.addEventListener('close', () => dialog.remove(), { once: true });
-    document.body.appendChild(dialog);
-    dialog.showModal();
+        action.addEventListener('click', async () => {
+          action.disabled = true;
+          status.textContent = `déliaison de ${title.textContent}...`;
+          try {
+            const { error } = await authClient.auth.unlinkIdentity(identity);
+            if (error) throw error;
+            await refreshCurrentUser();
+            renderAccountPage();
+          } catch (error) {
+            console.error(`Impossible de délier ${provider}.`, error);
+            status.textContent = `déliaison impossible : ${error.message}`;
+            action.disabled = false;
+          }
+        });
+      } else {
+        action.textContent = 'relier ce compte';
+        action.addEventListener('click', async () => {
+          action.disabled = true;
+          status.textContent = `redirection vers ${title.textContent}...`;
+          try {
+            sessionStorage.setItem(pendingIdentityLinkKey, provider);
+            const { error } = await authClient.auth.linkIdentity({
+              provider,
+              options: {
+                redirectTo: getAccountRedirectUrl(),
+                ...(provider === 'discord' ? { scopes: 'identify email' } : {}),
+              },
+            });
+            if (error) throw error;
+          } catch (error) {
+            sessionStorage.removeItem(pendingIdentityLinkKey);
+            console.error(`Impossible de relier ${provider}.`, error);
+            status.textContent = `liaison impossible : ${error.message}`;
+            action.disabled = false;
+          }
+        });
+      }
+      section.append(title, providerStatus, action);
+      container.appendChild(section);
+    });
+    container.prepend(email, explanation);
   }
 
   async function requireAccount() {
@@ -791,6 +829,7 @@
           authSession = session;
           currentUser = session?.user || null;
           accountPanels.forEach(renderAccountPanel);
+          renderAccountPage();
           refreshCallbacks.forEach((refresh) => {
             refresh().catch((error) => {
               console.error(
@@ -806,12 +845,18 @@
         'La bibliothèque Supabase Auth ou sa configuration est manquante.',
       );
     }
+    renderAccountPage();
     if (
       currentUser &&
       sessionStorage.getItem(pendingIdentityLinkKey)
     ) {
       sessionStorage.removeItem(pendingIdentityLinkKey);
-      openAccountManagementDialog();
+      try {
+        await refreshCurrentUser();
+        renderAccountPage();
+      } catch (error) {
+        console.error('Impossible d’actualiser les identités du compte.', error);
+      }
     }
     document.querySelectorAll('.comments-widget:not(.comments-page)').forEach(
       (container) => {

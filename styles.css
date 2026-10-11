@@ -206,6 +206,7 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
   visibility: visible;
   opacity: 1;
 }
+.account-panel a.account-button { text-decoration: none; }
 .report-action { border-color: #777; background: #222; }
 .comments-status { color: #ffb3b3; }
 .report-dialog {
@@ -233,6 +234,27 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 }
 .linked-identities li { margin: 6px 0; }
 .account-email { overflow-wrap: anywhere; }
+.account-page {
+  width: min(760px, 100%);
+  margin: 18px auto;
+  padding: clamp(16px, 3vw, 28px);
+  text-align: left;
+  background: #0b0b0b;
+  border: 1px solid rgba(127,0,0,0.55);
+}
+.account-page > p { line-height: 1.7; }
+.account-provider {
+  margin-top: 16px;
+  padding: 16px;
+  background: #101010;
+  border: 1px solid rgba(127,0,0,0.4);
+}
+.account-provider h3 {
+  margin-top: 0;
+  color: #ff4d4d;
+  font: bold 16px 'Courier New', monospace;
+}
+.account-provider p { overflow-wrap: anywhere; }
 .account-dialog-divider {
   margin: 0;
   color: #999;
