@@ -1,0 +1,4 @@
+project_id = "efdylqbvoqgmgfnzlqxj"
+
+[functions.report-comment]
+verify_jwt = false

@@ -18,9 +18,44 @@ create table if not exists public.blog_comment_reports (
   id uuid primary key default gen_random_uuid(),
   comment_id uuid not null references public.blog_comments(id) on delete cascade,
   visitor_id uuid not null,
+  reporter_name text not null default '',
+  reporter_email text not null default '',
+  message text not null default '',
   created_at timestamptz not null default now(),
   unique (comment_id, visitor_id)
 );
+
+alter table public.blog_comment_reports
+  add column if not exists reporter_name text not null default '',
+  add column if not exists reporter_email text not null default '',
+  add column if not exists message text not null default '';
+
+create table if not exists public.blog_report_rate_limits (
+  rate_key text primary key,
+  last_sent_at timestamptz not null default now()
+);
+
+alter table public.blog_report_rate_limits enable row level security;
+
+create or replace function public.claim_blog_report_rate_limit(p_rate_key text)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  insert into public.blog_report_rate_limits as limits (rate_key, last_sent_at)
+  values (p_rate_key, now())
+  on conflict (rate_key) do update
+    set last_sent_at = excluded.last_sent_at
+    where limits.last_sent_at < now() - interval '1 minute';
+  return found;
+end;
+$$;
+
+revoke all on public.blog_report_rate_limits from public, anon, authenticated;
+revoke all on function public.claim_blog_report_rate_limit(text) from public, anon, authenticated;
+grant execute on function public.claim_blog_report_rate_limit(text) to service_role;
 
 alter table public.blog_comments enable row level security;
 alter table public.blog_comment_votes enable row level security;
@@ -54,12 +89,26 @@ create policy "visitors can vote"
   to anon, authenticated
   with check (vote in (-1, 1));
 
-drop policy if exists "visitors can report comments" on public.blog_comment_reports;
-create policy "visitors can report comments"
-  on public.blog_comment_reports for insert
+drop policy if exists "visitors can change their vote" on public.blog_comment_votes;
+create policy "visitors can change their vote"
+  on public.blog_comment_votes for update
   to anon, authenticated
-  with check (true);
+  using (true)
+  with check (vote in (-1, 1));
+
+drop policy if exists "visitors can remove their vote" on public.blog_comment_votes;
+create policy "visitors can remove their vote"
+  on public.blog_comment_votes for delete
+  to anon, authenticated
+  using (true);
+
+drop policy if exists "visitors can report comments" on public.blog_comment_reports;
 
 grant select, insert on public.blog_comments to anon, authenticated;
-grant select, insert on public.blog_comment_votes to anon, authenticated;
-grant insert on public.blog_comment_reports to anon, authenticated;
+grant select on public.blog_comment_votes to anon, authenticated;
+grant insert (comment_id, visitor_id, vote) on public.blog_comment_votes to anon, authenticated;
+grant update (vote) on public.blog_comment_votes to anon, authenticated;
+grant delete on public.blog_comment_votes to anon, authenticated;
+revoke all on public.blog_comment_reports from anon, authenticated;
+grant select on public.blog_comments to service_role;
+grant insert on public.blog_comment_reports to service_role;

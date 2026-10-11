@@ -33,7 +33,6 @@
       ...options,
       headers: {
         apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`,
         'Content-Type': 'application/json',
         ...(options.headers || {})
       }
@@ -42,7 +41,8 @@
       const details = await response.text();
       throw new Error(`Supabase (${response.status}): ${details}`);
     }
-    return response.status === 204 ? null : response.json();
+    const responseBody = await response.text();
+    return responseBody ? JSON.parse(responseBody) : null;
   }
 
   function createStatus(container) {
@@ -123,12 +123,20 @@
             body
           })
         });
-        form.reset();
-        status.textContent = 'commentaire publié !';
-        await onSubmitted();
       } catch (error) {
         console.error('Impossible de publier le commentaire.', error);
         status.textContent = 'publication impossible. verifie la configuration Supabase et réessaie.';
+        submit.disabled = false;
+        return;
+      }
+
+      form.reset();
+      status.textContent = 'commentaire publié !';
+      try {
+        await onSubmitted();
+      } catch (error) {
+        console.error('Le commentaire a été publié, mais la liste n’a pas pu être actualisée.', error);
+        status.textContent = 'commentaire publié ! recharge la page pour actualiser la liste.';
       } finally {
         submit.disabled = false;
       }
@@ -164,64 +172,201 @@
     upButton.className = `comment-action${storedVote === '1' ? ' selected' : ''}`;
     upButton.textContent = `⬆️ ${upCount}`;
     upButton.setAttribute('aria-label', `aimer ce commentaire, ${upCount} likes`);
-    upButton.disabled = Boolean(storedVote);
-    upButton.addEventListener('click', () => vote(comment.id, 1, refresh));
+    upButton.addEventListener('click', () => vote(comment.id, 1, refresh, [upButton, downButton]));
 
     const downButton = document.createElement('button');
     downButton.type = 'button';
     downButton.className = `comment-action${storedVote === '-1' ? ' selected' : ''}`;
     downButton.textContent = `⬇️ ${downCount}`;
     downButton.setAttribute('aria-label', `ne pas aimer ce commentaire, ${downCount} dislikes`);
-    downButton.disabled = Boolean(storedVote);
-    downButton.addEventListener('click', () => vote(comment.id, -1, refresh));
+    downButton.addEventListener('click', () => vote(comment.id, -1, refresh, [upButton, downButton]));
 
     const reportButton = document.createElement('button');
     reportButton.type = 'button';
     reportButton.className = 'comment-action report-action';
     reportButton.textContent = 'signaler aussi';
-    reportButton.addEventListener('click', () => report(comment.id, refresh));
+    reportButton.addEventListener('click', () => report(comment, refresh));
 
     actions.append(upButton, downButton, reportButton);
     card.appendChild(actions);
     return card;
   }
 
-  async function vote(commentId, value, refresh) {
+  async function vote(commentId, value, refresh, buttons) {
+    buttons.forEach((button) => { button.disabled = true; });
     try {
-      await request('blog_comment_votes?on_conflict=comment_id%2Cvisitor_id', {
-        method: 'POST',
-        headers: { Prefer: 'return=minimal' },
-        body: JSON.stringify({
-          comment_id: commentId,
-          visitor_id: getVisitorId(),
-          vote: value
-        })
+      const visitorId = getVisitorId();
+      const voteQuery = new URLSearchParams({
+        select: 'vote',
+        comment_id: `eq.${commentId}`,
+        visitor_id: `eq.${visitorId}`
       });
-      localStorage.setItem(`blog-comment-vote-${commentId}`, String(value));
-      await refresh();
+      const existingVotes = await request(`blog_comment_votes?${voteQuery}`);
+      const existingVote = existingVotes[0]?.vote;
+
+      if (existingVote === value) {
+        const deleteQuery = new URLSearchParams({
+          comment_id: `eq.${commentId}`,
+          visitor_id: `eq.${visitorId}`
+        });
+        await request(`blog_comment_votes?${deleteQuery}`, {
+          method: 'DELETE',
+          headers: { Prefer: 'return=minimal' }
+        });
+        localStorage.removeItem(`blog-comment-vote-${commentId}`);
+      } else if (existingVotes.length > 0) {
+        const updateQuery = new URLSearchParams({
+          comment_id: `eq.${commentId}`,
+          visitor_id: `eq.${visitorId}`
+        });
+        await request(`blog_comment_votes?${updateQuery}`, {
+          method: 'PATCH',
+          headers: { Prefer: 'return=minimal' },
+          body: JSON.stringify({ vote: value })
+        });
+        localStorage.setItem(`blog-comment-vote-${commentId}`, String(value));
+      } else {
+        await request('blog_comment_votes', {
+          method: 'POST',
+          headers: { Prefer: 'return=minimal' },
+          body: JSON.stringify({
+            comment_id: commentId,
+            visitor_id: visitorId,
+            vote: value
+          })
+        });
+        localStorage.setItem(`blog-comment-vote-${commentId}`, String(value));
+      }
     } catch (error) {
       console.error('Impossible d’enregistrer le vote.', error);
-      window.alert('vote impossible. verifie la configuration Supabase et réessaie.');
+      window.alert(`vote impossible : ${error.message}`);
+      return;
+    } finally {
+      buttons.forEach((button) => { button.disabled = false; });
+    }
+
+    try {
+      await refresh();
+    } catch (error) {
+      console.error('Le vote a changé, mais la liste n’a pas pu être actualisée.', error);
+      window.alert('vote mis à jour. recharge la page pour actualiser le total.');
     }
   }
 
-  async function report(commentId, refresh) {
-    if (!window.confirm('signaler ce commentaire aux responsables du site ?')) return;
-    try {
-      await request('blog_comment_reports', {
-        method: 'POST',
-        headers: { Prefer: 'return=minimal' },
-        body: JSON.stringify({
-          comment_id: commentId,
-          visitor_id: getVisitorId()
-        })
-      });
-      window.alert('merci, le commentaire a été signalé.');
-      await refresh();
-    } catch (error) {
-      console.error('Impossible de signaler le commentaire.', error);
-      window.alert('signalement impossible. tu as peut-être déjà signalé ce commentaire.');
-    }
+  function addReportField(form, labelText, name, type, options = {}) {
+    const label = document.createElement('label');
+    label.textContent = labelText;
+    const field = options.multiline
+      ? document.createElement('textarea')
+      : document.createElement('input');
+    field.name = name;
+    field.required = options.required !== false;
+    if (field instanceof HTMLInputElement) field.type = type;
+    if (options.maxLength) field.maxLength = options.maxLength;
+    if (options.multiline) field.rows = 5;
+    if (options.autocomplete) field.autocomplete = options.autocomplete;
+    label.appendChild(field);
+    form.appendChild(label);
+  }
+
+  async function report(comment) {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'report-dialog';
+    const form = document.createElement('form');
+    form.className = 'comment-form';
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'signaler ce commentaire';
+    const details = document.createElement('p');
+    details.textContent = `article : ${postTitles[comment.post_id] || comment.post_id}`;
+    const status = createStatus(form);
+    addReportField(form, 'ton pseudo :', 'reporter_name', 'text', {
+      maxLength: 80,
+      autocomplete: 'nickname'
+    });
+    addReportField(form, 'ton e-mail pour recevoir une copie et être recontacté :', 'reporter_email', 'email', {
+      maxLength: 254,
+      autocomplete: 'email'
+    });
+    addReportField(form, 'pourquoi signales-tu ce commentaire ?', 'message', 'text', {
+      maxLength: 2000,
+      multiline: true
+    });
+
+    const honeypot = document.createElement('input');
+    honeypot.name = 'company';
+    honeypot.tabIndex = -1;
+    honeypot.autocomplete = 'off';
+    honeypot.setAttribute('aria-hidden', 'true');
+    honeypot.className = 'report-honeypot';
+    form.appendChild(honeypot);
+
+    const consent = document.createElement('label');
+    consent.className = 'report-consent';
+    const consentCheckbox = document.createElement('input');
+    consentCheckbox.type = 'checkbox';
+    consentCheckbox.name = 'consent';
+    consentCheckbox.required = true;
+    consent.append(consentCheckbox, document.createTextNode(
+      'j’accepte que ces informations soient utilisées pour traiter le signalement et envoyer une copie par e-mail.'
+    ));
+    form.appendChild(consent);
+
+    const buttons = document.createElement('div');
+    buttons.className = 'comment-actions';
+    const submit = document.createElement('button');
+    submit.type = 'submit';
+    submit.textContent = 'envoyer le signalement';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'comment-action';
+    cancel.textContent = 'annuler';
+    cancel.addEventListener('click', () => dialog.close());
+    buttons.append(submit, cancel);
+    form.appendChild(buttons);
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!supabaseUrl || !anonKey) {
+        status.textContent = 'connexion Supabase non configurée.';
+        return;
+      }
+
+      const formData = new FormData(form);
+      submit.disabled = true;
+      status.textContent = 'envoi du signalement...';
+      try {
+        const response = await fetch(`${supabaseUrl}/functions/v1/report-comment`, {
+          method: 'POST',
+          headers: {
+            apikey: anonKey,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            comment_id: comment.id,
+            visitor_id: getVisitorId(),
+            reporter_name: String(formData.get('reporter_name') || '').trim(),
+            reporter_email: String(formData.get('reporter_email') || '').trim(),
+            message: String(formData.get('message') || '').trim(),
+            company: String(formData.get('company') || '')
+          })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || `Supabase (${response.status})`);
+        status.textContent = 'signalement envoyé ! une copie a été envoyée à ton adresse e-mail.';
+        submit.disabled = true;
+        setTimeout(() => dialog.close(), 1800);
+      } catch (error) {
+        console.error('Impossible de signaler le commentaire.', error);
+        status.textContent = `signalement impossible : ${error.message}`;
+        submit.disabled = false;
+      }
+    });
+
+    dialog.append(heading, details, form);
+    dialog.addEventListener('close', () => dialog.remove(), { once: true });
+    document.body.appendChild(dialog);
+    dialog.showModal();
   }
 
   async function loadComments(postId) {
@@ -278,7 +423,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.comments-widget').forEach((container) => {
+    document.querySelectorAll('.comments-widget:not(.comments-page)').forEach((container) => {
       initialize(container, container.dataset.postId, false);
     });
     const commentsPage = document.querySelector('[data-comments-page]');

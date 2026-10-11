@@ -1,4 +1,4 @@
 window.BLOG_SUPABASE = {
-  url: 'https://VOTRE-PROJET.supabase.co',
-  anonKey: 'VOTRE_CLE_ANON_PUBLIQUE'
+  url: 'https://efdylqbvoqgmgfnzlqxj.supabase.co',
+  anonKey: 'sb_publishable_yGsNFwBiuiqki5H7PYivTA_Uqeo4IDY'
 };
