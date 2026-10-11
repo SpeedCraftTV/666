@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
+  <title id="title">La panne qui m’a appris à investir</title>
+  <desc id="desc">Un composant informatique incompatible, une liste de vérification et une tirelire pour les imprévus.</desc>
+  <rect width="800" height="520" rx="20" fill="#111"/><rect x="18" y="18" width="764" height="484" rx="12" fill="#170707" stroke="#b30000" stroke-width="5"/>
+  <rect x="116" y="129" width="300" height="240" rx="18" fill="#333" stroke="#aaa" stroke-width="9"/>
+  <rect x="142" y="155" width="248" height="188" rx="7" fill="#102315" stroke="#777" stroke-width="5"/>
+  <rect x="191" y="199" width="145" height="93" rx="8" fill="#444" stroke="#e8bd52" stroke-width="7"/>
+  <path d="M216 199v-22h95v22m-95 93v20h95v-20m-120-67h25m95 0h25" fill="none" stroke="#aaa" stroke-width="7"/>
+  <path d="m263 226 40 40m0-40-40 40" stroke="#c92929" stroke-width="11" stroke-linecap="round"/>
+  <rect x="478" y="104" width="205" height="213" rx="12" fill="#e9e3d4" stroke="#aaa" stroke-width="7"/>
+  <path d="M512 151h130m-130 50h130m-130 50h104" stroke="#777" stroke-width="7" stroke-linecap="round"/>
+  <path d="m508 149 10 12 21-25m-31 63 10 12 21-25m-31 63 10 12 21-25" fill="none" stroke="#34734a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M495 363c0-43 34-72 83-72s83 29 83 72v36H495z" fill="#7b4827" stroke="#c18a58" stroke-width="7"/>
+  <ellipse cx="578" cy="359" rx="18" ry="12" fill="#170707"/><circle cx="538" cy="333" r="6" fill="#f4d6aa"/><circle cx="618" cy="333" r="6" fill="#f4d6aa"/>
+  <circle cx="662" cy="393" r="20" fill="#e8bd52"/><circle cx="705" cy="405" r="16" fill="#e8bd52"/>
+  <text x="400" y="478" fill="#ff6868" text-anchor="middle" font-family="Courier New, monospace" font-size="29" font-weight="bold">VERIFIER AVANT D’INVESTIR</text>
+</svg>

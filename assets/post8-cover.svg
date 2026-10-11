@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
+  <title id="title">La photo qui répondait</title>
+  <desc id="desc">Une photo de pomme dans un cadre affiche une bulle de texte amusante pour la boutique.</desc>
+  <rect width="800" height="520" rx="20" fill="#111"/><rect x="18" y="18" width="764" height="484" rx="12" fill="#170707" stroke="#b30000" stroke-width="5"/>
+  <rect x="105" y="95" width="342" height="310" rx="14" fill="#ddd4c2" stroke="#aaa" stroke-width="9"/>
+  <rect x="128" y="118" width="296" height="264" fill="#263e2c"/>
+  <path d="M218 294c-57-33-36-103 10-113 10-52 82-57 105-11 49 4 67 72 20 108-37 30-94 32-135 16z" fill="#c92929" stroke="#f46a55" stroke-width="7"/>
+  <path d="M276 187c-3-22 8-38 28-46" fill="none" stroke="#7bc45a" stroke-width="10" stroke-linecap="round"/>
+  <path d="M263 244h62" stroke="#6f1818" stroke-width="8" stroke-linecap="round"/>
+  <path d="M457 137h237v136H457z" fill="#fff" stroke="#e8bd52" stroke-width="7"/>
+  <path d="m485 273-24 38 58-38" fill="#fff" stroke="#e8bd52" stroke-width="7" stroke-linejoin="round"/>
+  <text x="575" y="185" text-anchor="middle" fill="#333" font-family="Courier New, monospace" font-size="23">DEJA ASSEZ</text>
+  <text x="575" y="222" text-anchor="middle" fill="#b30000" font-family="Courier New, monospace" font-size="23" font-weight="bold">MURE !</text>
+  <path d="M502 347h146v55H502z" fill="#8c542e" stroke="#c18a58" stroke-width="6"/>
+  <path d="M483 347h184l-19-28H502z" fill="#c92929" stroke="#f46a55" stroke-width="6"/>
+  <path d="M525 357v45m44-45v45m44-45v45" stroke="#e8bd52" stroke-width="6"/>
+  <text x="400" y="478" fill="#ff6868" text-anchor="middle" font-family="Courier New, monospace" font-size="30" font-weight="bold">LA PHOTO QUI REPONDAIT</text>
+</svg>

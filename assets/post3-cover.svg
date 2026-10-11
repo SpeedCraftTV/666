@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
+  <title id="title">L’art de négocier sur le web</title>
+  <desc id="desc">Deux offres comparées sur un écran et un accord gagnant-gagnant autour de pommes et de pièces.</desc>
+  <rect width="800" height="520" rx="20" fill="#111"/><rect x="18" y="18" width="764" height="484" rx="12" fill="#170707" stroke="#b30000" stroke-width="5"/>
+  <rect x="94" y="105" width="610" height="275" rx="18" fill="#292929" stroke="#aaa" stroke-width="8"/>
+  <rect x="117" y="129" width="564" height="225" rx="8" fill="#e4dfcf"/>
+  <rect x="143" y="155" width="236" height="158" rx="10" fill="#fff" stroke="#b30000" stroke-width="5"/>
+  <rect x="419" y="155" width="236" height="158" rx="10" fill="#fff" stroke="#b30000" stroke-width="5"/>
+  <text x="261" y="190" fill="#333" text-anchor="middle" font-family="Courier New, monospace" font-size="23">OFFRE A</text>
+  <text x="537" y="190" fill="#333" text-anchor="middle" font-family="Courier New, monospace" font-size="23">OFFRE B</text>
+  <circle cx="261" cy="239" r="30" fill="#e8bd52"/><text x="261" y="248" fill="#38280a" text-anchor="middle" font-family="Courier New" font-size="22">12</text>
+  <circle cx="537" cy="239" r="30" fill="#e8bd52"/><text x="537" y="248" fill="#38280a" text-anchor="middle" font-family="Courier New" font-size="22">9</text>
+  <path d="M181 283h160m198 0h91" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M295 399h210m-105-20v28" stroke="#aaa" stroke-width="12" stroke-linecap="round"/>
+  <path d="M319 426c22-15 48-15 68 0m26 0c23-15 49-15 68 0" fill="none" stroke="#7bc45a" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="363" cy="415" r="11" fill="#c92929"/><circle cx="436" cy="415" r="11" fill="#c92929"/>
+  <text x="400" y="478" fill="#ff6868" text-anchor="middle" font-family="Courier New, monospace" font-size="30" font-weight="bold">NEGOCIER, COMPARER, S’ACCORDER</text>
+</svg>

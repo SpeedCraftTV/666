@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
+  <title id="title">À la recherche du pixel perdu</title>
+  <desc id="desc">Une loupe révèle le pixel jaune caché sur un écran d’ordinateur.</desc>
+  <rect width="800" height="520" rx="20" fill="#111"/><rect x="18" y="18" width="764" height="484" rx="12" fill="#170707" stroke="#b30000" stroke-width="5"/>
+  <rect x="133" y="103" width="532" height="294" rx="20" fill="#444" stroke="#aaa" stroke-width="9"/>
+  <rect x="158" y="128" width="482" height="231" rx="8" fill="#101c16" stroke="#777" stroke-width="5"/>
+  <path d="M216 188h35v35h-35zm52 0h35v35h-35zm52 0h35v35h-35zm52 0h35v35h-35zm52 0h35v35h-35zM216 240h35v35h-35zm52 0h35v35h-35zm52 0h35v35h-35zm52 0h35v35h-35zm52 0h35v35h-35z" fill="#34734a"/>
+  <rect x="482" y="291" width="35" height="35" fill="#f1d64c"/>
+  <path d="M398 398h-64l-32 42h196l-32-42h-68" fill="#777" stroke="#aaa" stroke-width="7"/>
+  <circle cx="563" cy="244" r="66" fill="none" stroke="#e8bd52" stroke-width="13"/>
+  <path d="m612 293 62 63" stroke="#e8bd52" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="563" cy="244" r="13" fill="#f1d64c"/>
+  <text x="400" y="478" fill="#ff6868" text-anchor="middle" font-family="Courier New, monospace" font-size="30" font-weight="bold">ENQUETE SUR LE PIXEL PERDU</text>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
+  <title id="title">La négociation des mèmes</title>
+  <desc id="desc">Un mème de castor couronné, une autorisation signée et une collecte pour un club de dessin.</desc>
+  <rect width="800" height="520" rx="20" fill="#111"/><rect x="18" y="18" width="764" height="484" rx="12" fill="#170707" stroke="#b30000" stroke-width="5"/>
+  <rect x="143" y="94" width="304" height="316" rx="15" fill="#eee2c7" stroke="#aaa" stroke-width="8"/>
+  <rect x="163" y="114" width="264" height="218" rx="8" fill="#2c4632"/>
+  <path d="M228 262c-28-39-12-104 28-121 29-37 91-33 113 3 37 28 35 83 10 118-35 49-113 51-151 0z" fill="#8a5733"/>
+  <path d="M245 155l-7-38 36 18 20-45 25 43 42-11-17 43z" fill="#e8bd52" stroke="#fff0a3" stroke-width="5"/>
+  <circle cx="277" cy="207" r="9" fill="#111"/><circle cx="345" cy="207" r="9" fill="#111"/>
+  <ellipse cx="311" cy="233" rx="20" ry="13" fill="#352014"/>
+  <path d="M256 280h77m-94 27h143" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  <path d="M489 129h166v182H489z" fill="#e8e1ce" stroke="#aaa" stroke-width="7"/>
+  <path d="M519 166h105m-105 30h89m-89 30h98" stroke="#555" stroke-width="7" stroke-linecap="round"/>
+  <path d="m530 275 22 22 57-62" fill="none" stroke="#31794d" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="561" cy="359" r="26" fill="#e8bd52"/><circle cx="617" cy="359" r="26" fill="#e8bd52"/><path d="M558 381h65" stroke="#c92929" stroke-width="10"/>
+  <text x="400" y="478" fill="#ff6868" text-anchor="middle" font-family="Courier New, monospace" font-size="30" font-weight="bold">MEME, DROITS ET ACCORD</text>
+</svg>

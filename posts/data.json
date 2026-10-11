@@ -6,7 +6,7 @@
     "date": "2025-01-01",
     "excerpt": "Mini Castor découvre le web rétro et transforme sa curiosité en première idée de petite entreprise.",
     "tags": ["486","rétro","tirelire"],
-    "thumb": "../assets/pexels-atelier-creatif.jpg"
+    "thumb": "../assets/post1-cover.svg"
   },
   {
     "id": "post2",
@@ -15,7 +15,7 @@
     "date": "2025-02-02",
     "excerpt": "Un vieil ordinateur, une réparation futée et le premier client de Mini Castor.",
     "tags": ["ordinateur","atelier","commerce"],
-    "thumb": "../assets/pexels-jeu-enfants.jpg"
+    "thumb": "../assets/post2-cover.svg"
   },
   {
     "id": "post3",
@@ -24,7 +24,7 @@
     "date": "2025-03-03",
     "excerpt": "Les astuces de Mini Castor pour comparer, négocier et repérer les bonnes affaires.",
     "tags": ["conseils","business","web"],
-    "thumb": "../assets/pexels-jeu-creatif.jpg"
+    "thumb": "../assets/post3-cover.svg"
   }
  ,
   {
@@ -34,7 +34,7 @@
     "date": "2025-10-31",
     "excerpt": "Une panne de modem se transforme en occasion inattendue pour Mini Castor.",
     "tags": ["modem","inventivité","business"],
-    "thumb": "../assets/pexels-atelier-creatif.jpg"
+    "thumb": "../assets/post4-cover.svg"
   },
   {
     "id": "post5",
@@ -43,7 +43,7 @@
     "date": "2026-06-12",
     "excerpt": "Mini Castor organise sa collection d’icônes et apprend à estimer leur valeur.",
     "tags": ["icônes","collection","rétro"],
-    "thumb": "../assets/pexels-jeu-bois.jpg"
+    "thumb": "../assets/post5-cover.svg"
   }
  ,
   {
@@ -53,7 +53,7 @@
     "date": "2026-07-07",
     "excerpt": "Un pixel semble avoir disparu de l’écran de Mini Castor : une enquête commence.",
     "tags": ["enquête","pixel","ordinateur"],
-    "thumb": "../assets/pexels-jeu-enfants.jpg"
+    "thumb": "../assets/post6-cover.svg"
   },
   {
     "id": "post7",
@@ -62,7 +62,7 @@
     "date": "2026-08-08",
     "excerpt": "Mini Castor négocie les droits d’un mème populaire pour financer un club de dessin.",
     "tags": ["mèmes","humour","négociation"],
-    "thumb": "../assets/pexels-jeu-creatif.jpg"
+    "thumb": "../assets/post7-cover.svg"
   }
  ,
   {
@@ -72,7 +72,7 @@
     "date": "2026-09-09",
     "excerpt": "Une photo semble répondre à Mini Castor et lui donne une idée de boutique.",
     "tags": ["photo","mystère","boutique"],
-    "thumb": "../assets/pexels-jeu-bois.jpg"
+    "thumb": "../assets/post8-cover.svg"
   },
   {
     "id": "post9",
@@ -81,7 +81,7 @@
     "date": "2026-10-10",
     "excerpt": "Après un achat inadapté, Mini Castor apprend à budgéter et à mieux préparer ses projets.",
     "tags": ["ordinateur","budget","leçon"],
-    "thumb": "../assets/pexels-atelier-creatif.jpg"
+    "thumb": "../assets/post9-cover.svg"
   },
   {
     "id": "post10",
@@ -90,7 +90,7 @@
     "date": "2026-10-11",
     "excerpt": "Les conseils de Mini Castor pour lancer un projet, écouter ses clients et négocier avec tact.",
     "tags": ["entrepreneuriat","conseils","business"],
-    "thumb": "../assets/pexels-jeu-enfants.jpg"
+    "thumb": "../assets/post10-cover.svg"
   },
   {
     "id": "post11",

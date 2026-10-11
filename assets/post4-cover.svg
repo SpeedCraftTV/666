@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
+  <title id="title">La panne qui devint une occasion</title>
+  <desc id="desc">Un modem rétro grésille dans la nuit et ses sons deviennent une idée de sonnerie.</desc>
+  <rect width="800" height="520" rx="20" fill="#111"/><rect x="18" y="18" width="764" height="484" rx="12" fill="#170707" stroke="#b30000" stroke-width="5"/>
+  <path d="M188 168c-53-56 42-105 77-40 42-82 146-43 132 22 87-35 119 67 50 94H241c-71-6-85-54-53-76z" fill="#282828" stroke="#777" stroke-width="8"/>
+  <path d="M390 241c0 51-80 51-80 102m136-102c0 51-80 51-80 102m138-102c0 51-80 51-80 102" fill="none" stroke="#b30000" stroke-width="9" stroke-linecap="round"/>
+  <rect x="238" y="294" width="355" height="102" rx="18" fill="#444" stroke="#aaa" stroke-width="8"/>
+  <rect x="267" y="315" width="105" height="40" rx="7" fill="#111" stroke="#9c9c9c" stroke-width="4"/>
+  <circle cx="420" cy="335" r="10" fill="#e1c65a"/><circle cx="460" cy="335" r="10" fill="#c92929"/>
+  <path d="M527 318v38m22-27v16m22-25v34" stroke="#8eff91" stroke-width="7"/>
+  <path d="M205 407h430" stroke="#8a5a3c" stroke-width="12" stroke-linecap="round"/>
+  <path d="M635 144l-11 35m38-22-24 28m57-6-34 15" stroke="#e1c65a" stroke-width="8" stroke-linecap="round"/>
+  <path d="M132 311h50v65h-50z" fill="#d8cda7" stroke="#fff" stroke-width="5"/>
+  <path d="M146 350h7l8-20 8 30 8-24" fill="none" stroke="#b30000" stroke-width="5"/>
+  <text x="400" y="478" fill="#ff6868" text-anchor="middle" font-family="Courier New, monospace" font-size="29" font-weight="bold">UNE PANNE, UNE IDEE DE SONNERIE</text>
+</svg>

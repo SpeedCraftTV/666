@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
+  <title id="title">Ma première tirelire</title>
+  <desc id="desc">Un ordinateur 486 rétro, une tirelire en forme de souche, une pomme et des pièces.</desc>
+  <rect width="800" height="520" rx="20" fill="#111"/>
+  <rect x="18" y="18" width="764" height="484" rx="12" fill="#170707" stroke="#b30000" stroke-width="5"/>
+  <rect x="112" y="104" width="365" height="235" rx="20" fill="#333" stroke="#aaa" stroke-width="8"/>
+  <rect x="140" y="130" width="310" height="170" rx="8" fill="#102315" stroke="#777" stroke-width="5"/>
+  <text x="164" y="190" fill="#8eff91" font-family="Courier New, monospace" font-size="30">486  C:\&gt;</text>
+  <text x="164" y="240" fill="#8eff91" font-family="Courier New, monospace" font-size="24">1re idee...</text>
+  <path d="M250 342h90l28 45H222z" fill="#777" stroke="#aaa" stroke-width="6"/>
+  <path d="M207 387h185v22H207z" fill="#aaa"/>
+  <path d="M512 345c0-52 40-91 101-91s101 39 101 91v47H512z" fill="#7b4827" stroke="#c18a58" stroke-width="8"/>
+  <path d="M560 282v-41h27v39m44 2v-48h27v55" fill="#7b4827" stroke="#c18a58" stroke-width="8"/>
+  <ellipse cx="610" cy="345" rx="20" ry="14" fill="#170707"/>
+  <circle cx="557" cy="314" r="7" fill="#f4d6aa"/><circle cx="666" cy="314" r="7" fill="#f4d6aa"/>
+  <path d="M613 263c-25-17-8-42 17-32 4-25 37-22 36 5 22 4 18 31-2 38-15 5-34 0-51-11z" fill="#c92929" stroke="#f46a55" stroke-width="5"/>
+  <path d="M633 235c-2-17 5-27 17-33" fill="none" stroke="#7bc45a" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="546" cy="416" r="21" fill="#e8bd52"/><circle cx="603" cy="430" r="21" fill="#e8bd52"/><circle cx="663" cy="416" r="21" fill="#e8bd52"/>
+  <text x="400" y="478" fill="#ff6868" text-anchor="middle" font-family="Courier New, monospace" font-size="30" font-weight="bold">MA PREMIERE TIRELIRE</text>
+</svg>
