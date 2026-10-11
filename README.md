@@ -1,4 +1,4 @@
-# Mini Castor | blog rétro
+# Le blog de Mini Castor
 
 Ce dépôt contient le blog rétro de Mini Castor, un castor futé, entrepreneur et passionné par les pommes, les tirelires et les bonnes négociations.
 
