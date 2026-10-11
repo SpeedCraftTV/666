@@ -11,6 +11,7 @@
   let currentUser = null;
   let currentIdentities = null;
   let accountIdentityError = '';
+  let accountMessage = '';
   let myVotes = new Map();
   const accountPanels = new Set();
   const refreshCallbacks = new Set();
@@ -85,6 +86,51 @@
     status.setAttribute('aria-live', 'polite');
     container.appendChild(status);
     return status;
+  }
+
+  function consumeOAuthError() {
+    const url = new URL(window.location.href);
+    const queryParams = url.searchParams;
+    const hashParams = new URLSearchParams(url.hash.replace(/^#/, ''));
+    const errorCode = queryParams.get('error_code') ||
+      queryParams.get('error') ||
+      hashParams.get('error_code') ||
+      hashParams.get('error');
+    const description = queryParams.get('error_description') ||
+      hashParams.get('error_description');
+    if (!errorCode && !description) return null;
+
+    ['error', 'error_code', 'error_description'].forEach((key) => {
+      queryParams.delete(key);
+      hashParams.delete(key);
+    });
+    url.hash = hashParams.toString();
+    window.history.replaceState({}, document.title, url);
+    return { code: errorCode || '', description: description || '' };
+  }
+
+  function getIdentityLinkErrorMessage(provider, error) {
+    const name = provider === 'google' ? 'Google' : 'Discord';
+    const detail = `${error.code || error.error || ''} ${
+      error.description || error.message || ''
+    }`.toLowerCase();
+    if (
+      detail.includes('identity_already_exists') ||
+      detail.includes('already linked') ||
+      detail.includes('already associated')
+    ) {
+      return `Impossible de relier ce compte ${name} : cette identité est déjà associée à un autre compte du site. Connecte-toi à ce compte pour la délier avant de réessayer.`;
+    }
+    if (
+      detail.includes('manual_linking_disabled') ||
+      detail.includes('linking identities is disabled')
+    ) {
+      return 'La liaison manuelle est désactivée dans Supabase. Active « Allow manual linking » dans Authentication → Sign In / Providers, puis réessaie.';
+    }
+    return `La liaison du compte ${name} a échoué. ${
+      error.description || error.message ||
+      'Vérifie la configuration OAuth dans Supabase puis réessaie.'
+    }`;
   }
 
   function renderAccountPanel(panel) {
@@ -333,6 +379,11 @@
       login.textContent = 'créer un compte / se connecter';
       login.addEventListener('click', openAccountDialog);
       container.append(message, login);
+      if (accountMessage) {
+        const status = createStatus(container);
+        status.classList.add('account-error');
+        status.textContent = accountMessage;
+      }
       return;
     }
 
@@ -354,6 +405,10 @@
     explanation.textContent =
       'Relie Google ou Discord pour te connecter avec ces services. Tu peux retirer une identité puis la relier à nouveau plus tard.';
     const status = createStatus(container);
+    if (accountMessage) {
+      status.classList.add('account-error');
+      status.textContent = accountMessage;
+    }
     const linkedIdentities = currentIdentities;
 
     ['google', 'discord'].forEach((provider) => {
@@ -416,7 +471,8 @@
           } catch (error) {
             sessionStorage.removeItem(pendingIdentityLinkKey);
             console.error(`Impossible de relier ${provider}.`, error);
-            status.textContent = `liaison impossible : ${error.message}`;
+            status.textContent = getIdentityLinkErrorMessage(provider, error);
+            status.classList.add('account-error');
             action.disabled = false;
           }
         });
@@ -844,6 +900,12 @@
 
   document.addEventListener('DOMContentLoaded', async () => {
     createSiteNavigation();
+    const oauthError = consumeOAuthError();
+    const pendingProvider = sessionStorage.getItem(pendingIdentityLinkKey);
+    if (oauthError && pendingProvider) {
+      accountMessage = getIdentityLinkErrorMessage(pendingProvider, oauthError);
+      sessionStorage.removeItem(pendingIdentityLinkKey);
+    }
     if (window.supabase?.createClient && supabaseUrl && anonKey) {
       try {
         authClient = window.supabase.createClient(supabaseUrl, anonKey);
@@ -902,13 +964,30 @@
       currentUser &&
       sessionStorage.getItem(pendingIdentityLinkKey)
     ) {
+      const provider = sessionStorage.getItem(pendingIdentityLinkKey);
       sessionStorage.removeItem(pendingIdentityLinkKey);
       try {
         await refreshCurrentUser();
+        if (!currentIdentities.some((identity) => identity.provider === provider)) {
+          accountMessage = getIdentityLinkErrorMessage(provider, {
+            description:
+              'Le fournisseur n’a pas confirmé la liaison. Cette identité est peut-être déjà associée à un autre compte.',
+          });
+        }
         renderAccountPage();
       } catch (error) {
         console.error('Impossible d’actualiser les identités du compte.', error);
+        accountMessage = getIdentityLinkErrorMessage(provider, {
+          description:
+            'Impossible de vérifier le résultat de la liaison. Recharge la page et vérifie l’état du compte.',
+        });
+        renderAccountPage();
       }
+    } else if (pendingProvider && !currentUser && !oauthError) {
+      sessionStorage.removeItem(pendingIdentityLinkKey);
+      accountMessage =
+        'La liaison n’a pas pu être terminée car la session a expiré. Reconnecte-toi puis réessaie.';
+      renderAccountPage();
     }
     document.querySelectorAll('.comments-widget:not(.comments-page)').forEach(
       (container) => {

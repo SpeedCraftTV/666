@@ -209,6 +209,7 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 .account-panel a.account-button { text-decoration: none; }
 .report-action { border-color: #777; background: #222; }
 .comments-status { color: #ffb3b3; }
+.account-error { color: #ff7777; }
 .report-dialog {
   width: min(560px, calc(100% - 32px));
   max-height: 85vh;
