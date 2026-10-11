@@ -805,6 +805,7 @@
     const list = document.createElement('div');
     list.className = 'comments-list';
     container.appendChild(list);
+    const status = createStatus(container);
 
     async function refresh() {
       if (!supabaseUrl || !anonKey || supabaseUrl.includes('VOTRE-PROJET')) {
@@ -813,8 +814,18 @@
         );
       }
       const comments = await loadComments(postId);
-      await loadMyVotes(comments);
+      let voteStateUnavailable = false;
+      try {
+        await loadMyVotes(comments);
+      } catch (error) {
+        console.error('Impossible de charger tes votes personnels.', error);
+        myVotes = new Map();
+        voteStateUnavailable = true;
+      }
       renderList(list, comments, refresh, includePostSelect);
+      status.textContent = voteStateUnavailable
+        ? 'les commentaires sont affichés, mais tes votes personnels sont temporairement indisponibles.'
+        : '';
     }
 
     container.insertBefore(
@@ -826,8 +837,8 @@
       await refresh();
     } catch (error) {
       console.error('Impossible de charger les commentaires.', error);
-      const status = createStatus(container);
-      status.textContent = 'commentaires indisponibles. la connexion Supabase doit être configurée et le site ouvert depuis un serveur web.';
+      status.textContent =
+        'impossible de charger les commentaires depuis Supabase. vérifie ta connexion internet puis recharge la page.';
     }
   }
 
