@@ -9,6 +9,8 @@
   let authClient = null;
   let authSession = null;
   let currentUser = null;
+  let currentIdentities = null;
+  let accountIdentityError = '';
   let myVotes = new Map();
   const accountPanels = new Set();
   const refreshCallbacks = new Set();
@@ -308,6 +310,11 @@
     const { data, error } = await authClient.auth.getUser();
     if (error) throw error;
     currentUser = data.user;
+    const { data: identityData, error: identityError } = await authClient.auth
+      .getUserIdentities();
+    if (identityError) throw identityError;
+    currentIdentities = identityData.identities;
+    accountIdentityError = '';
     accountPanels.forEach(renderAccountPanel);
   }
 
@@ -329,6 +336,15 @@
       return;
     }
 
+    if (!currentIdentities) {
+      const message = document.createElement('p');
+      message.setAttribute('role', 'status');
+      message.textContent = accountIdentityError ||
+        'chargement des identités du compte...';
+      container.appendChild(message);
+      return;
+    }
+
     const email = document.createElement('p');
     email.className = 'account-email';
     email.textContent = currentUser.email
@@ -338,7 +354,7 @@
     explanation.textContent =
       'Relie Google ou Discord pour te connecter avec ces services. Tu peux retirer une identité puis la relier à nouveau plus tard.';
     const status = createStatus(container);
-    const linkedIdentities = currentUser.identities || [];
+    const linkedIdentities = currentIdentities;
 
     ['google', 'discord'].forEach((provider) => {
       const identity = linkedIdentities.find((item) =>
@@ -367,15 +383,19 @@
         action.addEventListener('click', async () => {
           action.disabled = true;
           status.textContent = `déliaison de ${title.textContent}...`;
+          let identityUnlinked = false;
           try {
             const { error } = await authClient.auth.unlinkIdentity(identity);
             if (error) throw error;
+            identityUnlinked = true;
             await refreshCurrentUser();
             renderAccountPage();
           } catch (error) {
             console.error(`Impossible de délier ${provider}.`, error);
-            status.textContent = `déliaison impossible : ${error.message}`;
-            action.disabled = false;
+            status.textContent = identityUnlinked
+              ? 'identité déliée, mais son état n’a pas pu être actualisé. recharge la page.'
+              : `déliaison impossible : ${error.message}`;
+            if (!identityUnlinked) action.disabled = false;
           }
         });
       } else {
@@ -828,8 +848,20 @@
         authClient.auth.onAuthStateChange((_event, session) => {
           authSession = session;
           currentUser = session?.user || null;
+          currentIdentities = null;
+          accountIdentityError = '';
           accountPanels.forEach(renderAccountPanel);
           renderAccountPage();
+          if (document.querySelector('[data-account-page]') && currentUser) {
+            window.setTimeout(() => {
+              refreshCurrentUser().then(renderAccountPage).catch((error) => {
+                console.error('Impossible de charger les identités du compte.', error);
+                accountIdentityError =
+                  'impossible de charger les identités. recharge la page ou réessaie.';
+                renderAccountPage();
+              });
+            }, 0);
+          }
           refreshCallbacks.forEach((refresh) => {
             refresh().catch((error) => {
               console.error(
@@ -844,6 +876,15 @@
       console.error(
         'La bibliothèque Supabase Auth ou sa configuration est manquante.',
       );
+    }
+    if (document.querySelector('[data-account-page]') && currentUser) {
+      try {
+        await refreshCurrentUser();
+      } catch (error) {
+        console.error('Impossible de charger les identités du compte.', error);
+        accountIdentityError =
+          'impossible de charger les identités. recharge la page ou réessaie.';
+      }
     }
     renderAccountPage();
     if (
