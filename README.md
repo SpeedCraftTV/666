@@ -46,11 +46,11 @@ N'ouvre pas `contact.html` directement depuis l'explorateur (`file://`) : le nav
 
 ### comptes visiteurs
 
-la lecture du site et des commentaires reste publique. pour commenter, voter ou signaler, il faut creer un compte avec un pseudo, une adresse e-mail et un mot de passe, ou se connecter avec Google ou Discord. la page `account.html` permet de gérer et de délier les identités Google et Discord reliées. l'adresse de compte est utilisée pour envoyer la copie d'un signalement.
+la lecture du site et des commentaires reste publique. pour commenter, répondre, voter ou signaler, il faut creer un compte avec un pseudo, une adresse e-mail et un mot de passe, ou se connecter avec Google ou Discord. la page `account.html` permet de gérer et de délier les identités Google et Discord reliées. l'adresse de compte est utilisée pour envoyer la copie d'un signalement.
 
 pour activer les comptes sur un projet deja en service, suis cet ordre :
 
-1. relance `supabase-setup.sql` dans l'editeur SQL Supabase pour ajouter les colonnes utilisateur et restreindre les commentaires, votes et signalements aux comptes connectes. les anciens commentaires et votes restent visibles.
+1. relance `supabase-setup.sql` dans l'editeur SQL Supabase pour ajouter les colonnes utilisateur et restreindre les commentaires, votes et signalements aux comptes connectes. ce script crée également la table des réponses et les permissions nécessaires. les anciens commentaires et votes restent visibles.
 2. dans **Authentication → URL Configuration**, definis l'URL du site sur `https://speedcrafttv.github.io/666/` et autorise les redirections `https://speedcrafttv.github.io/666/**` et `http://localhost:8000/**`. si le site utilise un domaine personnalise, remplace cette URL par son adresse HTTPS et autorise aussi `https://ton-domaine/**`. dans `comments-config.js`, mets la meme adresse dans `siteUrl`. les liens de confirmation et le retour Google utilisent cette adresse (meme si l'inscription a ete faite en local).
 3. pour que les nouveaux membres recoivent leur confirmation par e-mail, configure un SMTP personnalise dans **Authentication → SMTP Settings** (Resend : serveur `smtp.resend.com`, port `465` ou `587`, utilisateur `resend`, mot de passe = cle API Resend, expediteur sur le domaine verifie). garde cette cle dans les parametres Supabase, jamais dans le code.
 4. dans **Authentication → Sign In / Providers → User Signups**, active **Allow manual linking**, puis clique sur **Save changes**. cette option (beta) autorise la liaison et la déliaison manuelles des comptes Google et Discord depuis la page Compte. pour éviter de perdre l'accès, le site empêche de délier la dernière identité reliée.
@@ -61,7 +61,7 @@ pour activer les comptes sur un projet deja en service, suis cet ordre :
 
 les utilisateurs de l'ancien site peuvent creer un compte ; les anciens commentaires et votes restent visibles, mais leur historique de vote ne peut pas etre rattache a un compte.
 
-les commentaires sont publics et publiés immédiatement. un signalement est conservé dans `blog_comment_reports`, envoyé à l'adresse de réception et une copie est envoyée à l'adresse du compte qui l'a soumis. informe les visiteurs de cet usage de leurs données et définis une durée de conservation adaptée. chaque compte ne peut voter et signaler qu'une fois par commentaire.
+les commentaires et réponses sont publics et publiés immédiatement. jusqu'à trois réponses sont affichées sous chaque commentaire ; à partir de quatre, un lien ouvre `replies.html` avec toute la discussion et un accès direct à l'accueil. un signalement est conservé dans `blog_comment_reports`, envoyé à l'adresse de réception et une copie est envoyée à l'adresse du compte qui l'a soumis. informe les visiteurs de cet usage de leurs données et définis une durée de conservation adaptée. chaque compte ne peut voter et signaler qu'une fois par commentaire.
 
 Idées pour la suite :
 - ajouter d'autres aventures de Mini Castor

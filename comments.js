@@ -6,6 +6,7 @@
   const siteBaseUrl = new URL('.', scriptUrl);
   const productionSiteUrl = config.siteUrl || 'https://speedcrafttv.github.io/666/';
   const pendingIdentityLinkKey = 'blog-pending-identity-link';
+  const replyPreviewLimit = 3;
   let authClient = null;
   let authSession = null;
   let currentUser = null;
@@ -167,6 +168,12 @@
 
   function rootPrefixForCurrentPage() {
     return window.location.pathname.includes('/posts/') ? '../' : './';
+  }
+
+  function getRepliesPageUrl(comment) {
+    const url = new URL(`${rootPrefixForCurrentPage()}replies.html`, window.location.href);
+    url.searchParams.set('comment', comment.id);
+    return url.href;
   }
 
   function createSiteNavigation() {
@@ -614,7 +621,76 @@
     return new Date(value).toLocaleString('fr-FR');
   }
 
-  function createCommentCard(comment, refresh) {
+  function createReplyForm(comment, onSubmitted, initiallyVisible = false) {
+    const form = document.createElement('form');
+    form.className = 'comment-form reply-form';
+    form.hidden = !initiallyVisible;
+
+    const label = document.createElement('label');
+    label.textContent = 'Ta réponse :';
+    const input = document.createElement('textarea');
+    input.name = 'body';
+    input.maxLength = 500;
+    input.rows = 3;
+    input.required = true;
+    label.appendChild(input);
+
+    const actions = document.createElement('div');
+    actions.className = 'comment-actions';
+    const submit = document.createElement('button');
+    submit.type = 'submit';
+    submit.textContent = 'Publier la réponse';
+    const status = createStatus(form);
+    actions.appendChild(submit);
+    form.append(label, actions);
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!await requireAccount()) return;
+      const body = input.value.trim();
+      if (!body) {
+        status.textContent = 'Écris une réponse avant de la publier.';
+        return;
+      }
+
+      submit.disabled = true;
+      status.textContent = 'Publication de la réponse...';
+      try {
+        await request('blog_comment_replies', {
+          method: 'POST',
+          headers: { Prefer: 'return=minimal' },
+          body: JSON.stringify({
+            comment_id: comment.id,
+            author_name: getNickname(currentUser),
+            body,
+            user_id: currentUser.id,
+          }),
+        });
+      } catch (error) {
+        console.error('Impossible de publier la réponse.', error);
+        status.textContent = `Publication impossible : ${error.message}`;
+        submit.disabled = false;
+        return;
+      }
+
+      form.reset();
+      status.textContent = 'Réponse publiée !';
+      try {
+        await onSubmitted();
+      } catch (error) {
+        console.error(
+          'La réponse a été publiée, mais la liste n’a pas pu être actualisée.',
+          error,
+        );
+        status.textContent =
+          'Réponse publiée. Recharge la page pour actualiser la liste.';
+      }
+      submit.disabled = false;
+    });
+    return form;
+  }
+
+  function createCommentCard(comment, refresh, replyData = { count: 0, previews: [] }) {
     const card = document.createElement('article');
     card.className = 'visitor-comment';
 
@@ -669,8 +745,49 @@
       if (await requireAccount()) report(comment);
     });
 
-    actions.append(upButton, downButton, reportButton);
-    card.appendChild(actions);
+    const replyButton = document.createElement('button');
+    replyButton.type = 'button';
+    replyButton.className = 'comment-action reply-toggle';
+    replyButton.textContent = 'Répondre';
+    const replyForm = createReplyForm(comment, refresh);
+    replyButton.addEventListener('click', async () => {
+      if (!await requireAccount()) return;
+      replyForm.hidden = !replyForm.hidden;
+      if (!replyForm.hidden) replyForm.querySelector('textarea').focus();
+    });
+
+    actions.append(upButton, downButton, replyButton, reportButton);
+    card.append(actions);
+
+    if (replyData.count > 0) {
+      const replies = document.createElement('div');
+      replies.className = 'comment-replies-preview';
+      const heading = document.createElement('h4');
+      heading.textContent = replyData.count === 1
+        ? '1 réponse'
+        : `${replyData.count} réponses`;
+      replies.appendChild(heading);
+      replyData.previews.forEach((reply) => {
+        const preview = document.createElement('article');
+        preview.className = 'comment-reply-preview';
+        const replyHeading = document.createElement('h5');
+        replyHeading.textContent =
+          `${reply.author_name} — ${formatDate(reply.created_at)}`;
+        const replyBody = document.createElement('p');
+        replyBody.textContent = reply.body;
+        preview.append(replyHeading, replyBody);
+        replies.appendChild(preview);
+      });
+      if (replyData.count > replyPreviewLimit) {
+        const viewAll = document.createElement('a');
+        viewAll.className = 'view-all-replies';
+        viewAll.href = getRepliesPageUrl(comment);
+        viewAll.textContent = `Voir les ${replyData.count} réponses`;
+        replies.appendChild(viewAll);
+      }
+      card.appendChild(replies);
+    }
+    card.appendChild(replyForm);
     return card;
   }
 
@@ -865,7 +982,7 @@
     myVotes = new Map(votes.map((item) => [item.comment_id, item.vote]));
   }
 
-  function renderList(container, comments, refresh, grouped) {
+  function renderList(container, comments, refresh, grouped, replyDataByComment) {
     container.replaceChildren();
     if (!comments.length) {
       const empty = document.createElement('p');
@@ -882,8 +999,112 @@
         container.appendChild(postTitle);
         previousPostId = comment.post_id;
       }
-      container.appendChild(createCommentCard(comment, refresh));
+      container.appendChild(
+        createCommentCard(
+          comment,
+          refresh,
+          replyDataByComment.get(comment.id) || { count: 0, previews: [] },
+        ),
+      );
     });
+  }
+
+  async function loadReplyPreviews(comments) {
+    if (!comments.length) return new Map();
+    const rows = [];
+    for (let index = 0; index < comments.length; index += 500) {
+      const batch = comments.slice(index, index + 500);
+      rows.push(...await request('rpc/get_blog_comment_reply_previews', {
+        method: 'POST',
+        body: JSON.stringify({
+          p_comment_ids: batch.map((comment) => comment.id),
+        }),
+      }));
+    }
+    return new Map(rows.map((row) => [
+      row.comment_id,
+      { count: Number(row.reply_count), previews: row.previews || [] },
+    ]));
+  }
+
+  async function renderRepliesPage(container) {
+    const commentId = new URLSearchParams(window.location.search).get('comment');
+    const status = createStatus(container);
+    if (!commentId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(commentId)) {
+      status.textContent = 'Le lien vers ce commentaire est invalide.';
+      return;
+    }
+
+    try {
+      const comments = await request(
+        `blog_comments?select=id,post_id,author_name,body,created_at&id=eq.${commentId}&limit=1`,
+      );
+      const comment = comments[0];
+      if (!comment) {
+        status.textContent = 'Ce commentaire n’existe plus.';
+        return;
+      }
+
+      const article = document.createElement('article');
+      article.className = 'visitor-comment replies-parent-comment';
+      const commentHeading = document.createElement('h2');
+      commentHeading.textContent =
+        `Commentaire de ${comment.author_name} — ${formatDate(comment.created_at)}`;
+      const commentBody = document.createElement('p');
+      commentBody.textContent = comment.body;
+      article.append(commentHeading, commentBody);
+
+      const repliesHeading = document.createElement('h2');
+      repliesHeading.className = 'all-replies-heading';
+      repliesHeading.textContent = 'Toutes les réponses';
+      const repliesList = document.createElement('div');
+      repliesList.className = 'all-replies-list';
+      const refresh = async () => {
+        const query = new URLSearchParams({
+          select: 'id,author_name,body,created_at',
+          comment_id: `eq.${comment.id}`,
+          order: 'created_at.asc,id.asc',
+        });
+        const replies = await request(`blog_comment_replies?${query}`);
+        repliesList.replaceChildren();
+        if (!replies.length) {
+          const empty = document.createElement('p');
+          empty.textContent = 'Pas encore de réponse. Sois le premier !';
+          repliesList.appendChild(empty);
+          return;
+        }
+        replies.forEach((reply) => {
+          const replyCard = document.createElement('article');
+          replyCard.className = 'visitor-comment comment-reply';
+          const heading = document.createElement('h3');
+          heading.textContent =
+            `${reply.author_name} — ${formatDate(reply.created_at)}`;
+          const body = document.createElement('p');
+          body.textContent = reply.body;
+          replyCard.append(heading, body);
+          repliesList.appendChild(replyCard);
+        });
+      };
+
+      const replyForm = createReplyForm(comment, refresh, true);
+      const postLink = document.createElement('a');
+      postLink.className = 'comment-parent-link';
+      postLink.href = `posts/${comment.post_id}.html`;
+      postLink.textContent = 'Retour à l’article';
+      container.append(
+        article,
+        repliesHeading,
+        repliesList,
+        replyForm,
+        postLink,
+      );
+      await refresh();
+      status.textContent = '';
+    } catch (error) {
+      console.error('Impossible de charger les réponses.', error);
+      status.textContent =
+        `Impossible de charger les réponses : ${error.message}`;
+    }
   }
 
   async function initialize(container, postId, includePostSelect) {
@@ -904,6 +1125,7 @@
       }
       const comments = await loadComments(postId);
       let voteStateUnavailable = false;
+      let replyStateUnavailable = false;
       try {
         await loadMyVotes(comments);
       } catch (error) {
@@ -911,10 +1133,22 @@
         myVotes = new Map();
         voteStateUnavailable = true;
       }
-      renderList(list, comments, refresh, includePostSelect);
-      status.textContent = voteStateUnavailable
-        ? 'Les commentaires sont affichés, mais tes votes personnels sont temporairement indisponibles.'
-        : '';
+      let replyDataByComment = new Map();
+      try {
+        replyDataByComment = await loadReplyPreviews(comments);
+      } catch (error) {
+        console.error('Impossible de charger les aperçus des réponses.', error);
+        replyStateUnavailable = true;
+      }
+      renderList(list, comments, refresh, includePostSelect, replyDataByComment);
+      status.textContent = [
+        voteStateUnavailable
+          ? 'Les commentaires sont affichés, mais tes votes personnels sont temporairement indisponibles.'
+          : '',
+        replyStateUnavailable
+          ? 'Les réponses sont temporairement indisponibles.'
+          : '',
+      ].filter(Boolean).join(' ');
     }
 
     container.insertBefore(
@@ -1022,12 +1256,16 @@
         'La liaison n’a pas pu être terminée car la session a expiré. Reconnecte-toi puis réessaie.';
       renderAccountPage();
     }
-    document.querySelectorAll('.comments-widget:not(.comments-page)').forEach(
+    document.querySelectorAll(
+      '.comments-widget:not(.comments-page):not(.replies-page)',
+    ).forEach(
       (container) => {
       initialize(container, container.dataset.postId, false);
       },
     );
     const commentsPage = document.querySelector('[data-comments-page]');
     if (commentsPage) initialize(commentsPage, '', true);
+    const repliesPage = document.querySelector('[data-replies-page]');
+    if (repliesPage) await renderRepliesPage(repliesPage);
   });
 })();

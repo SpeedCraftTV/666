@@ -328,6 +328,66 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 .report-honeypot { position: absolute; left: -10000px; }
 .comments-page { margin-top: 18px; }
 .comments-page .comments-list > h2 { margin-top: 28px; font: bold 18px 'Courier New', monospace; }
+.comment-replies-preview {
+  margin: 14px 0 0 12px;
+  padding: 4px 0 4px 14px;
+  border-left: 2px solid rgba(127,0,0,0.65);
+}
+.comment-replies-preview > h4,
+.all-replies-heading {
+  margin: 8px 0;
+  color: #ffb3b3;
+  font: bold 15px 'Courier New', monospace;
+}
+.comment-reply-preview {
+  margin: 8px 0;
+  padding: 10px 12px;
+  background: #0b0b0b;
+  border: 1px solid #242424;
+}
+.comment-reply-preview h5 {
+  margin: 0 0 6px;
+  color: #ccc;
+  font: bold 13px 'Courier New', monospace;
+}
+.comment-reply-preview p,
+.comment-reply p { margin: 0; }
+.view-all-replies,
+.comment-parent-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  margin: 6px 0;
+  padding: 8px 12px;
+  color: #ff6666;
+  background: #160000;
+  border: 1px solid rgba(179,0,0,0.6);
+  border-radius: 4px;
+  font: bold 14px 'Courier New', monospace;
+  text-decoration: none;
+}
+.reply-form {
+  margin: 12px 0 0 12px;
+  padding: 12px;
+  background: #0b0b0b;
+  border-left: 2px solid rgba(127,0,0,0.65);
+}
+.reply-form[hidden] { display: none; }
+.replies-navigation {
+  width: min(900px, 100%);
+  margin: 0 auto 12px;
+  text-align: left;
+}
+.replies-page > .comments-status:empty { display: none; }
+.replies-parent-comment h2 {
+  margin: 0 0 10px;
+  color: #ff6666;
+  font: bold 18px/1.4 'Courier New', monospace;
+}
+.all-replies-heading { margin-top: 24px; font-size: 18px; }
+.all-replies-list { margin-bottom: 16px; }
+.comment-reply { margin-left: 14px; }
+.replies-page > .reply-form { margin: 16px 0; }
 
 html {
   box-sizing: border-box;
@@ -531,6 +591,12 @@ hr {
   }
 
   .comment-actions { gap: 8px; }
+  .comment-actions .comment-action { flex: 1 1 auto; }
+  .comment-replies-preview { margin-left: 4px; padding-left: 10px; }
+  .reply-form { margin-left: 4px; padding: 10px; }
+  .replies-navigation { width: 100%; }
+  .replies-page { width: 100%; }
+  .comment-reply { margin-left: 4px; }
 
   .account-page {
     margin-top: 12px;
