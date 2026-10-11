@@ -23,9 +23,23 @@ marquee.banner { display: inline-block; padding: 10px 14px; background: linear-g
 .site-title { color: var(--accent); font-family: 'Courier New', monospace; text-shadow: 0 0 12px rgba(179,0,0,0.6), 0 0 2px rgba(0,0,0,0.8); }
 
 /* navigation */
-.nav-table { margin-top: 12px; }
-.nav-table a { padding: 6px 12px; display: inline-block; background: transparent; color: var(--accent); border: 2px solid rgba(179,0,0,0.6); text-decoration: none; margin: 0 4px; }
-.nav-table a:hover { background: rgba(179,0,0,0.08); box-shadow: 0 0 10px rgba(179,0,0,0.12); }
+.site-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 92%;
+  margin: 12px auto;
+}
+.site-navigation > a {
+  padding: 6px 12px;
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid rgba(179,0,0,0.6);
+  text-decoration: none;
+}
+.site-navigation > a:hover { background: rgba(179,0,0,0.08); box-shadow: 0 0 10px rgba(179,0,0,0.12); }
 
 .post { width: 80%; text-align: left; background: linear-gradient(180deg, #0f0f10, #070707); margin: 16px auto; padding: 12px; border: 1px solid rgba(127,0,0,0.4); box-shadow: 0 0 30px rgba(0,0,0,0.6); }
 .post h2 { color: #ff4d4d; text-shadow: 0 0 8px rgba(179,0,0,0.45); }
@@ -174,6 +188,16 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 }
 .visitor-comment h3 { margin-top: 0; font: bold 14px 'Courier New', monospace; }
 .comment-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.account-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+  padding-left: 12px;
+  font: 14px 'Courier New', monospace;
+}
 .report-action { border-color: #777; background: #222; }
 .comments-status { color: #ffb3b3; }
 .report-dialog {
@@ -187,6 +211,8 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 }
 .report-dialog::backdrop { background: rgba(0,0,0,0.8); }
 .report-dialog h2 { color: #ff4d4d; }
+.account-dialog { width: min(560px, calc(100% - 32px)); }
+.account-dialog form > label[hidden] { display: none; }
 .report-consent { display: flex !important; grid-template-columns: auto 1fr; align-items: start; }
 .report-consent input { width: auto; margin-top: 3px; }
 .report-honeypot { position: absolute; left: -10000px; }
@@ -195,4 +221,6 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 
 @media (max-width: 600px) {
   .comments-widget { width: 94%; padding: 12px; }
+  .site-navigation { width: 96%; gap: 6px; }
+  .account-panel { margin-left: 0; padding-left: 0; }
 }

@@ -25,6 +25,23 @@ create table if not exists public.blog_comment_reports (
   unique (comment_id, visitor_id)
 );
 
+alter table public.blog_comments
+  add column if not exists user_id uuid references auth.users(id) on delete set null;
+
+alter table public.blog_comment_votes
+  add column if not exists user_id uuid references auth.users(id) on delete cascade;
+
+alter table public.blog_comment_reports
+  add column if not exists user_id uuid references auth.users(id) on delete cascade;
+
+create unique index if not exists blog_comment_votes_comment_user_idx
+  on public.blog_comment_votes (comment_id, user_id)
+  where user_id is not null;
+
+create unique index if not exists blog_comment_reports_comment_user_idx
+  on public.blog_comment_reports (comment_id, user_id)
+  where user_id is not null;
+
 alter table public.blog_comment_reports
   add column if not exists reporter_name text not null default '',
   add column if not exists reporter_email text not null default '',
@@ -67,15 +84,46 @@ create policy "comments are public"
   to anon, authenticated
   using (true);
 
-drop policy if exists "visitors can add comments" on public.blog_comments;
-create policy "visitors can add comments"
+drop policy if exists "authenticated users can add comments" on public.blog_comments;
+create policy "authenticated users can add comments"
   on public.blog_comments for insert
-  to anon, authenticated
+  to authenticated
   with check (
-    post_id ~ '^post([1-9]|10)$'
+    auth.uid() = user_id
+    and post_id ~ '^post([1-9]|10)$'
     and char_length(btrim(author_name)) between 1 and 40
+    and author_name = left(coalesce(
+      nullif(btrim(auth.jwt() -> 'user_metadata' ->> 'nickname'), ''),
+      split_part(auth.jwt() ->> 'email', '@', 1)
+    ),
+      40
+    )
     and char_length(btrim(body)) between 1 and 500
   );
+
+drop policy if exists "visitors can vote" on public.blog_comment_votes;
+drop policy if exists "authenticated users can vote" on public.blog_comment_votes;
+create policy "authenticated users can vote"
+  on public.blog_comment_votes for insert
+  to authenticated
+  with check (auth.uid() = user_id and vote in (-1, 1));
+
+drop policy if exists "visitors can change their vote" on public.blog_comment_votes;
+drop policy if exists "authenticated users can change their vote" on public.blog_comment_votes;
+create policy "authenticated users can change their vote"
+  on public.blog_comment_votes for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id and vote in (-1, 1));
+
+drop policy if exists "visitors can remove their vote" on public.blog_comment_votes;
+drop policy if exists "authenticated users can remove their vote" on public.blog_comment_votes;
+create policy "authenticated users can remove their vote"
+  on public.blog_comment_votes for delete
+  to authenticated
+  using (auth.uid() = user_id);
+
+drop policy if exists "visitors can add comments" on public.blog_comments;
 
 drop policy if exists "vote totals are public" on public.blog_comment_votes;
 create policy "vote totals are public"
@@ -83,32 +131,18 @@ create policy "vote totals are public"
   to anon, authenticated
   using (true);
 
-drop policy if exists "visitors can vote" on public.blog_comment_votes;
-create policy "visitors can vote"
-  on public.blog_comment_votes for insert
-  to anon, authenticated
-  with check (vote in (-1, 1));
-
-drop policy if exists "visitors can change their vote" on public.blog_comment_votes;
-create policy "visitors can change their vote"
-  on public.blog_comment_votes for update
-  to anon, authenticated
-  using (true)
-  with check (vote in (-1, 1));
-
-drop policy if exists "visitors can remove their vote" on public.blog_comment_votes;
-create policy "visitors can remove their vote"
-  on public.blog_comment_votes for delete
-  to anon, authenticated
-  using (true);
-
 drop policy if exists "visitors can report comments" on public.blog_comment_reports;
 
-grant select, insert on public.blog_comments to anon, authenticated;
-grant select on public.blog_comment_votes to anon, authenticated;
-grant insert (comment_id, visitor_id, vote) on public.blog_comment_votes to anon, authenticated;
-grant update (vote) on public.blog_comment_votes to anon, authenticated;
-grant delete on public.blog_comment_votes to anon, authenticated;
+revoke select, insert on public.blog_comments from public, anon, authenticated;
+grant select (id, post_id, author_name, body, created_at)
+  on public.blog_comments to anon, authenticated;
+grant insert (post_id, author_name, body, user_id) on public.blog_comments to authenticated;
+revoke select, insert, update, delete on public.blog_comment_votes from public, anon, authenticated;
+grant select (comment_id, vote) on public.blog_comment_votes to anon;
+grant select (comment_id, user_id, vote) on public.blog_comment_votes to authenticated;
+grant insert (comment_id, visitor_id, vote, user_id) on public.blog_comment_votes to authenticated;
+grant update (vote) on public.blog_comment_votes to authenticated;
+grant delete on public.blog_comment_votes to authenticated;
 revoke all on public.blog_comment_reports from anon, authenticated;
 grant select on public.blog_comments to service_role;
 grant insert on public.blog_comment_reports to service_role;

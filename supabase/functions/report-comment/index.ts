@@ -73,6 +73,32 @@ async function hashRateLimitKey(ip: string, secret: string): Promise<string> {
   ).join("");
 }
 
+async function getAuthenticatedUser(
+  request: Request,
+): Promise<Record<string, unknown> | null> {
+  const authorization = request.headers.get("authorization");
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (
+    !authorization?.startsWith("Bearer ") || !supabaseUrl || !serviceRoleKey
+  ) {
+    return null;
+  }
+
+  const response = await fetch(`${supabaseUrl}/auth/v1/user`, {
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: authorization,
+    },
+  });
+  if (!response.ok) return null;
+
+  const user: unknown = await response.json();
+  return typeof user === "object" && user !== null && !Array.isArray(user)
+    ? user as Record<string, unknown>
+    : null;
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -101,30 +127,42 @@ Deno.serve(async (request) => {
   const commentId = typeof input.comment_id === "string"
     ? input.comment_id
     : "";
-  const visitorId = typeof input.visitor_id === "string"
-    ? input.visitor_id
-    : "";
-  const reporterName = typeof input.reporter_name === "string"
-    ? input.reporter_name.trim()
-    : "";
-  const reporterEmail = typeof input.reporter_email === "string"
-    ? input.reporter_email.trim()
-    : "";
   const message = typeof input.message === "string" ? input.message.trim() : "";
 
   if (
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       .test(commentId) ||
-    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-      .test(visitorId) ||
-    reporterName.length < 1 || reporterName.length > 80 ||
-    reporterEmail.length > 254 ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(reporterEmail) ||
     message.length < 1 || message.length > 2000
   ) {
     return jsonResponse(400, {
-      error:
-        "Vérifie le pseudo, l’adresse e-mail et le message du signalement.",
+      error: "Vérifie le message du signalement.",
+    });
+  }
+
+  let user: Record<string, unknown> | null;
+  try {
+    user = await getAuthenticatedUser(request);
+  } catch (error) {
+    console.error("Could not verify report user:", error);
+    return jsonResponse(503, {
+      error: "Impossible de vérifier ton compte pour le moment.",
+    });
+  }
+  const userId = typeof user?.id === "string" ? user.id : "";
+  const reporterEmail = typeof user?.email === "string"
+    ? user.email.trim()
+    : "";
+  const userMetadata = typeof user?.user_metadata === "object" &&
+      user.user_metadata !== null && !Array.isArray(user.user_metadata)
+    ? user.user_metadata as Record<string, unknown>
+    : {};
+  const reporterNameCandidate = userMetadata.nickname ?? userMetadata.name;
+  const reporterName = typeof reporterNameCandidate === "string"
+    ? reporterNameCandidate.trim().slice(0, 80)
+    : reporterEmail.split("@")[0].slice(0, 80);
+  if (!userId || !reporterEmail || !reporterName) {
+    return jsonResponse(401, {
+      error: "Connecte-toi à ton compte pour signaler un commentaire.",
     });
   }
 
@@ -201,7 +239,8 @@ Deno.serve(async (request) => {
       headers: { Prefer: "return=minimal" },
       body: JSON.stringify({
         comment_id: commentId,
-        visitor_id: visitorId,
+        visitor_id: userId,
+        user_id: userId,
         reporter_name: reporterName,
         reporter_email: reporterEmail,
         message,
@@ -213,7 +252,7 @@ Deno.serve(async (request) => {
       const duplicate = reportResponse.status === 409;
       return jsonResponse(duplicate ? 409 : 500, {
         error: duplicate
-          ? "Tu as déjà signalé ce commentaire depuis ce navigateur."
+          ? "Tu as déjà signalé ce commentaire avec ce compte."
           : "Impossible d’enregistrer le signalement.",
       });
     }
