@@ -148,25 +148,37 @@
     const form = document.createElement('form');
     form.className = 'comment-form';
     const status = createStatus(form);
-    const googleSignIn = document.createElement('button');
-    googleSignIn.type = 'button';
-    googleSignIn.className = 'comment-action google-sign-in';
-    googleSignIn.textContent = 'continuer avec Google';
-    googleSignIn.addEventListener('click', async () => {
-      googleSignIn.disabled = true;
-      status.textContent = 'connexion avec Google...';
-      try {
-        const { error } = await authClient.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: getSiteRedirectUrl() },
-        });
-        if (error) throw error;
-      } catch (error) {
-        console.error('Connexion Google impossible.', error);
-        status.textContent = `connexion Google impossible : ${error.message}`;
-        googleSignIn.disabled = false;
-      }
-    });
+    function createOAuthButton(provider, label, scopes) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `comment-action oauth-sign-in ${provider}-sign-in`;
+      button.textContent = label;
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        status.textContent = `connexion avec ${provider === 'google' ? 'Google' : 'Discord'}...`;
+        try {
+          const { error } = await authClient.auth.signInWithOAuth({
+            provider,
+            options: {
+              redirectTo: getSiteRedirectUrl(),
+              ...(scopes ? { scopes } : {}),
+            },
+          });
+          if (error) throw error;
+        } catch (error) {
+          console.error(`Connexion ${provider} impossible.`, error);
+          status.textContent = `connexion ${provider} impossible : ${error.message}`;
+          button.disabled = false;
+        }
+      });
+      return button;
+    }
+    const oauthButtons = document.createElement('div');
+    oauthButtons.className = 'oauth-buttons';
+    oauthButtons.append(
+      createOAuthButton('google', 'continuer avec Google'),
+      createOAuthButton('discord', 'continuer avec Discord', 'identify email'),
+    );
     const divider = document.createElement('p');
     divider.className = 'account-dialog-divider';
     divider.textContent = 'ou avec ton e-mail';
@@ -226,7 +238,7 @@
     actions.className = 'comment-actions';
     actions.append(submit, switchMode, cancel);
     form.append(
-      googleSignIn,
+      oauthButtons,
       divider,
       nicknameLabel,
       emailLabel,
@@ -525,10 +537,13 @@
     consentCheckbox.type = 'checkbox';
     consentCheckbox.name = 'consent';
     consentCheckbox.required = true;
+    const accountEmail = currentUser.email;
     consent.append(
       consentCheckbox,
       document.createTextNode(
-        `j’accepte que mon pseudo et l’adresse ${currentUser.email} soient utilisés pour traiter ce signalement et m’envoyer une copie par e-mail.`,
+        accountEmail
+          ? `j’accepte que mon pseudo et l’adresse ${accountEmail} soient utilisés pour traiter ce signalement et m’envoyer une copie par e-mail.`
+          : 'une adresse e-mail vérifiée est nécessaire pour signaler un commentaire et recevoir une copie.',
       ),
     );
     const buttons = document.createElement('div');
@@ -536,6 +551,7 @@
     const submit = document.createElement('button');
     submit.type = 'submit';
     submit.textContent = 'envoyer le signalement';
+    submit.disabled = !accountEmail;
     const cancel = document.createElement('button');
     cancel.type = 'button';
     cancel.className = 'comment-action';
@@ -543,6 +559,9 @@
     cancel.addEventListener('click', () => dialog.close());
     buttons.append(submit, cancel);
     form.append(messageLabel, consent, buttons);
+    if (!accountEmail) {
+      status.textContent = 'aucune adresse e-mail vérifiée n’est associée à ce compte. connecte-toi avec Google ou une adresse e-mail pour signaler.';
+    }
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();

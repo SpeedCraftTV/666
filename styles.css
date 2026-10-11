@@ -213,7 +213,11 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 .report-dialog h2 { color: #ff4d4d; }
 .account-dialog { width: min(560px, calc(100% - 32px)); }
 .account-dialog form > label[hidden] { display: none; }
-.google-sign-in { width: 100% !important; }
+.oauth-buttons {
+  display: grid;
+  gap: 8px;
+}
+.oauth-sign-in { width: 100% !important; }
 .account-dialog-divider {
   margin: 0;
   color: #999;
