@@ -14,6 +14,16 @@ fichiers principaux:
 
 pour l'utiliser, les pages statiques peuvent etre ouvertes directement. les archives et les commentaires partagés demandent toutefois un serveur web.
 
+pour lancer rapidement le site localement dans VS Code :
+1. ouvre la palette de commandes et lance `Tasks: Run Task` puis `Serve blog local`, ou
+2. lance `Run and Debug` puis `Ouvrir le blog`.
+
+le serveur tourne sur `http://localhost:8000` et peut etre relance manuellement apres un redemarrage de VS Code avec la meme commande. le script `start-local-server.ps1` demarre le site en tache de fond sans fenetre visible et ouvre automatiquement le navigateur.
+
+## publication gratuite avec GitHub Pages
+
+le depot doit etre public pour utiliser GitHub Pages gratuitement. apres activation de **Settings → Pages → Build and deployment → GitHub Actions**, chaque push sur `main` publie automatiquement le site à l'adresse `https://speedcrafttv.github.io/666/`. le workflow ne publie que les pages, styles, scripts, images et archives du site ; les scripts locaux et les sources Supabase ne sont pas inclus.
+
 ## commentaires partagés
 
 les commentaires, votes et signalements utilisent Supabase :
