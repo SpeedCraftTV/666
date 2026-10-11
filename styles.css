@@ -198,6 +198,14 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
   padding-left: 12px;
   font: 14px 'Courier New', monospace;
 }
+.account-panel .account-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  visibility: visible;
+  opacity: 1;
+}
 .report-action { border-color: #777; background: #222; }
 .comments-status { color: #ffb3b3; }
 .report-dialog {
@@ -218,6 +226,13 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
   gap: 8px;
 }
 .oauth-sign-in { width: 100% !important; }
+.linked-identities {
+  margin: 8px 0 16px;
+  padding-left: 22px;
+  font: 14px 'Courier New', monospace;
+}
+.linked-identities li { margin: 6px 0; }
+.account-email { overflow-wrap: anywhere; }
 .account-dialog-divider {
   margin: 0;
   color: #999;

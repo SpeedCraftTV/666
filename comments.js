@@ -5,6 +5,7 @@
   const scriptUrl = document.currentScript?.src || window.location.href;
   const siteBaseUrl = new URL('.', scriptUrl);
   const productionSiteUrl = config.siteUrl || 'https://speedcrafttv.github.io/666/';
+  const pendingIdentityLinkKey = 'blog-pending-identity-link';
   let authClient = null;
   let authSession = null;
   let currentUser = null;
@@ -80,6 +81,11 @@
     if (currentUser) {
       const identity = document.createElement('span');
       identity.textContent = `connecté·e : ${getNickname(currentUser)}`;
+      const manageAccount = document.createElement('button');
+      manageAccount.type = 'button';
+      manageAccount.className = 'comment-action account-button';
+      manageAccount.textContent = 'compte';
+      manageAccount.addEventListener('click', openAccountManagementDialog);
       const logout = document.createElement('button');
       logout.type = 'button';
       logout.className = 'comment-action';
@@ -91,7 +97,7 @@
           window.alert(`déconnexion impossible : ${error.message}`);
         }
       });
-      panel.append(identity, logout);
+      panel.append(identity, manageAccount, logout);
       return;
     }
 
@@ -281,6 +287,83 @@
 
     setMode('signup');
     dialog.append(heading, form);
+    dialog.addEventListener('close', () => dialog.remove(), { once: true });
+    document.body.appendChild(dialog);
+    dialog.showModal();
+  }
+
+  function openAccountManagementDialog() {
+    if (!currentUser) return;
+
+    const dialog = document.createElement('dialog');
+    dialog.className = 'report-dialog account-dialog';
+    const heading = document.createElement('h2');
+    heading.textContent = 'mon compte';
+    const email = document.createElement('p');
+    email.className = 'account-email';
+    email.textContent = currentUser.email
+      ? `adresse du compte : ${currentUser.email}`
+      : 'aucune adresse e-mail associée à ce compte.';
+    const description = document.createElement('p');
+    description.textContent =
+      'relie Google ou Discord pour pouvoir te connecter avec l’un ou l’autre.';
+    const identityList = document.createElement('ul');
+    identityList.className = 'linked-identities';
+    const linkedProviders = new Set(
+      (currentUser.identities || []).map((identity) => identity.provider),
+    );
+    ['google', 'discord'].forEach((provider) => {
+      const item = document.createElement('li');
+      const label = provider === 'google' ? 'Google' : 'Discord';
+      item.textContent = linkedProviders.has(provider)
+        ? `${label} : compte relié`
+        : `${label} : non relié`;
+      identityList.appendChild(item);
+    });
+    const status = createStatus(dialog);
+    const actions = document.createElement('div');
+    actions.className = 'comment-actions';
+
+    function createLinkButton(provider) {
+      if (linkedProviders.has(provider)) return;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'comment-action';
+      button.textContent = provider === 'google'
+        ? 'relier Google'
+        : 'relier Discord';
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        status.textContent = `redirection vers ${provider === 'google' ? 'Google' : 'Discord'}...`;
+        try {
+          sessionStorage.setItem(pendingIdentityLinkKey, provider);
+          const { error } = await authClient.auth.linkIdentity({
+            provider,
+            options: {
+              redirectTo: getSiteRedirectUrl(),
+              ...(provider === 'discord' ? { scopes: 'identify email' } : {}),
+            },
+          });
+          if (error) throw error;
+        } catch (error) {
+          sessionStorage.removeItem(pendingIdentityLinkKey);
+          console.error(`Impossible de relier le compte ${provider}.`, error);
+          status.textContent = `liaison impossible : ${error.message}`;
+          button.disabled = false;
+        }
+      });
+      actions.appendChild(button);
+    }
+
+    createLinkButton('google');
+    createLinkButton('discord');
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'comment-action';
+    close.textContent = 'fermer';
+    close.addEventListener('click', () => dialog.close());
+    actions.appendChild(close);
+    dialog.append(heading, email, description, identityList, status, actions);
     dialog.addEventListener('close', () => dialog.remove(), { once: true });
     document.body.appendChild(dialog);
     dialog.showModal();
@@ -722,6 +805,13 @@
       console.error(
         'La bibliothèque Supabase Auth ou sa configuration est manquante.',
       );
+    }
+    if (
+      currentUser &&
+      sessionStorage.getItem(pendingIdentityLinkKey)
+    ) {
+      sessionStorage.removeItem(pendingIdentityLinkKey);
+      openAccountManagementDialog();
     }
     document.querySelectorAll('.comments-widget:not(.comments-page)').forEach(
       (container) => {
