@@ -79,6 +79,10 @@
     const submit = form.querySelector('[type="submit"]');
     form.addEventListener('submit', async function(ev){
       ev.preventDefault();
+      if (location.protocol === 'file:') {
+        status.textContent = 'Ouvre le site avec le serveur local (http://localhost:8000 ou http://127.0.0.1:8765), pas directement depuis le fichier contact.html.';
+        return;
+      }
       if (!window.BLOG_SUPABASE?.url || !window.BLOG_SUPABASE?.anonKey) {
         status.textContent = 'Le formulaire est indisponible : la configuration Supabase manque.';
         return;
@@ -103,15 +107,26 @@
             }),
           },
         );
-        const result = await response.json();
+        const responseBody = await response.text();
+        let result = {};
+        if (responseBody) {
+          try {
+            result = JSON.parse(responseBody);
+          } catch {
+            throw new Error('Le service de contact a renvoyé une réponse illisible. Réessaie plus tard.');
+          }
+        }
+        if (response.status === 404) {
+          throw new Error('Le service de contact n’est pas encore déployé sur Supabase. Consulte le README ou contacte directement minicastorbot@gmail.com.');
+        }
         if (!response.ok) {
-          throw new Error(result.error || 'Le message n’a pas pu être envoyé.');
+          throw new Error(result.error || result.message || 'Le message n’a pas pu être envoyé.');
         }
         form.reset();
         status.textContent = 'Message envoyé à Mini Castor. Merci !';
       } catch (error) {
         console.error('Envoi du formulaire de contact impossible.', error);
-        status.textContent = `${error.message} Tu peux aussi écrire directement à minicastorbot@gmail.com.`;
+        status.textContent = `${error.message || 'Impossible de joindre le service de contact.'} Tu peux aussi écrire directement à minicastorbot@gmail.com.`;
       } finally {
         submit.disabled = false;
       }

@@ -42,6 +42,8 @@ Le formulaire envoie le nom, l'adresse e-mail et le message à `minicastorbot@gm
 
 Après `supabase login`, exécute `.\deploy-contact-message.ps1` à la racine pour publier `contact-message`. Aucun SQL supplémentaire n'est requis : elle réutilise la limite d'envoi par adresse IP créée par `supabase-setup.sql`. Le formulaire confirme l'envoi seulement si Resend l'accepte ; sinon, il affiche une erreur et conserve le message saisi. L'envoi réel nécessite cette fonction déployée et les secrets Resend configurés.
 
+N'ouvre pas `contact.html` directement depuis l'explorateur (`file://`) : le navigateur bloque les appels réseau de cette page. Lance le serveur local du dépôt, puis ouvre `http://localhost:8000/contact.html` (ou l'adresse `http://127.0.0.1:8765/contact.html` si c'est celle de ton serveur). Si le formulaire répond que le service n'est pas déployé, déploie `contact-message` avec le script ci-dessus et publie ensuite les changements du site sur GitHub Pages.
+
 ### comptes visiteurs
 
 la lecture du site et des commentaires reste publique. pour commenter, voter ou signaler, il faut creer un compte avec un pseudo, une adresse e-mail et un mot de passe, ou se connecter avec Google ou Discord. la page `account.html` permet de gérer et de délier les identités Google et Discord reliées. l'adresse de compte est utilisée pour envoyer la copie d'un signalement.
