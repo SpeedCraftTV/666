@@ -213,6 +213,13 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 .report-dialog h2 { color: #ff4d4d; }
 .account-dialog { width: min(560px, calc(100% - 32px)); }
 .account-dialog form > label[hidden] { display: none; }
+.google-sign-in { width: 100% !important; }
+.account-dialog-divider {
+  margin: 0;
+  color: #999;
+  text-align: center;
+  font: 13px 'Courier New', monospace;
+}
 .report-consent { display: flex !important; grid-template-columns: auto 1fr; align-items: start; }
 .report-consent input { width: auto; margin-top: 3px; }
 .report-honeypot { position: absolute; left: -10000px; }

@@ -2,6 +2,9 @@
   const config = window.BLOG_SUPABASE || {};
   const supabaseUrl = (config.url || '').replace(/\/$/, '');
   const anonKey = config.anonKey || '';
+  const scriptUrl = document.currentScript?.src || window.location.href;
+  const siteBaseUrl = new URL('.', scriptUrl);
+  const productionSiteUrl = config.siteUrl || 'https://speedcrafttv.github.io/666/';
   let authClient = null;
   let authSession = null;
   let currentUser = null;
@@ -20,6 +23,13 @@
     post9: 'fail hardware #epik',
     post10: 'le guide du kikoo',
   };
+
+  function getSiteRedirectUrl() {
+    if (['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)) {
+      return productionSiteUrl;
+    }
+    return siteBaseUrl.href;
+  }
 
   function getNickname(user) {
     const metadata = user?.user_metadata || {};
@@ -138,6 +148,28 @@
     const form = document.createElement('form');
     form.className = 'comment-form';
     const status = createStatus(form);
+    const googleSignIn = document.createElement('button');
+    googleSignIn.type = 'button';
+    googleSignIn.className = 'comment-action google-sign-in';
+    googleSignIn.textContent = 'continuer avec Google';
+    googleSignIn.addEventListener('click', async () => {
+      googleSignIn.disabled = true;
+      status.textContent = 'connexion avec Google...';
+      try {
+        const { error } = await authClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: getSiteRedirectUrl() },
+        });
+        if (error) throw error;
+      } catch (error) {
+        console.error('Connexion Google impossible.', error);
+        status.textContent = `connexion Google impossible : ${error.message}`;
+        googleSignIn.disabled = false;
+      }
+    });
+    const divider = document.createElement('p');
+    divider.className = 'account-dialog-divider';
+    divider.textContent = 'ou avec ton e-mail';
     const nicknameLabel = document.createElement('label');
     nicknameLabel.textContent = 'ton pseudo :';
     const nicknameInput = document.createElement('input');
@@ -193,7 +225,14 @@
     const actions = document.createElement('div');
     actions.className = 'comment-actions';
     actions.append(submit, switchMode, cancel);
-    form.append(nicknameLabel, emailLabel, passwordLabel, actions);
+    form.append(
+      googleSignIn,
+      divider,
+      nicknameLabel,
+      emailLabel,
+      passwordLabel,
+      actions,
+    );
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -208,7 +247,7 @@
             password,
             options: {
               data: { nickname: nicknameInput.value.trim() },
-              emailRedirectTo: window.location.href,
+              emailRedirectTo: getSiteRedirectUrl(),
             },
           })
           : await authClient.auth.signInWithPassword({ email, password });
