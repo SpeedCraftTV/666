@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
+  <title id="title">Tristan Yaki, le castor toujours assis</title>
+  <desc id="desc">Tristan Yaki, petit castor blanc et gris clair, est assis bien droit avec les pattes avant visibles, une queue plate grise et un brin de lavande.</desc>
+  <rect width="800" height="520" rx="20" fill="#171426"/>
+  <rect x="18" y="18" width="764" height="484" rx="12" fill="#201b35" stroke="#8d6db2" stroke-width="5"/>
+  <path d="M98 425h604" stroke="#75583e" stroke-width="16" stroke-linecap="round"/>
+  <path d="M495 364q120-80 193-8l-12 73q-115 29-186-17z" fill="#bfc5cd" stroke="#eef0f2" stroke-width="7"/>
+  <path d="M518 369l138 47m-122-5 106-62m-64 82 80-51" stroke="#909aa6" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="397" cy="354" rx="145" ry="131" fill="#e3e7ec" stroke="#b6bec8" stroke-width="7"/>
+  <ellipse cx="397" cy="370" rx="89" ry="101" fill="#fff"/>
+  <path d="M285 367q-46 8-34 53 13 37 61 28m197-81q46 8 34 53-13 37-61 28" fill="#d7dce2" stroke="#adb6c0" stroke-width="7"/>
+  <path d="M270 379q-18 5-12 27 6 20 29 20m224-47q18 5 12 27-6 20-29 20" fill="#fff" stroke="#eef0f2" stroke-width="4"/>
+  <circle cx="397" cy="242" r="103" fill="#d7dce2" stroke="#adb6c0" stroke-width="7"/>
+  <path d="M300 243q-5-74 31-105l38 73m91 32q7-76 47-100l20 95" fill="#d7dce2" stroke="#adb6c0" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M316 224q-1-43 17-61l22 54m116 4q6-43 27-59l11 61" fill="#fff" stroke="#eef0f2" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="359" cy="254" rx="11" ry="15" fill="#17191d"/>
+  <ellipse cx="435" cy="254" rx="11" ry="15" fill="#17191d"/>
+  <path d="M383 276q14-15 28 0-3 18-14 18t-14-18z" fill="#17191d"/>
+  <path d="M388 302q18 16 36 0" fill="none" stroke="#85727d" stroke-width="5" stroke-linecap="round"/>
+  <path d="M347 452v31m83-31v31" stroke="#abb4be" stroke-width="20" stroke-linecap="round"/>
+  <path d="M318 485h55m41 0h55" stroke="#949eaa" stroke-width="14" stroke-linecap="round"/>
+  <path d="M267 363q-27 19-16 51m278-51q27 19 16 51" fill="none" stroke="#e0e4e9" stroke-width="20" stroke-linecap="round"/>
+  <path d="M568 302l16-88m-12 64-34-23m39 4 33-28m-39 5-5-36m6 64 45 15" fill="none" stroke="#7b9e62" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="542" cy="252" r="8" fill="#b795cf"/>
+  <circle cx="612" cy="236" r="8" fill="#b795cf"/>
+  <circle cx="575" cy="213" r="8" fill="#b795cf"/>
+  <circle cx="613" cy="278" r="8" fill="#b795cf"/>
+  <text x="400" y="510" fill="#e2d0f0" text-anchor="middle" font-family="Courier New, monospace" font-size="26" font-weight="bold">TRISTAN YAKI, TOUJOURS ASSIS</text>
+</svg>

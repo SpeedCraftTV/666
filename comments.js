@@ -34,6 +34,7 @@
     post14: 'Papa Speed et l’expérience qui faisait dring',
     post15: 'Neko, ma mère au caractère de chat',
     post16: 'Le plan malicieux de Yaki',
+    post17: 'Tristan Yaki, le castor toujours assis',
   };
 
   function getPostUrl(postId) {

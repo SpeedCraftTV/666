@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
   <title id="title">Le plan malicieux de Yaki</title>
-  <desc id="desc">Dans un salon, un téléviseur affiche un visage fantomatique violet aux grands yeux verts. Yaki prépare sa surprise en riant.</desc>
+  <desc id="desc">Dans un salon, un téléviseur affiche un visage fantomatique violet. Tristan Yaki, petit castor blanc et gris clair assis avec un brin de lavande, sourit fièrement.</desc>
   <rect width="800" height="520" rx="20" fill="#101426"/>
   <rect x="18" y="18" width="764" height="484" rx="12" fill="#171b35" stroke="#7555b5" stroke-width="5"/>
   <path d="M80 420h640" stroke="#785333" stroke-width="16" stroke-linecap="round"/>
@@ -15,11 +15,25 @@
   <path d="M372 272l10 17m24-28 2 30m24-29-10 27" stroke="#fff1d5" stroke-width="7" stroke-linecap="round"/>
   <path d="M364 368v31m71-31v31" stroke="#aeb4cf" stroke-width="12" stroke-linecap="round"/>
   <path d="M298 411h205" stroke="#aeb4cf" stroke-width="14" stroke-linecap="round"/>
-  <path d="M637 280c-32 8-48 33-42 70 7 38 39 62 75 57 25-4 43-25 42-54-2-46-34-82-75-73z" fill="#bb8c5c" stroke="#f2c391" stroke-width="6"/>
-  <path d="M643 287l-5-32 29 23m20 5 18-29 6 39" fill="#bb8c5c" stroke="#f2c391" stroke-width="6" stroke-linejoin="round"/>
-  <circle cx="656" cy="331" r="4" fill="#251b17"/>
-  <circle cx="688" cy="331" r="4" fill="#251b17"/>
-  <path d="M655 350q17 17 34 0" fill="none" stroke="#58382a" stroke-width="5" stroke-linecap="round"/>
-  <path d="M632 393q24-16 49 0" fill="none" stroke="#c68e5e" stroke-width="9" stroke-linecap="round"/>
+  <path d="M697 376q44-28 70 0l-5 39q-36 8-66-10z" fill="#c7ccd2" stroke="#eef1f4" stroke-width="5"/>
+  <path d="M708 381l48 25m-46-10 37-20m-25 35 29-18" stroke="#9ba3ad" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="662" cy="365" rx="49" ry="53" fill="#e4e8ec" stroke="#b7bec7" stroke-width="5"/>
+  <ellipse cx="662" cy="376" rx="27" ry="34" fill="#fff"/>
+  <circle cx="660" cy="309" r="42" fill="#d6dbe1" stroke="#aeb6c0" stroke-width="5"/>
+  <ellipse cx="660" cy="318" rx="29" ry="28" fill="#fff"/>
+  <path d="M623 355q-21 6-17 32 5 20 28 22m54-54q22 5 19 32-4 20-27 22" fill="#d6dbe1" stroke="#aeb6c0" stroke-width="5"/>
+  <path d="M627 365q-9 4-6 17 3 11 14 12m52-29q10 4 7 17-3 11-14 12" fill="#fff" stroke="#eef1f4" stroke-width="3"/>
+  <path d="M618 302q-3-37 14-48l19 34m19 13q8-38 29-43l8 46" fill="#d6dbe1" stroke="#aeb6c0" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M625 293q0-21 8-28l11 23m32 4q5-20 15-27l4 29" fill="#fff" stroke="#eef1f4" stroke-width="3" stroke-linejoin="round"/>
+  <ellipse cx="641" cy="318" rx="6" ry="8" fill="#17191d"/>
+  <ellipse cx="679" cy="318" rx="6" ry="8" fill="#17191d"/>
+  <path d="M653 331q8-9 16 0-2 10-8 10t-8-10z" fill="#17191d"/>
+  <path d="M658 344q9 9 18 0" fill="none" stroke="#7d6874" stroke-width="4" stroke-linecap="round"/>
+  <path d="M650 402v12m25-12v12" stroke="#aeb6c0" stroke-width="12" stroke-linecap="round"/>
+  <path d="M637 414h13m25 0h13" stroke="#929ba6" stroke-width="9" stroke-linecap="round"/>
+  <path d="M618 270l-8-23m4 19-17-9m18 7 5-19" stroke="#85a85b" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="601" cy="256" r="4" fill="#a88bc2"/>
+  <circle cx="620" cy="247" r="4" fill="#a88bc2"/>
+  <circle cx="610" cy="240" r="4" fill="#a88bc2"/>
   <text x="400" y="470" fill="#d4c4ff" text-anchor="middle" font-family="Courier New, monospace" font-size="29" font-weight="bold">LE PLAN MALICIEUX DE YAKI</text>
 </svg>

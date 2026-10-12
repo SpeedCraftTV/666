@@ -93,6 +93,15 @@
     "thumb": "../assets/post10-cover.svg"
   },
   {
+    "id": "post17",
+    "title": "Tristan Yaki, le castor toujours assis",
+    "url": "post17.html",
+    "date": "2026-10-12",
+    "excerpt": "Découvrez Tristan Yaki, frère de Yaki, Yuki, Mini Castor et Toutou Yaki : un petit castor toujours assis, espiègle et fier de son parfum de lavande.",
+    "tags": ["TristanYaki","famille","castor","lavande"],
+    "thumb": "../assets/post17-cover.svg"
+  },
+  {
     "id": "post16",
     "title": "Le plan malicieux de Yaki",
     "url": "post16.html",
@@ -106,7 +115,7 @@
     "title": "Neko, ma mère au caractère de chat",
     "url": "post15.html",
     "date": "2026-10-12",
-    "excerpt": "Neko, homme humain et mère de la famille, réclame cinq minutes de calme. Quatre castors bruyants et Speed mettent vite sa patience à l’épreuve.",
+    "excerpt": "Neko, homme humain et mère de la famille, réclame cinq minutes de calme. Cinq castors bruyants et Speed mettent vite sa patience à l’épreuve.",
     "tags": ["Neko","famille","Speed","castors"],
     "thumb": "../assets/post15-cover.svg"
   },
