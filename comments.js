@@ -631,7 +631,9 @@
           },
         );
         if (!deleted.length) {
-          throw new Error('Contenu introuvable ou droits de modération insuffisants.');
+          throw new Error(
+            'Supabase n’a supprimé aucune ligne. Vérifie que les politiques RLS de suppression admin sont appliquées, que le compte possède app_metadata.role = "admin", puis reconnecte-toi pour actualiser la session.',
+          );
         }
       } catch (error) {
         console.error('Impossible de supprimer définitivement ce contenu.', error);
