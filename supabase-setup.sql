@@ -69,7 +69,16 @@ alter table public.blog_comment_replies
   references public.blog_comment_replies(id) on delete set null;
 
 alter table public.blog_comments
-  add column if not exists user_id uuid references auth.users(id) on delete set null;
+  add column if not exists user_id uuid references auth.users(id) on delete set null,
+  add column if not exists deleted_at timestamptz;
+
+alter table public.blog_comment_replies
+  add column if not exists deleted_at timestamptz;
+
+create index if not exists blog_comments_moderation_idx
+  on public.blog_comments (deleted_at, created_at desc);
+create index if not exists blog_comment_replies_moderation_idx
+  on public.blog_comment_replies (deleted_at, created_at desc);
 
 alter table public.blog_comment_votes
   add column if not exists user_id uuid references auth.users(id) on delete cascade,
@@ -162,7 +171,18 @@ drop policy if exists "comment replies are public" on public.blog_comment_replie
 create policy "comment replies are public"
   on public.blog_comment_replies for select
   to anon, authenticated
-  using (true);
+  using (
+    (
+      deleted_at is null
+      and exists (
+        select 1
+        from public.blog_comments
+        where blog_comments.id = blog_comment_replies.comment_id
+          and blog_comments.deleted_at is null
+      )
+    )
+    or (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+  );
 
 drop policy if exists "authenticated users can add comment replies"
   on public.blog_comment_replies;
@@ -180,6 +200,7 @@ create policy "authenticated users can add comment replies"
     and exists (
       select 1 from public.blog_comments
       where blog_comments.id = blog_comment_replies.comment_id
+        and blog_comments.deleted_at is null
     )
     and (
       parent_reply_id is null
@@ -187,6 +208,7 @@ create policy "authenticated users can add comment replies"
         select 1 from public.blog_comment_replies as parent
         where parent.id = blog_comment_replies.parent_reply_id
           and parent.comment_id = blog_comment_replies.comment_id
+          and parent.deleted_at is null
       )
     )
   );
@@ -195,7 +217,10 @@ drop policy if exists "comments are public" on public.blog_comments;
 create policy "comments are public"
   on public.blog_comments for select
   to anon, authenticated
-  using (true);
+  using (
+    deleted_at is null
+    or (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+  );
 
 drop policy if exists "authenticated users can add comments" on public.blog_comments;
 create policy "authenticated users can add comments"
@@ -221,8 +246,17 @@ create policy "users can edit their own comments"
   using (auth.uid() = user_id)
   with check (
     auth.uid() = user_id
+    and deleted_at is null
     and char_length(btrim(body)) between 1 and 256
   );
+
+drop policy if exists "administrators can moderate comments"
+  on public.blog_comments;
+create policy "administrators can moderate comments"
+  on public.blog_comments for update
+  to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 drop policy if exists "users can delete their own comments" on public.blog_comments;
 create policy "users can delete their own comments"
@@ -232,10 +266,7 @@ create policy "users can delete their own comments"
 
 drop policy if exists "administrators can delete any comment"
   on public.blog_comments;
-create policy "administrators can delete any comment"
-  on public.blog_comments for delete
-  to authenticated
-  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+drop policy if exists admin_delete_comments on public.blog_comments;
 
 drop policy if exists "users can edit their own replies"
   on public.blog_comment_replies;
@@ -245,8 +276,17 @@ create policy "users can edit their own replies"
   using (auth.uid() = user_id)
   with check (
     auth.uid() = user_id
+    and deleted_at is null
     and char_length(btrim(body)) between 1 and 256
   );
+
+drop policy if exists "administrators can moderate replies"
+  on public.blog_comment_replies;
+create policy "administrators can moderate replies"
+  on public.blog_comment_replies for update
+  to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 drop policy if exists "users can delete their own replies"
   on public.blog_comment_replies;
@@ -257,10 +297,7 @@ create policy "users can delete their own replies"
 
 drop policy if exists "administrators can delete any reply"
   on public.blog_comment_replies;
-create policy "administrators can delete any reply"
-  on public.blog_comment_replies for delete
-  to authenticated
-  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+drop policy if exists admin_delete_replies on public.blog_comment_replies;
 
 drop policy if exists "visitors can vote" on public.blog_comment_votes;
 drop policy if exists "authenticated users can vote" on public.blog_comment_votes;
@@ -307,11 +344,12 @@ drop policy if exists "visitors can report comments" on public.blog_comment_repo
 
 revoke select, insert on public.blog_comments from public, anon, authenticated;
 revoke update, delete on public.blog_comments from public, anon, authenticated;
-grant select (id, post_id, author_name, body, created_at)
+grant select (id, post_id, author_name, body, created_at, deleted_at)
   on public.blog_comments to anon, authenticated;
 grant select (user_id) on public.blog_comments to authenticated;
 grant insert (post_id, author_name, body, user_id) on public.blog_comments to authenticated;
 grant update (body) on public.blog_comments to authenticated;
+grant update (deleted_at) on public.blog_comments to authenticated;
 grant delete on public.blog_comments to authenticated;
 revoke select, insert, update, delete on public.blog_comment_votes from public, anon, authenticated;
 grant select (comment_id, reply_id, vote) on public.blog_comment_votes to anon;
@@ -321,12 +359,13 @@ grant update (vote) on public.blog_comment_votes to authenticated;
 grant delete on public.blog_comment_votes to authenticated;
 revoke all on public.blog_comment_reports from anon, authenticated;
 revoke all on public.blog_comment_replies from public, anon, authenticated;
-grant select (id, comment_id, parent_reply_id, author_name, body, created_at)
+grant select (id, comment_id, parent_reply_id, author_name, body, created_at, deleted_at)
   on public.blog_comment_replies to anon, authenticated;
 grant select (user_id) on public.blog_comment_replies to authenticated;
 grant insert (comment_id, parent_reply_id, user_id, author_name, body)
   on public.blog_comment_replies to authenticated;
 grant update (body) on public.blog_comment_replies to authenticated;
+grant update (deleted_at) on public.blog_comment_replies to authenticated;
 grant delete on public.blog_comment_replies to authenticated;
 grant select on public.blog_comments to service_role;
 grant insert on public.blog_comment_reports to service_role;
@@ -367,10 +406,12 @@ begin
     from requested_comments
     join public.blog_comments as comments
       on comments.id = requested_comments.id
+        and comments.deleted_at is null
     left join lateral (
       select count(*) as reply_count
       from public.blog_comment_replies as comment_replies
       where comment_replies.comment_id = comments.id
+        and comment_replies.deleted_at is null
     ) as reply_counts on true
     left join lateral (
       select jsonb_agg(
@@ -392,6 +433,7 @@ begin
           comment_replies.parent_reply_id
         from public.blog_comment_replies as comment_replies
         where comment_replies.comment_id = comments.id
+          and comment_replies.deleted_at is null
           and comment_replies.parent_reply_id is null
         order by comment_replies.created_at, comment_replies.id
         limit 3

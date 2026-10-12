@@ -552,6 +552,65 @@
     return false;
   }
 
+  function createAdminModerationActions(item, table, refresh, archived = false) {
+    if (!isAdminUser()) return null;
+
+    const actions = document.createElement('div');
+    actions.className = 'comment-actions comment-moderation-actions';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = archived
+      ? 'comment-action moderation-restore-action'
+      : 'comment-action comment-delete-action';
+    button.textContent = archived ? 'Restaurer' : 'Archiver';
+    button.addEventListener('click', async () => {
+      const label = table === 'blog_comments' ? 'ce commentaire' : 'cette réponse';
+      const confirmation = archived
+        ? `Restaurer ${label} et le rendre à nouveau visible ?`
+        : table === 'blog_comments'
+          ? 'Archiver ce commentaire ? Il ne sera plus visible publiquement, mais tu pourras restaurer toute sa discussion depuis les archives de modération.'
+          : 'Archiver cette réponse ? Elle ne sera plus visible publiquement, mais restera restaurable depuis les archives de modération.';
+      if (!window.confirm(confirmation)) return;
+
+      button.disabled = true;
+      const deletedAt = archived ? null : new Date().toISOString();
+      try {
+        const updated = await request(
+          `${table}?id=eq.${encodeURIComponent(item.id)}&select=id`,
+          {
+            method: 'PATCH',
+            headers: { Prefer: 'return=representation' },
+            body: JSON.stringify({ deleted_at: deletedAt }),
+          },
+        );
+        if (!updated.length) {
+          throw new Error('Contenu introuvable ou droits de modération insuffisants.');
+        }
+      } catch (error) {
+        console.error(`Impossible de ${archived ? 'restaurer' : 'archiver'} ${label}.`, error);
+        window.alert(`${archived ? 'Restauration' : 'Archivage'} impossible : ${error.message}`);
+        button.disabled = false;
+        return;
+      }
+
+      item.deleted_at = deletedAt;
+      try {
+        await refresh();
+      } catch (error) {
+        console.error(
+          `${label} ${archived ? 'restauré' : 'archivé'}, mais impossible d’actualiser la liste.`,
+          error,
+        );
+        window.alert(
+          `${archived ? 'Restauration' : 'Archivage'} enregistré, mais impossible d’actualiser la liste. Recharge la page.`,
+        );
+        button.disabled = false;
+      }
+    });
+    actions.appendChild(button);
+    return actions;
+  }
+
   function createCharacterCounter(input, limit = 256) {
     const counter = document.createElement('output');
     counter.className = 'character-counter';
@@ -862,9 +921,15 @@
     return form;
   }
 
-  function createCommentCard(comment, refresh, replyData = { count: 0, previews: [] }) {
+  function createCommentCard(
+    comment,
+    refresh,
+    replyData = { count: 0, previews: [] },
+    archived = false,
+  ) {
     const card = document.createElement('article');
     card.className = 'visitor-comment';
+    if (archived) card.classList.add('is-moderation-archived');
 
     const heading = document.createElement('h3');
     heading.textContent = `${comment.author_name} | ${formatDate(comment.created_at)}`;
@@ -874,6 +939,23 @@
     body.className = 'comment-body';
     body.textContent = comment.body;
     card.appendChild(body);
+    if (archived) {
+      const archivedLabel = document.createElement('p');
+      archivedLabel.className = 'moderation-archive-label';
+      archivedLabel.textContent = 'Dans les archives de modération';
+      const moderationActions = createAdminModerationActions(
+        comment,
+        'blog_comments',
+        refresh,
+        true,
+      );
+      const threadLink = document.createElement('a');
+      threadLink.className = 'comment-action reply-toggle';
+      threadLink.href = getRepliesPageUrl(comment);
+      threadLink.textContent = 'Ouvrir la discussion';
+      card.append(archivedLabel, moderationActions, threadLink);
+      return card;
+    }
     const ownerActions = createContentOwnerActions(
       comment,
       'blog_comments',
@@ -881,6 +963,12 @@
       'ton commentaire',
     );
     if (ownerActions) card.appendChild(ownerActions);
+    const moderationActions = createAdminModerationActions(
+      comment,
+      'blog_comments',
+      refresh,
+    );
+    if (moderationActions) card.appendChild(moderationActions);
 
     const actions = document.createElement('div');
     actions.className = 'comment-actions';
@@ -904,6 +992,13 @@
     });
 
     actions.append(replyButton, createReportButton(comment));
+    if (isAdminUser()) {
+      const moderateRepliesLink = document.createElement('a');
+      moderateRepliesLink.className = 'comment-action reply-toggle';
+      moderateRepliesLink.href = getRepliesPageUrl(comment);
+      moderateRepliesLink.textContent = 'Modérer les réponses';
+      actions.appendChild(moderateRepliesLink);
+    }
     card.append(actions);
 
     if (replyData.count > 0) {
@@ -1179,8 +1274,9 @@
 
   async function loadComments(postId) {
     const filters = postId ? `&post_id=eq.${encodeURIComponent(postId)}` : '';
+    const visibilityFilter = isAdminUser() ? '' : '&deleted_at=is.null';
     return request(
-      `blog_comments?select=id,post_id,author_name,body,created_at${currentUser ? ',user_id' : ''}&order=created_at.desc${filters}`,
+      `blog_comments?select=id,post_id,author_name,body,created_at,deleted_at${currentUser ? ',user_id' : ''}&order=created_at.desc${visibilityFilter}${filters}`,
     );
   }
 
@@ -1219,7 +1315,9 @@
     container.replaceChildren();
     if (!comments.length) {
       const empty = document.createElement('p');
-      empty.textContent = 'Pas encore de commentaire... Sois le premier !';
+      empty.textContent = container.dataset.moderationArchive === 'true'
+        ? 'Les archives de modération sont vides.'
+        : 'Pas encore de commentaire... Sois le premier !';
       container.appendChild(empty);
       return;
     }
@@ -1240,6 +1338,7 @@
           comment,
           refresh,
           replyDataByComment.get(comment.id) || { count: 0, previews: [] },
+          container.dataset.moderationArchive === 'true',
         ),
       );
     });
@@ -1284,6 +1383,7 @@
   }
 
   async function renderRepliesPage(container) {
+    container.replaceChildren();
     const params = new URLSearchParams(window.location.search);
     const commentId = params.get('comment');
     const focusedReplyId = params.get('reply');
@@ -1295,7 +1395,7 @@
 
     try {
       const comments = await request(
-        `blog_comments?select=id,post_id,author_name,body,created_at${currentUser ? ',user_id' : ''}&id=eq.${commentId}&limit=1`,
+        `blog_comments?select=id,post_id,author_name,body,created_at,deleted_at${currentUser ? ',user_id' : ''}&id=eq.${commentId}&limit=1`,
       );
       const comment = comments[0];
       if (!comment) {
@@ -1314,6 +1414,13 @@
       const parentActions = document.createElement('div');
       parentActions.className = 'comment-actions';
       article.append(commentHeading, commentBody, parentActions);
+      const parentModerationActions = createAdminModerationActions(
+        comment,
+        'blog_comments',
+        () => renderRepliesPage(container),
+        Boolean(comment.deleted_at),
+      );
+      if (parentModerationActions) article.appendChild(parentModerationActions);
 
       const repliesHeading = document.createElement('h2');
       repliesHeading.className = 'all-replies-heading';
@@ -1323,22 +1430,25 @@
       let focusedReplyForm = null;
       const refresh = async () => {
         const query = new URLSearchParams({
-          select: `id,parent_reply_id,author_name,body,created_at${currentUser ? ',user_id' : ''}`,
+          select: `id,parent_reply_id,author_name,body,created_at,deleted_at${currentUser ? ',user_id' : ''}`,
           comment_id: `eq.${comment.id}`,
+          ...(!isAdminUser() ? { deleted_at: 'is.null' } : {}),
           order: 'created_at.asc,id.asc',
         });
         const replies = await request(`blog_comment_replies?${query}`);
         const votesByTarget = await loadThreadVotes(comment.id, replies);
         comment.blog_comment_votes = votesByTarget.get(comment.id) || [];
         parentActions.replaceChildren();
-        appendVoteControls(
-          parentActions,
-          { commentId: comment.id },
-          comment.blog_comment_votes,
-          refresh,
-          'ce commentaire',
-        );
-        parentActions.appendChild(createReportButton(comment));
+        if (!comment.deleted_at) {
+          appendVoteControls(
+            parentActions,
+            { commentId: comment.id },
+            comment.blog_comment_votes,
+            refresh,
+            'ce commentaire',
+          );
+          parentActions.appendChild(createReportButton(comment));
+        }
         repliesList.replaceChildren();
         if (!replies.length) {
           const empty = document.createElement('p');
@@ -1380,6 +1490,8 @@
           const replyCard = document.createElement('article');
           replyCard.className = 'visitor-comment comment-reply';
           replyCard.style.setProperty('--reply-depth', Math.min(depth, 4));
+          const replyArchived = Boolean(reply.deleted_at || comment.deleted_at);
+          if (replyArchived) replyCard.classList.add('is-moderation-archived');
           const heading = document.createElement('h3');
           heading.textContent =
             `${reply.author_name} | ${formatDate(reply.created_at)}`;
@@ -1392,6 +1504,14 @@
             refresh,
             'ta réponse',
           );
+          const moderationActions = comment.deleted_at
+            ? null
+            : createAdminModerationActions(
+              reply,
+              'blog_comment_replies',
+              refresh,
+              Boolean(reply.deleted_at),
+            );
           const actions = document.createElement('div');
           actions.className = 'comment-actions';
           const replyButton = document.createElement('button');
@@ -1399,28 +1519,39 @@
           replyButton.className = 'comment-action reply-toggle';
           replyButton.textContent = 'Répondre';
           const replyForm = createReplyForm(comment, refresh, reply.id === focusedReplyId, reply);
+          if (replyArchived) {
+            const archivedLabel = document.createElement('p');
+            archivedLabel.className = 'moderation-archive-label';
+            archivedLabel.textContent = 'Dans les archives de modération';
+            replyCard.appendChild(archivedLabel);
+          }
           if (reply.id === focusedReplyId) focusedReplyForm = replyForm;
           replyButton.addEventListener('click', async () => {
             if (!await requireAccount()) return;
             replyForm.hidden = !replyForm.hidden;
             if (!replyForm.hidden) replyForm.querySelector('textarea').focus();
           });
-          appendVoteControls(
-            actions,
-            { commentId: comment.id, replyId: reply.id },
-            votesByTarget.get(reply.id) || [],
-            refresh,
-            'cette réponse',
-          );
-          actions.append(replyButton, createReportButton(comment, reply));
+          if (!replyArchived) {
+            appendVoteControls(
+              actions,
+              { commentId: comment.id, replyId: reply.id },
+              votesByTarget.get(reply.id) || [],
+              refresh,
+              'cette réponse',
+            );
+            actions.append(replyButton, createReportButton(comment, reply));
+          }
           replyCard.append(heading, body);
           if (ownerActions) replyCard.appendChild(ownerActions);
+          if (moderationActions) replyCard.appendChild(moderationActions);
           replyCard.append(actions, replyForm);
           repliesList.appendChild(replyCard);
         });
       };
 
-      const replyForm = createReplyForm(comment, refresh, true);
+      const replyForm = comment.deleted_at
+        ? null
+        : createReplyForm(comment, refresh, true);
       const postLink = document.createElement('a');
       postLink.className = 'comment-parent-link';
       postLink.href = getPostUrl(comment.post_id);
@@ -1429,7 +1560,7 @@
         article,
         repliesHeading,
         repliesList,
-        replyForm,
+        ...(replyForm ? [replyForm] : []),
         postLink,
       );
       await refresh();
@@ -1451,8 +1582,8 @@
     for (let offset = 0; ; offset += pageSize) {
       const query = new URLSearchParams({
         select: table === 'blog_comments'
-          ? 'id,post_id,author_name,body,created_at'
-          : 'id,comment_id,parent_reply_id,author_name,body,created_at',
+          ? 'id,post_id,author_name,body,created_at,deleted_at'
+          : 'id,comment_id,parent_reply_id,author_name,body,created_at,deleted_at',
         order: 'created_at.desc,id.desc',
         limit: String(pageSize),
         offset: String(offset),
@@ -1463,7 +1594,7 @@
     }
   }
 
-  function createAdminContentCard(item, table, postId = null) {
+  function createAdminContentCard(item, table, postId = null, archived = false, refresh) {
     const card = document.createElement('article');
     card.className = 'visitor-comment admin-content-card';
     const heading = document.createElement('h3');
@@ -1476,37 +1607,13 @@
     body.textContent = item.body;
     const actions = document.createElement('div');
     actions.className = 'comment-actions';
-    const remove = document.createElement('button');
-    remove.type = 'button';
-    remove.className = 'comment-action comment-delete-action';
-    remove.textContent = table === 'blog_comments'
-      ? 'Supprimer le commentaire'
-      : 'Supprimer la réponse';
-    remove.addEventListener('click', async () => {
-      const prompt = table === 'blog_comments'
-        ? 'Supprimer ce commentaire et toutes ses réponses ? Cette action est définitive.'
-        : 'Supprimer cette réponse ? Cette action est définitive.';
-      if (!window.confirm(prompt)) return;
-      remove.disabled = true;
-      try {
-        const deleted = await request(
-          `${table}?id=eq.${encodeURIComponent(item.id)}&select=id`,
-          {
-            method: 'DELETE',
-            headers: { Prefer: 'return=representation' },
-          },
-        );
-        if (!deleted.length) {
-          throw new Error('Le contenu a déjà été supprimé ou tu n’as pas les droits.');
-        }
-        await refreshAdminPage();
-      } catch (error) {
-        console.error('Impossible de modérer ce contenu.', error);
-        window.alert(`Suppression impossible : ${error.message}`);
-        remove.disabled = false;
-      }
-    });
-    actions.appendChild(remove);
+    const moderationActions = createAdminModerationActions(
+      item,
+      table,
+      refresh,
+      archived,
+    );
+    if (moderationActions) actions.appendChild(...moderationActions.childNodes);
     card.append(heading, body, actions);
     return card;
   }
@@ -1519,7 +1626,7 @@
     heading.textContent = 'Modération du site';
     const introduction = document.createElement('p');
     introduction.textContent =
-      'Gère les commentaires et les réponses de tous les articles. Supprimer un commentaire supprime également toutes ses réponses.';
+      'Archive les contenus à modérer sans les effacer définitivement. Les commentaires et leurs réponses archivés restent récupérables.';
     container.append(heading, introduction);
 
     if (!currentUser) {
@@ -1549,50 +1656,96 @@
         loadAdminRecords('blog_comment_replies'),
       ]);
       const commentsById = new Map(comments.map((comment) => [comment.id, comment]));
-      status.textContent =
-        `${comments.length} commentaire(s) et ${replies.length} réponse(s) chargés.`;
+      const archivedComments = comments.filter((comment) => comment.deleted_at);
+      const activeComments = comments.filter((comment) => !comment.deleted_at);
+      const activeReplies = replies.filter((reply) =>
+        !reply.deleted_at && !commentsById.get(reply.comment_id)?.deleted_at,
+      );
+      const archivedReplies = replies.filter((reply) => reply.deleted_at);
+      const archiveView = document.createElement('section');
+      const viewControls = document.createElement('div');
+      viewControls.className = 'comment-actions moderation-view-controls';
+      const activeButton = document.createElement('button');
+      activeButton.type = 'button';
+      activeButton.className = 'comment-action';
+      activeButton.textContent = `Contenus visibles (${activeComments.length + activeReplies.length})`;
+      const archiveButton = document.createElement('button');
+      archiveButton.type = 'button';
+      archiveButton.className = 'comment-action';
+      archiveButton.textContent = `Archives de modération (${archivedComments.length + archivedReplies.length})`;
+      const search = document.createElement('input');
+      search.type = 'search';
+      search.className = 'moderation-search';
+      search.placeholder = 'Rechercher un pseudo ou un message';
+      search.setAttribute('aria-label', 'Rechercher dans les contenus à modérer');
+      const records = document.createElement('div');
+      records.className = 'moderation-records';
+      let showArchive = false;
 
-      const commentsHeading = document.createElement('h2');
-      commentsHeading.textContent = 'Commentaires';
-      const commentsList = document.createElement('div');
-      commentsList.className = 'admin-content-list';
-      if (!comments.length) {
-        const empty = document.createElement('p');
-        empty.textContent = 'Aucun commentaire à modérer.';
-        commentsList.appendChild(empty);
-      }
-      comments.forEach((comment) => {
-        commentsList.appendChild(
-          createAdminContentCard(comment, 'blog_comments', comment.post_id),
+      const renderRecords = () => {
+        records.replaceChildren();
+        const selectedComments = showArchive ? archivedComments : activeComments;
+        const selectedReplies = showArchive ? archivedReplies : activeReplies;
+        const needle = search.value.trim().toLocaleLowerCase('fr');
+        status.textContent = showArchive
+          ? `${archivedComments.length} commentaire(s) et ${archivedReplies.length} réponse(s) dans les archives.`
+          : `${activeComments.length} commentaire(s) et ${activeReplies.length} réponse(s) visibles.`;
+        const addRecord = (item, table, postId, archived, parentComment) => {
+          if (needle && !`${item.author_name} ${item.body}`.toLocaleLowerCase('fr').includes(needle)) return;
+          const card = createAdminContentCard(
+            item,
+            table,
+            postId,
+            archived,
+            () => renderAdminPage(container),
+          );
+          if (table === 'blog_comment_replies') {
+            card.classList.add('comment-reply');
+            const parentSummary = document.createElement('p');
+            parentSummary.className = 'meta';
+            parentSummary.textContent = parentComment
+              ? `Réponse au commentaire de ${parentComment.author_name} : ${parentComment.body}`
+              : 'Le commentaire d’origine n’existe plus.';
+            card.insertBefore(parentSummary, card.querySelector('.comment-actions'));
+          }
+          records.appendChild(card);
+        };
+        selectedComments.forEach((comment) =>
+          addRecord(comment, 'blog_comments', comment.post_id, showArchive),
         );
+        selectedReplies.forEach((reply) => {
+          const parentComment = commentsById.get(reply.comment_id);
+          addRecord(
+            reply,
+            'blog_comment_replies',
+            parentComment?.post_id,
+            Boolean(reply.deleted_at),
+            parentComment,
+          );
+        });
+        if (!records.childElementCount) {
+          const empty = document.createElement('p');
+          empty.textContent = needle
+            ? 'Aucun résultat pour cette recherche.'
+            : showArchive
+              ? 'Les archives de modération sont vides.'
+              : 'Aucun contenu visible à modérer.';
+          records.appendChild(empty);
+        }
+      };
+      activeButton.addEventListener('click', () => {
+        showArchive = false;
+        renderRecords();
       });
-
-      const repliesHeading = document.createElement('h2');
-      repliesHeading.textContent = 'Réponses';
-      const repliesList = document.createElement('div');
-      repliesList.className = 'admin-content-list';
-      if (!replies.length) {
-        const empty = document.createElement('p');
-        empty.textContent = 'Aucune réponse à modérer.';
-        repliesList.appendChild(empty);
-      }
-      replies.forEach((reply) => {
-        const parentComment = commentsById.get(reply.comment_id);
-        const card = createAdminContentCard(
-          reply,
-          'blog_comment_replies',
-          parentComment?.post_id,
-        );
-        card.classList.add('comment-reply');
-        const parentSummary = document.createElement('p');
-        parentSummary.className = 'meta';
-        parentSummary.textContent = parentComment
-          ? `Réponse au commentaire de ${parentComment.author_name} : ${parentComment.body}`
-          : 'Le commentaire d’origine n’existe plus.';
-        card.insertBefore(parentSummary, card.querySelector('.comment-actions'));
-        repliesList.appendChild(card);
+      archiveButton.addEventListener('click', () => {
+        showArchive = true;
+        renderRecords();
       });
-      container.append(commentsHeading, commentsList, repliesHeading, repliesList);
+      search.addEventListener('input', renderRecords);
+      viewControls.append(activeButton, archiveButton);
+      archiveView.append(viewControls, search, records);
+      container.appendChild(archiveView);
+      renderRecords();
     } catch (error) {
       console.error('Impossible de charger les contenus à modérer.', error);
       status.textContent = `Chargement de la modération impossible : ${error.message}`;
@@ -1613,6 +1766,16 @@
     const list = document.createElement('div');
     list.className = 'comments-list';
     container.appendChild(list);
+    const archiveSection = document.createElement('section');
+    archiveSection.className = 'moderation-archive-section';
+    archiveSection.hidden = true;
+    const archiveHeading = document.createElement('h2');
+    archiveHeading.textContent = 'Archives de modération';
+    const archiveList = document.createElement('div');
+    archiveList.className = 'comments-list';
+    archiveList.dataset.moderationArchive = 'true';
+    archiveSection.append(archiveHeading, archiveList);
+    container.appendChild(archiveSection);
     const status = createStatus(container);
 
     async function refresh() {
@@ -1622,12 +1785,17 @@
         );
       }
       const comments = await loadComments(postId);
+      const visibleComments = comments.filter((comment) => !comment.deleted_at);
+      const archivedComments = isAdminUser()
+        ? comments.filter((comment) => comment.deleted_at)
+        : [];
+      archiveSection.hidden = !isAdminUser();
       let voteTotalsUnavailable = false;
       try {
-        await loadCommentVotes(comments);
+        await loadCommentVotes(visibleComments);
       } catch (error) {
         console.error('Impossible de charger les totaux des votes.', error);
-        comments.forEach((comment) => {
+        visibleComments.forEach((comment) => {
           comment.blog_comment_votes = [];
         });
         voteTotalsUnavailable = true;
@@ -1635,7 +1803,7 @@
       let voteStateUnavailable = false;
       let replyStateUnavailable = false;
       try {
-        await loadMyVotes(comments);
+        await loadMyVotes(visibleComments);
       } catch (error) {
         console.error('Impossible de charger tes votes personnels.', error);
         myVotes = new Map();
@@ -1643,12 +1811,13 @@
       }
       let replyDataByComment = new Map();
       try {
-        replyDataByComment = await loadReplyPreviews(comments);
+        replyDataByComment = await loadReplyPreviews(visibleComments);
       } catch (error) {
         console.error('Impossible de charger les aperçus des réponses.', error);
         replyStateUnavailable = true;
       }
-      renderList(list, comments, refresh, includePostSelect, replyDataByComment);
+      renderList(list, visibleComments, refresh, includePostSelect, replyDataByComment);
+      renderList(archiveList, archivedComments, refresh, includePostSelect, new Map());
       status.textContent = [
         voteTotalsUnavailable
           ? 'Les commentaires sont affichés, mais les totaux des votes sont temporairement indisponibles.'

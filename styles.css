@@ -207,9 +207,13 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 .comment-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .visitor-comment > .comment-actions { margin-top: 14px; }
 .comment-owner-actions { margin: 12px 0; }
+.comment-moderation-actions { margin: 10px 0; }
 .comment-edit-form { flex-basis: 100%; width: 100%; margin: 4px 0 0; }
 .comment-edit-form[hidden] { display: none; }
 .comment-delete-action { border-color: #a33; background: #310000; }
+.moderation-restore-action { border-color: #397a49; background: #102818; }
+.is-moderation-archived { opacity: 0.78; border-left-color: #777; }
+.moderation-archive-label { color: #ffc66d; font-size: 0.85em; }
 .comment-owner-actions .comment-edit-form .comments-status { margin: 0; }
 .account-panel {
   display: flex;
@@ -232,8 +236,24 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 .account-panel a.account-button { text-decoration: none; }
 .report-action { border-color: #777; background: #222; }
 .admin-page { width: min(960px, 94%); margin: 16px auto; text-align: left; }
+.moderation-archive-section {
+  width: 100%;
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid #555;
+}
 .admin-content-list { width: 100%; }
 .admin-content-card { margin-left: 0; }
+.moderation-view-controls { margin: 16px 0 10px; }
+.moderation-search {
+  box-sizing: border-box;
+  width: min(100%, 520px);
+  margin: 4px 0 12px;
+  padding: 8px;
+  color: #eee;
+  background: #111;
+  border: 2px solid #2b2b2b;
+}
 .comments-status { color: #ffb3b3; }
 .account-error { color: #ff7777; }
 .report-dialog {
