@@ -31,6 +31,7 @@
     post12: 'Yuki et la note jamais réglée',
     post13: 'Toutou Yaki, le frère qui garde son calme',
     post14: 'Papa Speed et l’expérience qui faisait dring',
+    post15: 'Neko, ma mère au caractère de chat',
   };
 
   function getPostUrl(postId) {

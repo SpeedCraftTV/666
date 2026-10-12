@@ -93,6 +93,15 @@
     "thumb": "../assets/post10-cover.svg"
   },
   {
+    "id": "post15",
+    "title": "Neko, ma mère au caractère de chat",
+    "url": "post15.html",
+    "date": "2026-10-12",
+    "excerpt": "Neko, homme humain et mère de la famille, réclame cinq minutes de calme. Quatre castors bruyants et Speed mettent vite sa patience à l’épreuve.",
+    "tags": ["Neko","famille","Speed","castors"],
+    "thumb": "../assets/post15-cover.svg"
+  },
+  {
     "id": "post14",
     "title": "Papa Speed et l’expérience qui faisait dring",
     "url": "post14.html",

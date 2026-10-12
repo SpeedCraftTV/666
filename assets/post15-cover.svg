@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
+  <title id="title">Neko, ma mère au caractère de chat</title>
+  <desc id="desc">Un fauteuil rouge bien installé au milieu du salon, avec un panneau demandant cinq minutes de calme et des objets de castors autour.</desc>
+  <rect width="800" height="520" rx="20" fill="#111"/>
+  <rect x="18" y="18" width="764" height="484" rx="12" fill="#170707" stroke="#b30000" stroke-width="5"/>
+  <path d="M90 390h620" stroke="#865534" stroke-width="16" stroke-linecap="round"/>
+  <path d="M253 251c0-52 38-90 91-90h111c53 0 92 38 92 90v66H253z" fill="#9d2020" stroke="#e45a4d" stroke-width="10"/>
+  <rect x="226" y="286" width="346" height="124" rx="34" fill="#b12b2b" stroke="#e45a4d" stroke-width="10"/>
+  <path d="M262 398v40m274-40v40" stroke="#70432d" stroke-width="18" stroke-linecap="round"/>
+  <rect x="329" y="216" width="141" height="91" rx="24" fill="#d24b40" stroke="#f47d6b" stroke-width="7"/>
+  <path d="M124 114h226l-17 115H141z" fill="#e8d9aa" stroke="#aa8c50" stroke-width="7"/>
+  <path d="M159 153h155m-141 35h127" stroke="#654a32" stroke-width="7" stroke-linecap="round"/>
+  <text x="237" y="210" fill="#81221d" text-anchor="middle" font-family="Courier New, monospace" font-size="19" font-weight="bold">5 MIN DE CALME</text>
+  <path d="M592 140q31-43 62 0-31 17-62 0zm41 37q45-33 77 6-39 13-77-6z" fill="none" stroke="#ef7770" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M624 116l-4-27m32 28 13-23m-48 91-19 19" stroke="#ef7770" stroke-width="7" stroke-linecap="round"/>
+  <path d="M125 346c-19-15-6-36 15-28 3-20 29-17 28 5 18 3 14 24-3 30-12 4-27 0-40-7z" fill="#c92929" stroke="#f46a55" stroke-width="5"/>
+  <path d="M151 318v-13" stroke="#7bc45a" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="675" cy="350" r="24" fill="#d5bb80" stroke="#f1dfb3" stroke-width="5"/>
+  <path d="M660 350h30m-15-15v30" stroke="#755e38" stroke-width="5" stroke-linecap="round"/>
+  <text x="400" y="472" fill="#ff6868" text-anchor="middle" font-family="Courier New, monospace" font-size="30" font-weight="bold">NEKO, MA MÈRE</text>
+</svg>
