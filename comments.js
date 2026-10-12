@@ -872,15 +872,7 @@
     const status = createStatus(form);
     const actions = document.createElement('div');
     actions.className = 'comment-actions';
-    const cancel = document.createElement('button');
-    cancel.type = 'button';
-    cancel.className = 'comment-action';
-    cancel.textContent = 'Annuler';
-    cancel.addEventListener('click', () => {
-      form.reset();
-      status.textContent = '';
-    });
-    actions.append(submit, cancel);
+    actions.append(submit);
     form.append(bodyLabel, actions, status);
 
     form.addEventListener('reset', () => {
