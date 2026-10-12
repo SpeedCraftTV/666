@@ -608,7 +608,49 @@
       }
     });
     actions.appendChild(button);
+    actions.appendChild(createAdminPermanentDeleteButton(item, table, refresh));
     return actions;
+  }
+
+  function createAdminPermanentDeleteButton(item, table, refresh) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'comment-action comment-delete-action';
+    button.textContent = 'Supprimer définitivement';
+    button.addEventListener('click', async () => {
+      const confirmation = table === 'blog_comments'
+        ? 'Supprimer définitivement ce commentaire et toutes ses réponses ? Cette action ne peut pas être annulée ni restaurée.'
+        : 'Supprimer définitivement cette réponse ? Ses éventuelles réponses resteront dans la discussion sans parent.';
+      if (!window.confirm(confirmation)) return;
+
+      button.disabled = true;
+      try {
+        const deleted = await request(
+          `${table}?id=eq.${encodeURIComponent(item.id)}&select=id`,
+          {
+            method: 'DELETE',
+            headers: { Prefer: 'return=representation' },
+          },
+        );
+        if (!deleted.length) {
+          throw new Error('Contenu introuvable ou droits de modération insuffisants.');
+        }
+      } catch (error) {
+        console.error('Impossible de supprimer définitivement ce contenu.', error);
+        window.alert(`Suppression impossible : ${error.message}`);
+        button.disabled = false;
+        return;
+      }
+
+      try {
+        await refresh();
+      } catch (error) {
+        console.error('Contenu supprimé, mais impossible d’actualiser la liste.', error);
+        window.alert('Suppression effectuée. Recharge la page pour actualiser la liste.');
+        button.disabled = false;
+      }
+    });
+    return button;
   }
 
   function createCharacterCounter(input, limit = 256) {
@@ -1023,6 +1065,14 @@
         replyLink.href = getRepliesPageUrl(comment, reply.id);
         replyLink.textContent = 'Répondre';
         preview.append(replyHeading, replyBody, replyLink);
+        if (isAdminUser()) {
+          const replyModerationActions = createAdminModerationActions(
+            reply,
+            'blog_comment_replies',
+            refresh,
+          );
+          if (replyModerationActions) preview.appendChild(replyModerationActions);
+        }
         replies.appendChild(preview);
       });
       if (replyData.count > 0) {
@@ -1505,7 +1555,11 @@
             'ta réponse',
           );
           const moderationActions = comment.deleted_at
-            ? null
+            ? createAdminPermanentDeleteButton(
+              reply,
+              'blog_comment_replies',
+              refresh,
+            )
             : createAdminModerationActions(
               reply,
               'blog_comment_replies',
@@ -1613,7 +1667,7 @@
       refresh,
       archived,
     );
-    if (moderationActions) actions.appendChild(...moderationActions.childNodes);
+    if (moderationActions) actions.append(...moderationActions.childNodes);
     card.append(heading, body, actions);
     return card;
   }
