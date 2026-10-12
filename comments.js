@@ -1921,7 +1921,21 @@
   }
 
   function initializeAdminPage(container) {
-    refreshAdminPage = () => renderAdminPage(container);
+    const adminShell = document.querySelector('[data-admin-shell]');
+    const accessError = document.querySelector('[data-admin-access-error]');
+    refreshAdminPage = async () => {
+      if (!isAdminUser()) {
+        adminShell.hidden = true;
+        accessError.hidden = false;
+        accessError.textContent = currentUser
+          ? 'Erreur 403 — Accès refusé. Cette page est réservée aux comptes administrateurs.'
+          : 'Erreur 403 — Accès refusé. Connecte-toi avec un compte administrateur pour accéder à cette page.';
+        return;
+      }
+      accessError.hidden = true;
+      adminShell.hidden = false;
+      await renderAdminPage(container);
+    };
     refreshCallbacks.add(refreshAdminPage);
     refreshAdminPage();
   }
