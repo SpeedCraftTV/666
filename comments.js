@@ -869,9 +869,20 @@
     const submit = document.createElement('button');
     submit.type = 'submit';
     submit.textContent = 'Publier le commentaire';
-    form.append(bodyLabel, submit);
-
     const status = createStatus(form);
+    const actions = document.createElement('div');
+    actions.className = 'comment-actions';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'comment-action';
+    cancel.textContent = 'Annuler';
+    cancel.addEventListener('click', () => {
+      form.reset();
+      status.textContent = '';
+    });
+    actions.append(submit, cancel);
+    form.append(bodyLabel, actions, status);
+
     form.addEventListener('reset', () => {
       window.setTimeout(() => {
         bodyInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -960,7 +971,16 @@
     submit.type = 'submit';
     submit.textContent = 'Publier la réponse';
     const status = createStatus(form);
-    actions.appendChild(submit);
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'comment-action';
+    cancel.textContent = 'Annuler';
+    cancel.addEventListener('click', () => {
+      form.reset();
+      form.hidden = true;
+      status.textContent = '';
+    });
+    actions.append(submit, cancel);
     form.append(label, actions, status);
 
     form.addEventListener('reset', () => {
@@ -997,6 +1017,7 @@
       }
 
       form.reset();
+      form.hidden = true;
       status.textContent = 'Réponse publiée !';
       try {
         await onSubmitted();
@@ -1486,7 +1507,13 @@
     container.replaceChildren();
     const params = new URLSearchParams(window.location.search);
     const commentId = params.get('comment');
-    const focusedReplyId = params.get('reply');
+    let focusedReplyId = params.get('reply');
+    if (focusedReplyId) {
+      params.delete('reply');
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete('reply');
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
     const status = createStatus(container);
     if (!commentId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(commentId)) {
       status.textContent = 'Le lien vers ce commentaire est invalide.';
@@ -1528,6 +1555,7 @@
       const repliesList = document.createElement('div');
       repliesList.className = 'all-replies-list';
       let focusedReplyForm = null;
+      let parentReplyForm = null;
       const refresh = async () => {
         const query = new URLSearchParams({
           select: `id,parent_reply_id,author_name,body,created_at,deleted_at${currentUser ? ',user_id' : ''}`,
@@ -1548,6 +1576,18 @@
             'ce commentaire',
           );
           parentActions.appendChild(createReportButton(comment));
+          const replyToCommentButton = document.createElement('button');
+          replyToCommentButton.type = 'button';
+          replyToCommentButton.className = 'comment-action reply-toggle';
+          replyToCommentButton.textContent = 'Répondre au commentaire';
+          replyToCommentButton.addEventListener('click', async () => {
+            if (!await requireAccount() || !parentReplyForm) return;
+            parentReplyForm.hidden = !parentReplyForm.hidden;
+            if (!parentReplyForm.hidden) {
+              parentReplyForm.querySelector('textarea').focus();
+            }
+          });
+          parentActions.appendChild(replyToCommentButton);
         }
         repliesList.replaceChildren();
         if (!replies.length) {
@@ -1655,7 +1695,8 @@
 
       const replyForm = comment.deleted_at
         ? null
-        : createReplyForm(comment, refresh, true);
+        : createReplyForm(comment, refresh, false);
+      parentReplyForm = replyForm;
       const postLink = document.createElement('a');
       postLink.className = 'comment-parent-link';
       postLink.href = getPostUrl(comment.post_id);
@@ -1671,6 +1712,7 @@
       if (focusedReplyForm) {
         focusedReplyForm.scrollIntoView({ block: 'center' });
         focusedReplyForm.querySelector('textarea').focus();
+        focusedReplyId = null;
       }
       status.textContent = '';
     } catch (error) {
