@@ -80,6 +80,19 @@ create index if not exists blog_comments_moderation_idx
 create index if not exists blog_comment_replies_moderation_idx
   on public.blog_comment_replies (deleted_at, created_at desc);
 
+create table if not exists public.blog_moderation_settings (
+  id boolean primary key default true check (id),
+  retention_days integer not null default 30
+    check (retention_days between 1 and 3650),
+  updated_at timestamptz not null default now()
+);
+
+insert into public.blog_moderation_settings (id, retention_days)
+values (true, 30)
+on conflict (id) do nothing;
+
+alter table public.blog_moderation_settings enable row level security;
+
 alter table public.blog_comment_votes
   add column if not exists user_id uuid references auth.users(id) on delete cascade,
   add column if not exists reply_id uuid;
@@ -311,6 +324,14 @@ create policy "administrators can permanently delete replies"
   to authenticated
   using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
+drop policy if exists "administrators can manage moderation settings"
+  on public.blog_moderation_settings;
+create policy "administrators can manage moderation settings"
+  on public.blog_moderation_settings for all
+  to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
 drop policy if exists "visitors can vote" on public.blog_comment_votes;
 drop policy if exists "authenticated users can vote" on public.blog_comment_votes;
 create policy "authenticated users can vote"
@@ -379,8 +400,58 @@ grant insert (comment_id, parent_reply_id, user_id, author_name, body)
 grant update (body) on public.blog_comment_replies to authenticated;
 grant update (deleted_at) on public.blog_comment_replies to authenticated;
 grant delete on public.blog_comment_replies to authenticated;
+revoke all on public.blog_moderation_settings from public, anon, authenticated;
+grant select (id, retention_days, updated_at)
+  on public.blog_moderation_settings to authenticated;
+grant update (retention_days, updated_at)
+  on public.blog_moderation_settings to authenticated;
 grant select on public.blog_comments to service_role;
 grant insert on public.blog_comment_reports to service_role;
+
+create or replace function public.purge_expired_blog_moderation_archive()
+returns integer
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  retention integer;
+  removed_count integer := 0;
+  current_count integer := 0;
+begin
+  if (auth.jwt() -> 'app_metadata' ->> 'role') is distinct from 'admin' then
+    raise exception 'Administrator access required.';
+  end if;
+
+  select retention_days
+    into retention
+    from public.blog_moderation_settings
+    where id = true;
+
+  if retention is null then
+    raise exception 'Moderation archive settings are missing.';
+  end if;
+
+  delete from public.blog_comment_replies
+    where deleted_at is not null
+      and deleted_at < now() - make_interval(days => retention);
+  get diagnostics current_count = row_count;
+  removed_count := removed_count + current_count;
+
+  delete from public.blog_comments
+    where deleted_at is not null
+      and deleted_at < now() - make_interval(days => retention);
+  get diagnostics current_count = row_count;
+  removed_count := removed_count + current_count;
+
+  return removed_count;
+end;
+$$;
+
+revoke all on function public.purge_expired_blog_moderation_archive()
+  from public, anon, authenticated;
+grant execute on function public.purge_expired_blog_moderation_archive()
+  to authenticated;
 
 create or replace function public.get_blog_comment_reply_previews(
   p_comment_ids uuid[]

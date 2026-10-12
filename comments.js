@@ -14,6 +14,7 @@
   let accountIdentityError = '';
   let accountMessage = '';
   let myVotes = new Map();
+  let archiveMaintenanceUserId = null;
   const accountPanels = new Set();
   const refreshCallbacks = new Set();
   const postTitles = {
@@ -190,6 +191,15 @@
 
   function isAdminUser(user = currentUser) {
     return user?.app_metadata?.role === 'admin';
+  }
+
+  async function purgeExpiredModerationArchive() {
+    if (!isAdminUser() || archiveMaintenanceUserId === currentUser.id) return;
+    await request('rpc/purge_expired_blog_moderation_archive', {
+      method: 'POST',
+      body: '{}',
+    });
+    archiveMaintenanceUserId = currentUser.id;
   }
 
   function getRepliesPageUrl(comment, replyId = null) {
@@ -562,14 +572,14 @@
     button.className = archived
       ? 'comment-action moderation-restore-action'
       : 'comment-action comment-delete-action';
-    button.textContent = archived ? 'Restaurer' : 'Archiver';
+    button.textContent = archived ? 'Restaurer' : 'Supprimer (récupérable)';
     button.addEventListener('click', async () => {
       const label = table === 'blog_comments' ? 'ce commentaire' : 'cette réponse';
       const confirmation = archived
         ? `Restaurer ${label} et le rendre à nouveau visible ?`
         : table === 'blog_comments'
-          ? 'Archiver ce commentaire ? Il ne sera plus visible publiquement, mais tu pourras restaurer toute sa discussion depuis les archives de modération.'
-          : 'Archiver cette réponse ? Elle ne sera plus visible publiquement, mais restera restaurable depuis les archives de modération.';
+          ? 'Supprimer ce commentaire ? Il sera masqué et conservé temporairement dans les Archives de modération, avec ses réponses, avant le nettoyage automatique.'
+          : 'Supprimer cette réponse ? Elle sera masquée et conservée temporairement dans les Archives de modération avant le nettoyage automatique.';
       if (!window.confirm(confirmation)) return;
 
       button.disabled = true;
@@ -608,7 +618,9 @@
       }
     });
     actions.appendChild(button);
-    actions.appendChild(createAdminPermanentDeleteButton(item, table, refresh));
+    if (archived) {
+      actions.appendChild(createAdminPermanentDeleteButton(item, table, refresh));
+    }
     return actions;
   }
 
@@ -1718,7 +1730,7 @@
     heading.textContent = 'Modération du site';
     const introduction = document.createElement('p');
     introduction.textContent =
-      'Archive les contenus à modérer sans les effacer définitivement. Les commentaires et leurs réponses archivés restent récupérables.';
+      'Les suppressions sont conservées dans les Archives de modération pendant la durée choisie, puis nettoyées à la prochaine visite admin après expiration.';
     container.append(heading, introduction);
 
     if (!currentUser) {
@@ -1743,6 +1755,15 @@
     const status = createStatus(container);
     status.textContent = 'Chargement des commentaires et des réponses...';
     try {
+      await purgeExpiredModerationArchive();
+      const settings = await request(
+        'blog_moderation_settings?select=retention_days&id=eq.true&limit=1',
+      );
+      let retentionDays = settings[0]?.retention_days;
+      if (!Number.isInteger(retentionDays) || retentionDays < 1) {
+        throw new Error('Le réglage de conservation de l’archive est invalide.');
+      }
+
       const [comments, replies] = await Promise.all([
         loadAdminRecords('blog_comments'),
         loadAdminRecords('blog_comment_replies'),
@@ -1764,12 +1785,67 @@
       const archiveButton = document.createElement('button');
       archiveButton.type = 'button';
       archiveButton.className = 'comment-action';
-      archiveButton.textContent = `Archives de modération (${archivedComments.length + archivedReplies.length})`;
+      archiveButton.textContent =
+        `Archives de modération (${archivedComments.length + archivedReplies.length}, ${retentionDays} j)`;
       const search = document.createElement('input');
       search.type = 'search';
       search.className = 'moderation-search';
       search.placeholder = 'Rechercher un pseudo ou un message';
       search.setAttribute('aria-label', 'Rechercher dans les contenus à modérer');
+      const settingsForm = document.createElement('form');
+      settingsForm.className = 'moderation-retention-settings';
+      const retentionLabel = document.createElement('label');
+      retentionLabel.textContent =
+        'Conserver les suppressions dans les archives pendant (jours) : ';
+      const retentionInput = document.createElement('input');
+      retentionInput.type = 'number';
+      retentionInput.name = 'retention_days';
+      retentionInput.min = '1';
+      retentionInput.max = '3650';
+      retentionInput.step = '1';
+      retentionInput.required = true;
+      retentionInput.value = String(retentionDays);
+      retentionLabel.appendChild(retentionInput);
+      const saveRetention = document.createElement('button');
+      saveRetention.type = 'submit';
+      saveRetention.className = 'comment-action';
+      saveRetention.textContent = 'Enregistrer la durée';
+      settingsForm.append(retentionLabel, saveRetention);
+      settingsForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const nextRetention = Number(retentionInput.value);
+        if (!Number.isInteger(nextRetention) || nextRetention < 1 || nextRetention > 3650) {
+          status.textContent = 'Choisis une durée entière entre 1 et 3650 jours.';
+          return;
+        }
+        saveRetention.disabled = true;
+        try {
+          const updated = await request(
+            'blog_moderation_settings?id=eq.true&select=retention_days',
+            {
+              method: 'PATCH',
+              headers: { Prefer: 'return=representation' },
+              body: JSON.stringify({
+                retention_days: nextRetention,
+                updated_at: new Date().toISOString(),
+              }),
+            },
+          );
+          if (!updated.length) {
+            throw new Error('Le réglage n’a pas été enregistré. Vérifie les droits admin dans Supabase.');
+          }
+          retentionDays = nextRetention;
+          archiveButton.textContent =
+            `Archives de modération (${archivedComments.length + archivedReplies.length}, ${retentionDays} j)`;
+          status.textContent =
+            `Durée enregistrée : ${nextRetention} jours. Les éléments expirés seront nettoyés lors de la prochaine visite admin.`;
+        } catch (error) {
+          console.error('Impossible d’enregistrer la durée des archives.', error);
+          status.textContent = `Enregistrement impossible : ${error.message}`;
+        } finally {
+          saveRetention.disabled = false;
+        }
+      });
       const records = document.createElement('div');
       records.className = 'moderation-records';
       let showArchive = false;
@@ -1835,7 +1911,7 @@
       });
       search.addEventListener('input', renderRecords);
       viewControls.append(activeButton, archiveButton);
-      archiveView.append(viewControls, search, records);
+      archiveView.append(settingsForm, viewControls, search, records);
       container.appendChild(archiveView);
       renderRecords();
     } catch (error) {
@@ -1876,6 +1952,7 @@
           'Renseigne comments-config.js avec les informations publiques de ton projet Supabase.',
         );
       }
+      await purgeExpiredModerationArchive();
       const comments = await loadComments(postId);
       const visibleComments = comments.filter((comment) => !comment.deleted_at);
       const archivedComments = isAdminUser()
