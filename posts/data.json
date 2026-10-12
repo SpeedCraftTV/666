@@ -93,11 +93,20 @@
     "thumb": "../assets/post10-cover.svg"
   },
   {
+    "id": "post12",
+    "title": "Yuki et la note jamais réglée",
+    "url": "post12.html",
+    "date": "2026-10-12",
+    "excerpt": "Yuki, son air impassible et ses tartes aux pommes : une histoire de famille, de bêtises complices et d’une addition oubliée par Toutou Yaki et Mini Castor, pendant que Yaki tenait la caisse.",
+    "tags": ["Yuki","famille","tarteauxpommes","restaurant"],
+    "thumb": "../assets/yuki.png"
+  },
+  {
     "id": "post11",
     "title": "Yaki et les hochets qui font dring",
     "url": "post11.html",
     "date": "2026-10-12",
-    "excerpt": "Yaki le castor adore secouer ses hochets étoile et champignon et découvre le son, le geste et leurs effets.",
+    "excerpt": "Yaki a 146 ans en âge castor et bientôt cinq ans en novembre. Avant ses hochets, il secouait Mini Castor, qui raconte l’expérience avec humour.",
     "tags": ["Yaki","hochet","jeu","castor"],
     "thumb": "../assets/yaki-hochets.png"
   }
