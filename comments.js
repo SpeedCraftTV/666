@@ -33,6 +33,7 @@
     post13: 'Toutou Yaki, le frère qui garde son calme',
     post14: 'Papa Speed et l’expérience qui faisait dring',
     post15: 'Neko, ma mère au caractère de chat',
+    post16: 'Le plan malicieux de Yaki',
   };
 
   function getPostUrl(postId) {

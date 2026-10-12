@@ -93,6 +93,15 @@
     "thumb": "../assets/post10-cover.svg"
   },
   {
+    "id": "post16",
+    "title": "Le plan malicieux de Yaki",
+    "url": "post16.html",
+    "date": "2026-10-12",
+    "excerpt": "Yaki prépare un screamer visuel à la fin de l’épisode de Neko. Toute la famille rit, et Tristan Yaki vante son parfum de lavande.",
+    "tags": ["Yaki","famille","Neko","TristanYaki"],
+    "thumb": "../assets/post16-cover.svg"
+  },
+  {
     "id": "post15",
     "title": "Neko, ma mère au caractère de chat",
     "url": "post15.html",

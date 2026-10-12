@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
+  <title id="title">Le plan malicieux de Yaki</title>
+  <desc id="desc">Dans un salon, un téléviseur affiche un visage fantomatique violet aux grands yeux verts. Yaki prépare sa surprise en riant.</desc>
+  <rect width="800" height="520" rx="20" fill="#101426"/>
+  <rect x="18" y="18" width="764" height="484" rx="12" fill="#171b35" stroke="#7555b5" stroke-width="5"/>
+  <path d="M80 420h640" stroke="#785333" stroke-width="16" stroke-linecap="round"/>
+  <rect x="185" y="85" width="430" height="270" rx="25" fill="#252633" stroke="#aeb4cf" stroke-width="12"/>
+  <rect x="207" y="107" width="386" height="226" rx="12" fill="#171026"/>
+  <path d="M321 293c-15-25-19-61-13-96 8-48 45-76 96-76s88 28 96 76c6 35 2 71-13 96-21 34-50 49-83 49s-62-15-83-49z" fill="#7660ba" stroke="#b9a7ff" stroke-width="7"/>
+  <ellipse cx="362" cy="208" rx="25" ry="38" fill="#c9f27b"/>
+  <ellipse cx="446" cy="208" rx="25" ry="38" fill="#c9f27b"/>
+  <circle cx="367" cy="215" r="10" fill="#1b1830"/>
+  <circle cx="441" cy="215" r="10" fill="#1b1830"/>
+  <path d="M344 280q60-63 120 0-60 50-120 0z" fill="#271634" stroke="#f09aa4" stroke-width="6"/>
+  <path d="M372 272l10 17m24-28 2 30m24-29-10 27" stroke="#fff1d5" stroke-width="7" stroke-linecap="round"/>
+  <path d="M364 368v31m71-31v31" stroke="#aeb4cf" stroke-width="12" stroke-linecap="round"/>
+  <path d="M298 411h205" stroke="#aeb4cf" stroke-width="14" stroke-linecap="round"/>
+  <path d="M637 280c-32 8-48 33-42 70 7 38 39 62 75 57 25-4 43-25 42-54-2-46-34-82-75-73z" fill="#bb8c5c" stroke="#f2c391" stroke-width="6"/>
+  <path d="M643 287l-5-32 29 23m20 5 18-29 6 39" fill="#bb8c5c" stroke="#f2c391" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="656" cy="331" r="4" fill="#251b17"/>
+  <circle cx="688" cy="331" r="4" fill="#251b17"/>
+  <path d="M655 350q17 17 34 0" fill="none" stroke="#58382a" stroke-width="5" stroke-linecap="round"/>
+  <path d="M632 393q24-16 49 0" fill="none" stroke="#c68e5e" stroke-width="9" stroke-linecap="round"/>
+  <text x="400" y="470" fill="#d4c4ff" text-anchor="middle" font-family="Courier New, monospace" font-size="29" font-weight="bold">LE PLAN MALICIEUX DE YAKI</text>
+</svg>
