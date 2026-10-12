@@ -231,6 +231,9 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 }
 .account-panel a.account-button { text-decoration: none; }
 .report-action { border-color: #777; background: #222; }
+.admin-page { width: min(960px, 94%); margin: 16px auto; text-align: left; }
+.admin-content-list { width: 100%; }
+.admin-content-card { margin-left: 0; }
 .comments-status { color: #ffb3b3; }
 .account-error { color: #ff7777; }
 .report-dialog {

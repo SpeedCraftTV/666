@@ -152,6 +152,15 @@
       manageAccount.href = `${rootPrefixForCurrentPage()}account.html`;
       manageAccount.className = 'comment-action account-button';
       manageAccount.textContent = 'Compte';
+      if (isAdminUser(currentUser)) {
+        const adminLink = document.createElement('a');
+        adminLink.href = `${rootPrefixForCurrentPage()}admin.html`;
+        adminLink.className = 'comment-action account-button';
+        adminLink.textContent = 'Administration';
+        panel.append(identity, adminLink, manageAccount);
+      } else {
+        panel.append(identity, manageAccount);
+      }
       const logout = document.createElement('button');
       logout.type = 'button';
       logout.className = 'comment-action';
@@ -163,7 +172,7 @@
           window.alert(`Déconnexion impossible : ${error.message}`);
         }
       });
-      panel.append(identity, manageAccount, logout);
+      panel.append(logout);
       return;
     }
 
@@ -177,6 +186,10 @@
 
   function rootPrefixForCurrentPage() {
     return window.location.pathname.includes('/posts/') ? '../' : './';
+  }
+
+  function isAdminUser(user = currentUser) {
+    return user?.app_metadata?.role === 'admin';
   }
 
   function getRepliesPageUrl(comment, replyId = null) {
@@ -1432,6 +1445,166 @@
     }
   }
 
+  async function loadAdminRecords(table) {
+    const records = [];
+    const pageSize = 500;
+    for (let offset = 0; ; offset += pageSize) {
+      const query = new URLSearchParams({
+        select: table === 'blog_comments'
+          ? 'id,post_id,author_name,body,created_at'
+          : 'id,comment_id,parent_reply_id,author_name,body,created_at',
+        order: 'created_at.desc,id.desc',
+        limit: String(pageSize),
+        offset: String(offset),
+      });
+      const batch = await request(`${table}?${query}`);
+      records.push(...batch);
+      if (batch.length < pageSize) return records;
+    }
+  }
+
+  function createAdminContentCard(item, table, postId = null) {
+    const card = document.createElement('article');
+    card.className = 'visitor-comment admin-content-card';
+    const heading = document.createElement('h3');
+    const location = postId ? postTitles[postId] || postId : '';
+    heading.textContent = `${item.author_name} | ${formatDate(item.created_at)}${
+      location ? ` | ${location}` : ''
+    }`;
+    const body = document.createElement('p');
+    body.className = 'comment-body';
+    body.textContent = item.body;
+    const actions = document.createElement('div');
+    actions.className = 'comment-actions';
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'comment-action comment-delete-action';
+    remove.textContent = table === 'blog_comments'
+      ? 'Supprimer le commentaire'
+      : 'Supprimer la réponse';
+    remove.addEventListener('click', async () => {
+      const prompt = table === 'blog_comments'
+        ? 'Supprimer ce commentaire et toutes ses réponses ? Cette action est définitive.'
+        : 'Supprimer cette réponse ? Cette action est définitive.';
+      if (!window.confirm(prompt)) return;
+      remove.disabled = true;
+      try {
+        const deleted = await request(
+          `${table}?id=eq.${encodeURIComponent(item.id)}&select=id`,
+          {
+            method: 'DELETE',
+            headers: { Prefer: 'return=representation' },
+          },
+        );
+        if (!deleted.length) {
+          throw new Error('Le contenu a déjà été supprimé ou tu n’as pas les droits.');
+        }
+        await refreshAdminPage();
+      } catch (error) {
+        console.error('Impossible de modérer ce contenu.', error);
+        window.alert(`Suppression impossible : ${error.message}`);
+        remove.disabled = false;
+      }
+    });
+    actions.appendChild(remove);
+    card.append(heading, body, actions);
+    return card;
+  }
+
+  let refreshAdminPage = async () => {};
+
+  async function renderAdminPage(container) {
+    container.replaceChildren();
+    const heading = document.createElement('h2');
+    heading.textContent = 'Modération du site';
+    const introduction = document.createElement('p');
+    introduction.textContent =
+      'Gère les commentaires et les réponses de tous les articles. Supprimer un commentaire supprime également toutes ses réponses.';
+    container.append(heading, introduction);
+
+    if (!currentUser) {
+      const message = document.createElement('p');
+      message.textContent = 'Connecte-toi avec le compte administrateur pour accéder à la modération.';
+      const login = document.createElement('button');
+      login.type = 'button';
+      login.className = 'comment-action';
+      login.textContent = 'Créer un compte / se connecter';
+      login.addEventListener('click', openAccountDialog);
+      container.append(message, login);
+      return;
+    }
+    if (!isAdminUser()) {
+      const message = document.createElement('p');
+      message.className = 'account-error';
+      message.textContent = 'Accès réservé aux comptes administrateurs.';
+      container.appendChild(message);
+      return;
+    }
+
+    const status = createStatus(container);
+    status.textContent = 'Chargement des commentaires et des réponses...';
+    try {
+      const [comments, replies] = await Promise.all([
+        loadAdminRecords('blog_comments'),
+        loadAdminRecords('blog_comment_replies'),
+      ]);
+      const commentsById = new Map(comments.map((comment) => [comment.id, comment]));
+      status.textContent =
+        `${comments.length} commentaire(s) et ${replies.length} réponse(s) chargés.`;
+
+      const commentsHeading = document.createElement('h2');
+      commentsHeading.textContent = 'Commentaires';
+      const commentsList = document.createElement('div');
+      commentsList.className = 'admin-content-list';
+      if (!comments.length) {
+        const empty = document.createElement('p');
+        empty.textContent = 'Aucun commentaire à modérer.';
+        commentsList.appendChild(empty);
+      }
+      comments.forEach((comment) => {
+        commentsList.appendChild(
+          createAdminContentCard(comment, 'blog_comments', comment.post_id),
+        );
+      });
+
+      const repliesHeading = document.createElement('h2');
+      repliesHeading.textContent = 'Réponses';
+      const repliesList = document.createElement('div');
+      repliesList.className = 'admin-content-list';
+      if (!replies.length) {
+        const empty = document.createElement('p');
+        empty.textContent = 'Aucune réponse à modérer.';
+        repliesList.appendChild(empty);
+      }
+      replies.forEach((reply) => {
+        const parentComment = commentsById.get(reply.comment_id);
+        const card = createAdminContentCard(
+          reply,
+          'blog_comment_replies',
+          parentComment?.post_id,
+        );
+        card.classList.add('comment-reply');
+        const parentSummary = document.createElement('p');
+        parentSummary.className = 'meta';
+        parentSummary.textContent = parentComment
+          ? `Réponse au commentaire de ${parentComment.author_name} : ${parentComment.body}`
+          : 'Le commentaire d’origine n’existe plus.';
+        card.insertBefore(parentSummary, card.querySelector('.comment-actions'));
+        repliesList.appendChild(card);
+      });
+      container.append(commentsHeading, commentsList, repliesHeading, repliesList);
+    } catch (error) {
+      console.error('Impossible de charger les contenus à modérer.', error);
+      status.textContent = `Chargement de la modération impossible : ${error.message}`;
+    }
+  }
+
+  function initializeAdminPage(container) {
+    refreshAdminPage = () => renderAdminPage(container);
+    refreshCallbacks.add(refreshAdminPage);
+    refreshAdminPage();
+  }
+
   async function initialize(container, postId, includePostSelect) {
     const heading = document.createElement('h2');
     heading.textContent = includePostSelect ? 'Tous les commentaires' : 'Commentaires des visiteurs';
@@ -1605,5 +1778,7 @@
     if (commentsPage) initialize(commentsPage, '', true);
     const repliesPage = document.querySelector('[data-replies-page]');
     if (repliesPage) await renderRepliesPage(repliesPage);
+    const adminPage = document.querySelector('[data-admin-page]');
+    if (adminPage) await initializeAdminPage(adminPage);
   });
 })();

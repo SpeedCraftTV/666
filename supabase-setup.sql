@@ -230,6 +230,13 @@ create policy "users can delete their own comments"
   to authenticated
   using (auth.uid() = user_id);
 
+drop policy if exists "administrators can delete any comment"
+  on public.blog_comments;
+create policy "administrators can delete any comment"
+  on public.blog_comments for delete
+  to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
 drop policy if exists "users can edit their own replies"
   on public.blog_comment_replies;
 create policy "users can edit their own replies"
@@ -247,6 +254,13 @@ create policy "users can delete their own replies"
   on public.blog_comment_replies for delete
   to authenticated
   using (auth.uid() = user_id);
+
+drop policy if exists "administrators can delete any reply"
+  on public.blog_comment_replies;
+create policy "administrators can delete any reply"
+  on public.blog_comment_replies for delete
+  to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 drop policy if exists "visitors can vote" on public.blog_comment_votes;
 drop policy if exists "authenticated users can vote" on public.blog_comment_votes;

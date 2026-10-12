@@ -61,7 +61,34 @@ pour activer les comptes sur un projet deja en service, suis cet ordre :
 
 les utilisateurs de l'ancien site peuvent creer un compte ; les anciens commentaires et votes restent visibles, mais leur historique de vote ne peut pas etre rattache a un compte.
 
-les commentaires et réponses sont publics et publiés immédiatement, avec une limite de 256 caractères et les retours à la ligne conservés. leurs auteurs peuvent modifier ou supprimer leurs propres commentaires et réponses ; supprimer un commentaire principal supprime aussi sa discussion. jusqu'à trois réponses directes sont affichées sous chaque commentaire ; un lien permet d'ouvrir toute la discussion, quel que soit son nombre de réponses. dans `replies.html`, chaque réponse peut recevoir une réponse à son tour, sans limite de profondeur, et la page propose un retour à l'accueil. le message du formulaire de contact est limité à 1024 caractères. un signalement est conservé dans `blog_comment_reports`, envoyé à l'adresse de réception et une copie est envoyée à l'adresse du compte qui l'a soumis. informe les visiteurs de cet usage de leurs données et définis une durée de conservation adaptée. chaque compte ne peut voter et signaler qu'une fois par commentaire.
+les commentaires et réponses sont publics et publiés immédiatement, avec une limite de 256 caractères et les retours à la ligne conservés. leurs auteurs peuvent modifier ou supprimer leurs propres commentaires et réponses ; supprimer un commentaire principal supprime aussi sa discussion. jusqu'à trois réponses directes sont affichées sous chaque commentaire ; un lien permet d'ouvrir toute la discussion, quel que soit son nombre de réponses. dans `replies.html`, chaque réponse peut recevoir une réponse à son tour, sans limite de profondeur, et la page propose un retour à l'accueil. le message du formulaire de contact est limité à 1024 caractères. un signalement est conservé dans `blog_comment_reports`, envoyé à l'adresse de réception et une copie est envoyée à l'adresse du compte qui l'a soumis. informe les visiteurs de cet usage de leurs données et définis une durée de conservation adaptée. chaque compte peut voter et signaler une seule fois par commentaire ou par réponse.
+
+### espace d'administration
+
+`admin.html` permet aux comptes administrateurs de consulter et supprimer tous les commentaires et toutes les réponses. la suppression d'un commentaire principal supprime toute sa discussion. les articles eux-mêmes sont des fichiers statiques et ne sont pas modifiables depuis cette page. l'accès est protégé dans l'interface et par des politiques Supabase RLS ; le rôle doit être ajouté à `app_metadata` (et non à `user_metadata`, qui est modifiable par le compte).
+
+pour donner le rôle administrateur au compte Mini Castor :
+
+1. crée le compte et connecte-toi une première fois sur le site.
+2. dans Supabase → **SQL Editor**, retrouve son UUID dans **Authentication → Users**, puis exécute la requête suivante en remplaçant `UUID_DU_COMPTE` par cet UUID :
+
+   ```sql
+   update auth.users
+   set raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb)
+     || '{"role":"admin"}'::jsonb
+   where id = 'UUID_DU_COMPTE';
+   ```
+
+3. vérifie qu'une seule ligne a été modifiée. déconnecte puis reconnecte le compte afin qu'il reçoive un nouveau jeton avec le rôle admin. ouvre `https://speedcrafttv.github.io/666/admin.html`.
+4. pour retirer les droits, exécute dans le SQL Editor :
+
+   ```sql
+   update auth.users
+   set raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) - 'role'
+   where id = 'UUID_DU_COMPTE';
+   ```
+
+ne partage jamais un mot de passe ou une clé `service_role`. seuls les comptes auxquels tu attribues explicitement `app_metadata.role = "admin"` peuvent supprimer le contenu d'autres utilisateurs.
 
 Idées pour la suite :
 - ajouter d'autres aventures de Mini Castor
