@@ -267,6 +267,14 @@ marquee.banner { animation: pulse 4s ease-in-out infinite; }
 }
 .report-dialog::backdrop { background: rgba(0,0,0,0.8); }
 .report-dialog h2 { color: #ff4d4d; }
+.moderation-delete-dialog { border-color: #a33; }
+.moderation-delete-dialog blockquote {
+  margin: 12px 0;
+  padding: 10px;
+  overflow-wrap: anywhere;
+  background: #171010;
+  border-left: 3px solid #a33;
+}
 .account-dialog { width: min(560px, calc(100% - 32px)); }
 .account-dialog form > label[hidden] { display: none; }
 .oauth-buttons {

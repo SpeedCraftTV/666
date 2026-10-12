@@ -616,12 +616,10 @@
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'comment-action comment-delete-action';
-    button.textContent = 'Supprimer définitivement';
+    button.textContent = 'Supprimer';
     button.addEventListener('click', async () => {
-      const confirmation = table === 'blog_comments'
-        ? 'Supprimer définitivement ce commentaire et toutes ses réponses ? Cette action ne peut pas être annulée ni restaurée.'
-        : 'Supprimer définitivement cette réponse ? Ses éventuelles réponses resteront dans la discussion sans parent.';
-      if (!window.confirm(confirmation)) return;
+      const confirmed = await confirmPermanentDeletion(item, table);
+      if (!confirmed) return;
 
       button.disabled = true;
       try {
@@ -651,6 +649,44 @@
       }
     });
     return button;
+  }
+
+  function confirmPermanentDeletion(item, table) {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'report-dialog moderation-delete-dialog';
+    const heading = document.createElement('h2');
+    heading.textContent = 'Confirmer la suppression';
+    const explanation = document.createElement('p');
+    explanation.textContent = table === 'blog_comments'
+      ? 'Ce commentaire et toutes ses réponses seront supprimés définitivement. Ils ne pourront pas être restaurés depuis les Archives de modération.'
+      : 'Cette réponse sera supprimée définitivement. Ses éventuelles réponses resteront dans la discussion.';
+    const preview = document.createElement('blockquote');
+    preview.textContent = `${item.author_name} : ${item.body}`;
+    const actions = document.createElement('div');
+    actions.className = 'comment-actions';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'comment-action';
+    cancel.textContent = 'Annuler';
+    cancel.autofocus = true;
+    const confirm = document.createElement('button');
+    confirm.type = 'button';
+    confirm.className = 'comment-action comment-delete-action';
+    confirm.textContent = 'Oui, supprimer définitivement';
+    cancel.addEventListener('click', () => dialog.close('cancel'));
+    confirm.addEventListener('click', () => dialog.close('confirm'));
+    actions.append(cancel, confirm);
+    dialog.append(heading, explanation, preview, actions);
+
+    return new Promise((resolve) => {
+      dialog.addEventListener('close', () => {
+        const confirmed = dialog.returnValue === 'confirm';
+        dialog.remove();
+        resolve(confirmed);
+      }, { once: true });
+      document.body.appendChild(dialog);
+      dialog.showModal();
+    });
   }
 
   function createCharacterCounter(input, limit = 256) {
