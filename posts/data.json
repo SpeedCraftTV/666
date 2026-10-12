@@ -93,6 +93,15 @@
     "thumb": "../assets/post10-cover.svg"
   },
   {
+    "id": "post14",
+    "title": "Papa Speed et l’expérience qui faisait dring",
+    "url": "post14.html",
+    "date": "2026-10-12",
+    "excerpt": "Speed analyse l’invention de Yaki avec la famille, mais Toutou Yaki repère d’abord le câble débranché. Même les adultes curieux peuvent rater un détail.",
+    "tags": ["Speed","famille","technologie","Neko"],
+    "thumb": "../assets/speedcrafttv-logo.png"
+  },
+  {
     "id": "post13",
     "title": "Toutou Yaki, le frère qui garde son calme",
     "url": "post13.html",

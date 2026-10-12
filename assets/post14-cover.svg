@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="title desc">
+  <title id="title">Papa Speed et l’expérience qui faisait dring</title>
+  <desc id="desc">Un établi rétro avec un ordinateur, un carnet d’observations, une pomme et une invention sonore à ressort.</desc>
+  <rect width="800" height="520" rx="20" fill="#111"/>
+  <rect x="18" y="18" width="764" height="484" rx="12" fill="#170707" stroke="#b30000" stroke-width="5"/>
+  <path d="M85 388h630" stroke="#865534" stroke-width="18" stroke-linecap="round"/>
+  <rect x="109" y="164" width="260" height="190" rx="12" fill="#242424" stroke="#999" stroke-width="10"/>
+  <rect x="129" y="184" width="220" height="142" rx="5" fill="#071a16" stroke="#5c756e" stroke-width="5"/>
+  <path d="M157 219h91m-91 29h147m-147 29h114" stroke="#77d6a4" stroke-width="8" stroke-linecap="round"/>
+  <path d="M194 355h91l24 32H171z" fill="#777" stroke="#aaa" stroke-width="6"/>
+  <rect x="452" y="176" width="176" height="176" rx="16" fill="#34302c" stroke="#d1b88b" stroke-width="8"/>
+  <circle cx="540" cy="255" r="45" fill="#a52323" stroke="#e85d4b" stroke-width="9"/>
+  <path d="M540 207v-30m0 155v-30m-48-47h-30m155 0h-30" stroke="#e4cc8e" stroke-width="8" stroke-linecap="round"/>
+  <path d="M637 216q40 38 0 76m20-99q61 61 0 122" fill="none" stroke="#ed7770" stroke-width="7" stroke-linecap="round"/>
+  <rect x="398" y="270" width="58" height="82" rx="5" fill="#e8d9aa" stroke="#aa8c50" stroke-width="5" transform="rotate(-8 398 270)"/>
+  <path d="m407 288 31-4m-30 17 30-4m-29 17 20-3" stroke="#806b41" stroke-width="4" stroke-linecap="round"/>
+  <path d="M681 337c-20-15-6-37 15-29 3-20 30-17 29 5 18 3 14 24-3 30-12 4-28 0-41-6z" fill="#c92929" stroke="#f46a55" stroke-width="5"/>
+  <path d="M707 309v-13" stroke="#7bc45a" stroke-width="6" stroke-linecap="round"/>
+  <text x="400" y="452" fill="#ff6868" text-anchor="middle" font-family="Courier New, monospace" font-size="28" font-weight="bold">L'EXPÉRIENCE QUI FAISAIT DRING</text>
+</svg>

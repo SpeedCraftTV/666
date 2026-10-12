@@ -1,6 +1,6 @@
 create table if not exists public.blog_comments (
   id uuid primary key default gen_random_uuid(),
-  post_id text not null check (post_id ~ '^post([1-9]|1[0-3])$'),
+  post_id text not null check (post_id ~ '^post([1-9]|1[0-4])$'),
   author_name text not null check (char_length(btrim(author_name)) between 1 and 40),
   body text not null check (char_length(btrim(body)) between 1 and 500),
   created_at timestamptz not null default now()
@@ -10,7 +10,7 @@ alter table public.blog_comments
   drop constraint if exists blog_comments_post_id_check;
 alter table public.blog_comments
   add constraint blog_comments_post_id_check
-  check (post_id ~ '^post([1-9]|1[0-3])$') not valid;
+  check (post_id ~ '^post([1-9]|1[0-4])$') not valid;
 
 create table if not exists public.blog_comment_votes (
   id uuid primary key default gen_random_uuid(),
@@ -173,7 +173,7 @@ create policy "authenticated users can add comments"
   to authenticated
   with check (
     auth.uid() = user_id
-    and post_id ~ '^post([1-9]|1[0-3])$'
+    and post_id ~ '^post([1-9]|1[0-4])$'
     and char_length(btrim(author_name)) between 1 and 40
     and author_name = left(coalesce(
       nullif(btrim(auth.jwt() -> 'user_metadata' ->> 'nickname'), ''),

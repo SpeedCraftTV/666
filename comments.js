@@ -30,6 +30,7 @@
     post11: 'Yaki et les hochets qui font dring',
     post12: 'Yuki et la note jamais réglée',
     post13: 'Toutou Yaki, le frère qui garde son calme',
+    post14: 'Papa Speed et l’expérience qui faisait dring',
   };
 
   function getPostUrl(postId) {
