@@ -29,6 +29,7 @@
     post10: 'Le guide du petit entrepreneur',
     post11: 'Yaki et les hochets qui font dring',
     post12: 'Yuki et la note jamais réglée',
+    post13: 'Toutou Yaki, le frère qui garde son calme',
   };
 
   function getPostUrl(postId) {

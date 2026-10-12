@@ -4,7 +4,7 @@
     "title": "Ma première tirelire",
     "url": "post1.html",
     "date": "2025-01-01",
-    "excerpt": "Mini Castor découvre le web rétro et transforme sa curiosité en première idée de petite entreprise.",
+    "excerpt": "En découvrant le web sur son 486, Mini Castor trouve sa première idée de commerce et adopte déjà sa devise : une petite pièce aujourd’hui, un empire demain.",
     "tags": ["486","rétro","tirelire"],
     "thumb": "../assets/post1-cover.svg"
   },
@@ -13,7 +13,7 @@
     "title": "L’atelier des bonnes affaires",
     "url": "post2.html",
     "date": "2025-02-02",
-    "excerpt": "Un vieil ordinateur, une réparation futée et le premier client de Mini Castor.",
+    "excerpt": "Mini Castor répare un 486, accepte des pommes en paiement et rappelle que tout travail mérite salaire, surtout en fruits.",
     "tags": ["ordinateur","atelier","commerce"],
     "thumb": "../assets/post2-cover.svg"
   },
@@ -22,7 +22,7 @@
     "title": "L’art de négocier sur le web",
     "url": "post3.html",
     "date": "2025-03-03",
-    "excerpt": "Les astuces de Mini Castor pour comparer, négocier et repérer les bonnes affaires.",
+    "excerpt": "Mini Castor compare les offres, défend chaque centime et cherche un accord honnête qui remplisse aussi sa tirelire.",
     "tags": ["conseils","business","web"],
     "thumb": "../assets/post3-cover.svg"
   }
@@ -32,7 +32,7 @@
     "title": "La panne qui devint une occasion",
     "url": "post4.html",
     "date": "2025-10-31",
-    "excerpt": "Une panne de modem se transforme en occasion inattendue pour Mini Castor.",
+    "excerpt": "Le modem de Mini Castor grésille ; lui entend déjà une sonnerie à vendre. Les appareils qui chauffent, en revanche, se débranchent.",
     "tags": ["modem","inventivité","business"],
     "thumb": "../assets/post4-cover.svg"
   },
@@ -41,7 +41,7 @@
     "title": "La collection qui vaut de l’or",
     "url": "post5.html",
     "date": "2026-06-12",
-    "excerpt": "Mini Castor organise sa collection d’icônes et apprend à estimer leur valeur.",
+    "excerpt": "Mini Castor classe ses icônes de pommes, vérifie les droits et négocie une collection qui intéresse aussi les noisettes.",
     "tags": ["icônes","collection","rétro"],
     "thumb": "../assets/post5-cover.svg"
   }
@@ -51,7 +51,7 @@
     "title": "À la recherche du pixel perdu",
     "url": "post6.html",
     "date": "2026-07-07",
-    "excerpt": "Un pixel semble avoir disparu de l’écran de Mini Castor : une enquête commence.",
+    "excerpt": "Un pixel caché déclenche une enquête : Mini Castor retrouve son tableau sans dépenser une pièce de sa tirelire.",
     "tags": ["enquête","pixel","ordinateur"],
     "thumb": "../assets/post6-cover.svg"
   },
@@ -60,7 +60,7 @@
     "title": "La négociation des mèmes",
     "url": "post7.html",
     "date": "2026-08-08",
-    "excerpt": "Mini Castor négocie les droits d’un mème populaire pour financer un club de dessin.",
+    "excerpt": "Avec l’accord de l’artiste, Mini Castor organise une vente de mème pour financer un club de dessin et gagner une pomme.",
     "tags": ["mèmes","humour","négociation"],
     "thumb": "../assets/post7-cover.svg"
   }
@@ -70,7 +70,7 @@
     "title": "La photo qui répondait",
     "url": "post8.html",
     "date": "2026-09-09",
-    "excerpt": "Une photo semble répondre à Mini Castor et lui donne une idée de boutique.",
+    "excerpt": "Une annotation oubliée sur la photo d’une pomme devient une affiche amusante et une nouvelle idée de produit pour Mini Castor.",
     "tags": ["photo","mystère","boutique"],
     "thumb": "../assets/post8-cover.svg"
   },
@@ -79,7 +79,7 @@
     "title": "La panne qui m’a appris à investir",
     "url": "post9.html",
     "date": "2026-10-10",
-    "excerpt": "Après un achat inadapté, Mini Castor apprend à budgéter et à mieux préparer ses projets.",
+    "excerpt": "Une pièce incompatible apprend à Mini Castor à vérifier avant d’investir et à garder une réserve pour les imprévus.",
     "tags": ["ordinateur","budget","leçon"],
     "thumb": "../assets/post9-cover.svg"
   },
@@ -88,16 +88,25 @@
     "title": "Le guide du petit entrepreneur",
     "url": "post10.html",
     "date": "2026-10-11",
-    "excerpt": "Les conseils de Mini Castor pour lancer un projet, écouter ses clients et négocier avec tact.",
+    "excerpt": "Mini Castor partage ses étapes pour lancer un commerce, écouter les clients et négocier avec respect. Expert autoproclamé après trois minutes.",
     "tags": ["entrepreneuriat","conseils","business"],
     "thumb": "../assets/post10-cover.svg"
+  },
+  {
+    "id": "post13",
+    "title": "Toutou Yaki, le frère qui garde son calme",
+    "url": "post13.html",
+    "date": "2026-10-12",
+    "excerpt": "Doux, sage et presque toujours allongé sur le ventre, Toutou Yaki évite une catastrophe en repérant le détail oublié par ses trois frères. Mini Castor songe déjà à facturer la sieste.",
+    "tags": ["ToutouYaki","famille","castor","fratrie"],
+    "thumb": "../assets/toutou-yaki.png"
   },
   {
     "id": "post12",
     "title": "Yuki et la note jamais réglée",
     "url": "post12.html",
     "date": "2026-10-12",
-    "excerpt": "Yuki, son air impassible et ses tartes aux pommes : une histoire de famille, de bêtises complices et d’une addition oubliée par Toutou Yaki et Mini Castor, pendant que Yaki tenait la caisse.",
+    "excerpt": "Yuki tient son restaurant impassible tandis que Toutou Yaki et Mini Castor oublient de payer leurs tartes. Yaki, à la caisse, note la dette familiale.",
     "tags": ["Yuki","famille","tarteauxpommes","restaurant"],
     "thumb": "../assets/yuki.png"
   },
@@ -106,7 +115,7 @@
     "title": "Yaki et les hochets qui font dring",
     "url": "post11.html",
     "date": "2026-10-12",
-    "excerpt": "Yaki a 146 ans en âge castor et bientôt cinq ans en novembre. Avant ses hochets, il secouait Mini Castor, qui raconte l’expérience avec humour.",
+    "excerpt": "Yaki, frère de Mini Castor, a 146 ans en âge castor. Avant ses hochets, il secouait Mini Castor, qui réclame désormais un tarif familial en pommes.",
     "tags": ["Yaki","hochet","jeu","castor"],
     "thumb": "../assets/yaki-hochets.png"
   }
