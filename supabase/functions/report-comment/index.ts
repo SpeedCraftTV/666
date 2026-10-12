@@ -127,11 +127,15 @@ Deno.serve(async (request) => {
   const commentId = typeof input.comment_id === "string"
     ? input.comment_id
     : "";
+  const replyId = typeof input.reply_id === "string" ? input.reply_id : "";
   const message = typeof input.message === "string" ? input.message.trim() : "";
 
   if (
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       .test(commentId) ||
+    (replyId !== "" &&
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+        .test(replyId)) ||
     message.length < 1 || message.length > 2000
   ) {
     return jsonResponse(400, {
@@ -234,11 +238,40 @@ Deno.serve(async (request) => {
       return jsonResponse(404, { error: "Ce commentaire n’existe plus." });
     }
 
+    let reply: Record<string, unknown> | null = null;
+    if (replyId) {
+      const replyQuery = new URLSearchParams({
+        select: "comment_id,author_name,body",
+        id: `eq.${replyId}`,
+        comment_id: `eq.${commentId}`,
+        limit: "1",
+      });
+      const replyResponse = await serviceRequest(
+        `blog_comment_replies?${replyQuery}`,
+      );
+      if (!replyResponse.ok) {
+        console.error(
+          "Could not load reported reply:",
+          replyResponse.status,
+          await replyResponse.text(),
+        );
+        return jsonResponse(500, {
+          error: "Impossible de retrouver la réponse signalée.",
+        });
+      }
+      const replies = await replyResponse.json();
+      reply = replies[0] || null;
+      if (!reply) {
+        return jsonResponse(404, { error: "Cette réponse n’existe plus." });
+      }
+    }
+
     const reportResponse = await serviceRequest("blog_comment_reports", {
       method: "POST",
       headers: { Prefer: "return=minimal" },
       body: JSON.stringify({
         comment_id: commentId,
+        reply_id: replyId || null,
         visitor_id: userId,
         user_id: userId,
         reporter_name: reporterName,
@@ -252,21 +285,32 @@ Deno.serve(async (request) => {
       const duplicate = reportResponse.status === 409;
       return jsonResponse(duplicate ? 409 : 500, {
         error: duplicate
-          ? "Tu as déjà signalé ce commentaire avec ce compte."
+          ? `Tu as déjà signalé ${reply ? "cette réponse" : "ce commentaire"} avec ce compte.`
           : "Impossible d’enregistrer le signalement.",
       });
     }
 
     const reportText = [
-      "Un commentaire a été signalé sur le blogue.",
+      reply
+        ? "Une réponse a été signalée sur le blogue."
+        : "Un commentaire a été signalé sur le blogue.",
       "",
       `Article : ${comment.post_id}`,
       `Pseudo du signalant : ${reporterName}`,
       `E-mail de contact : ${reporterEmail}`,
       `Message : ${message}`,
       "",
-      `Commentaire signalé par ${comment.author_name} :`,
-      comment.body,
+      reply
+        ? `Réponse signalée par ${reply.author_name} :`
+        : `Commentaire signalé par ${comment.author_name} :`,
+      String(reply?.body ?? comment.body),
+      ...(reply
+        ? [
+          "",
+          `Commentaire parent par ${comment.author_name} :`,
+          String(comment.body),
+        ]
+        : []),
     ].join("\n");
 
     try {

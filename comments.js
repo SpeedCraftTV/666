@@ -869,48 +869,15 @@
     );
     if (ownerActions) card.appendChild(ownerActions);
 
-    const votes = comment.blog_comment_votes || [];
-    const upCount = votes.filter((item) => item.vote === 1).length;
-    const downCount = votes.filter((item) => item.vote === -1).length;
     const actions = document.createElement('div');
     actions.className = 'comment-actions';
-
-    const storedVote = myVotes.get(comment.id);
-    const upButton = document.createElement('button');
-    upButton.type = 'button';
-    upButton.className = `comment-action${storedVote === 1 ? ' selected' : ''}`;
-    upButton.textContent = `⬆️ ${upCount}`;
-    upButton.setAttribute(
-      'aria-label',
-      `Aimer ce commentaire, ${upCount} likes`,
+    appendVoteControls(
+      actions,
+      { commentId: comment.id },
+      comment.blog_comment_votes || [],
+      refresh,
+      'ce commentaire',
     );
-
-    const downButton = document.createElement('button');
-    downButton.type = 'button';
-    downButton.className = `comment-action${storedVote === -1 ? ' selected' : ''}`;
-    downButton.textContent = `⬇️ ${downCount}`;
-    downButton.setAttribute(
-      'aria-label',
-      `Ne pas aimer ce commentaire, ${downCount} dislikes`,
-    );
-    upButton.addEventListener('click', async () => {
-      if (await requireAccount()) {
-        vote(comment.id, 1, refresh, [upButton, downButton]);
-      }
-    });
-    downButton.addEventListener('click', async () => {
-      if (await requireAccount()) {
-        vote(comment.id, -1, refresh, [upButton, downButton]);
-      }
-    });
-
-    const reportButton = document.createElement('button');
-    reportButton.type = 'button';
-    reportButton.className = 'comment-action report-action';
-    reportButton.textContent = 'Signaler aussi';
-    reportButton.addEventListener('click', async () => {
-      if (await requireAccount()) report(comment);
-    });
 
     const replyButton = document.createElement('button');
     replyButton.type = 'button';
@@ -923,7 +890,7 @@
       if (!replyForm.hidden) replyForm.querySelector('textarea').focus();
     });
 
-    actions.append(upButton, downButton, replyButton, reportButton);
+    actions.append(replyButton, createReportButton(comment));
     card.append(actions);
 
     if (replyData.count > 0) {
@@ -965,14 +932,61 @@
     return card;
   }
 
-  async function vote(commentId, value, refresh, buttons) {
+  function appendVoteControls(actions, target, votes, refresh, label) {
+    const upCount = votes.filter((item) => item.vote === 1).length;
+    const downCount = votes.filter((item) => item.vote === -1).length;
+    const storedVote = myVotes.get(target.replyId || target.commentId);
+    const upButton = document.createElement('button');
+    upButton.type = 'button';
+    upButton.className = `comment-action${storedVote === 1 ? ' selected' : ''}`;
+    upButton.textContent = `⬆️ ${upCount}`;
+    upButton.setAttribute('aria-label', `Aimer ${label}, ${upCount} likes`);
+
+    const downButton = document.createElement('button');
+    downButton.type = 'button';
+    downButton.className = `comment-action${storedVote === -1 ? ' selected' : ''}`;
+    downButton.textContent = `⬇️ ${downCount}`;
+    downButton.setAttribute(
+      'aria-label',
+      `Ne pas aimer ${label}, ${downCount} dislikes`,
+    );
+    upButton.addEventListener('click', async () => {
+      if (await requireAccount()) {
+        vote(target, 1, refresh, [upButton, downButton]);
+      }
+    });
+    downButton.addEventListener('click', async () => {
+      if (await requireAccount()) {
+        vote(target, -1, refresh, [upButton, downButton]);
+      }
+    });
+    actions.append(upButton, downButton);
+  }
+
+  function createReportButton(comment, reply = null) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'comment-action report-action';
+    button.textContent = 'Signaler';
+    button.addEventListener('click', async () => {
+      if (await requireAccount()) report(comment, reply);
+    });
+    return button;
+  }
+
+  async function vote(target, value, refresh, buttons) {
     buttons.forEach((button) => {
       button.disabled = true;
     });
     try {
+      const targetField = 'reply_id';
+      const targetFilter = target.replyId
+        ? `eq.${target.replyId}`
+        : 'is.null';
       const voteQuery = new URLSearchParams({
         select: 'vote',
-        comment_id: `eq.${commentId}`,
+        comment_id: `eq.${target.commentId}`,
+        [targetField]: targetFilter,
         user_id: `eq.${currentUser.id}`,
       });
       const existingVotes = await request(`blog_comment_votes?${voteQuery}`);
@@ -980,7 +994,8 @@
 
       if (existingVote === value) {
         const deleteQuery = new URLSearchParams({
-          comment_id: `eq.${commentId}`,
+          comment_id: `eq.${target.commentId}`,
+          [targetField]: targetFilter,
           user_id: `eq.${currentUser.id}`,
         });
         await request(`blog_comment_votes?${deleteQuery}`, {
@@ -989,7 +1004,8 @@
         });
       } else if (existingVotes.length > 0) {
         const updateQuery = new URLSearchParams({
-          comment_id: `eq.${commentId}`,
+          comment_id: `eq.${target.commentId}`,
+          [targetField]: targetFilter,
           user_id: `eq.${currentUser.id}`,
         });
         await request(`blog_comment_votes?${updateQuery}`, {
@@ -1002,7 +1018,8 @@
           method: 'POST',
           headers: { Prefer: 'return=minimal' },
           body: JSON.stringify({
-            comment_id: commentId,
+            comment_id: target.commentId,
+            ...(target.replyId ? { reply_id: target.replyId } : {}),
             visitor_id: getVoterId(),
             vote: value,
             user_id: currentUser.id,
@@ -1032,20 +1049,26 @@
     }
   }
 
-  async function report(comment) {
+  async function report(comment, reply = null) {
     const dialog = document.createElement('dialog');
     dialog.className = 'report-dialog';
     const form = document.createElement('form');
     form.className = 'comment-form';
 
     const heading = document.createElement('h2');
-    heading.textContent = 'Signaler ce commentaire';
+    heading.textContent = reply ? 'Signaler cette réponse' : 'Signaler ce commentaire';
     const details = document.createElement('p');
     details.append('Article : ');
     const postLink = document.createElement('a');
     postLink.href = getPostUrl(comment.post_id);
     postLink.textContent = postTitles[comment.post_id] || comment.post_id;
     details.appendChild(postLink);
+    if (reply) {
+      details.append(
+        document.createElement('br'),
+        document.createTextNode(`Réponse de ${reply.author_name} : ${reply.body}`),
+      );
+    }
     const messageLabel = document.createElement('label');
     messageLabel.textContent = 'Pourquoi signales-tu ce commentaire ?';
     const messageInput = document.createElement('textarea');
@@ -1116,6 +1139,7 @@
           },
           body: JSON.stringify({
             comment_id: comment.id,
+            ...(reply ? { reply_id: reply.id } : {}),
             message: String(formData.get('message') || '').trim(),
             }),
           },
@@ -1143,8 +1167,25 @@
   async function loadComments(postId) {
     const filters = postId ? `&post_id=eq.${encodeURIComponent(postId)}` : '';
     return request(
-      `blog_comments?select=id,post_id,author_name,body,created_at${currentUser ? ',user_id' : ''},blog_comment_votes(vote)&order=created_at.desc${filters}`,
+      `blog_comments?select=id,post_id,author_name,body,created_at${currentUser ? ',user_id' : ''}&order=created_at.desc${filters}`,
     );
+  }
+
+  async function loadCommentVotes(comments) {
+    for (let index = 0; index < comments.length; index += 500) {
+      const batch = comments.slice(index, index + 500);
+      const query = new URLSearchParams({
+        select: 'comment_id,vote',
+        comment_id: `in.(${batch.map((comment) => comment.id).join(',')})`,
+        reply_id: 'is.null',
+      });
+      const votes = await request(`blog_comment_votes?${query}`);
+      const votesByComment = new Map(batch.map((comment) => [comment.id, []]));
+      votes.forEach((item) => votesByComment.get(item.comment_id)?.push(item));
+      batch.forEach((comment) => {
+        comment.blog_comment_votes = votesByComment.get(comment.id) || [];
+      });
+    }
   }
 
   async function loadMyVotes(comments) {
@@ -1155,6 +1196,7 @@
       select: 'comment_id,vote',
       user_id: `eq.${currentUser.id}`,
       comment_id: `in.(${commentIds.join(',')})`,
+      reply_id: 'is.null',
     });
     const votes = await request(`blog_comment_votes?${query}`);
     myVotes = new Map(votes.map((item) => [item.comment_id, item.vote]));
@@ -1208,6 +1250,26 @@
     ]));
   }
 
+  async function loadThreadVotes(commentId, replies) {
+    const targetIds = [commentId, ...replies.map((reply) => reply.id)];
+    targetIds.forEach((id) => myVotes.delete(id));
+    const query = new URLSearchParams({
+      select: `comment_id,reply_id,vote${currentUser ? ',user_id' : ''}`,
+      comment_id: `eq.${commentId}`,
+    });
+    const rows = await request(`blog_comment_votes?${query}`);
+    const votesByTarget = new Map(targetIds.map((id) => [id, []]));
+    rows.forEach((row) => {
+      const targetId = row.reply_id || row.comment_id;
+      if (!votesByTarget.has(targetId)) return;
+      votesByTarget.get(targetId).push({ vote: row.vote });
+      if (currentUser && row.user_id === currentUser.id) {
+        myVotes.set(targetId, row.vote);
+      }
+    });
+    return votesByTarget;
+  }
+
   async function renderRepliesPage(container) {
     const params = new URLSearchParams(window.location.search);
     const commentId = params.get('comment');
@@ -1236,7 +1298,9 @@
       const commentBody = document.createElement('p');
       commentBody.className = 'comment-body';
       commentBody.textContent = comment.body;
-      article.append(commentHeading, commentBody);
+      const parentActions = document.createElement('div');
+      parentActions.className = 'comment-actions';
+      article.append(commentHeading, commentBody, parentActions);
 
       const repliesHeading = document.createElement('h2');
       repliesHeading.className = 'all-replies-heading';
@@ -1251,6 +1315,17 @@
           order: 'created_at.asc,id.asc',
         });
         const replies = await request(`blog_comment_replies?${query}`);
+        const votesByTarget = await loadThreadVotes(comment.id, replies);
+        comment.blog_comment_votes = votesByTarget.get(comment.id) || [];
+        parentActions.replaceChildren();
+        appendVoteControls(
+          parentActions,
+          { commentId: comment.id },
+          comment.blog_comment_votes,
+          refresh,
+          'ce commentaire',
+        );
+        parentActions.appendChild(createReportButton(comment));
         repliesList.replaceChildren();
         if (!replies.length) {
           const empty = document.createElement('p');
@@ -1317,7 +1392,14 @@
             replyForm.hidden = !replyForm.hidden;
             if (!replyForm.hidden) replyForm.querySelector('textarea').focus();
           });
-          actions.appendChild(replyButton);
+          appendVoteControls(
+            actions,
+            { commentId: comment.id, replyId: reply.id },
+            votesByTarget.get(reply.id) || [],
+            refresh,
+            'cette réponse',
+          );
+          actions.append(replyButton, createReportButton(comment, reply));
           replyCard.append(heading, body);
           if (ownerActions) replyCard.appendChild(ownerActions);
           replyCard.append(actions, replyForm);
@@ -1367,6 +1449,16 @@
         );
       }
       const comments = await loadComments(postId);
+      let voteTotalsUnavailable = false;
+      try {
+        await loadCommentVotes(comments);
+      } catch (error) {
+        console.error('Impossible de charger les totaux des votes.', error);
+        comments.forEach((comment) => {
+          comment.blog_comment_votes = [];
+        });
+        voteTotalsUnavailable = true;
+      }
       let voteStateUnavailable = false;
       let replyStateUnavailable = false;
       try {
@@ -1385,6 +1477,9 @@
       }
       renderList(list, comments, refresh, includePostSelect, replyDataByComment);
       status.textContent = [
+        voteTotalsUnavailable
+          ? 'Les commentaires sont affichés, mais les totaux des votes sont temporairement indisponibles.'
+          : '',
         voteStateUnavailable
           ? 'Les commentaires sont affichés, mais tes votes personnels sont temporairement indisponibles.'
           : '',

@@ -15,6 +15,7 @@ alter table public.blog_comments
 create table if not exists public.blog_comment_votes (
   id uuid primary key default gen_random_uuid(),
   comment_id uuid not null references public.blog_comments(id) on delete cascade,
+  reply_id uuid,
   visitor_id uuid not null,
   vote smallint not null check (vote in (-1, 1)),
   unique (comment_id, visitor_id)
@@ -23,6 +24,7 @@ create table if not exists public.blog_comment_votes (
 create table if not exists public.blog_comment_reports (
   id uuid primary key default gen_random_uuid(),
   comment_id uuid not null references public.blog_comments(id) on delete cascade,
+  reply_id uuid,
   visitor_id uuid not null,
   reporter_name text not null default '',
   reporter_email text not null default '',
@@ -70,10 +72,26 @@ alter table public.blog_comments
   add column if not exists user_id uuid references auth.users(id) on delete set null;
 
 alter table public.blog_comment_votes
-  add column if not exists user_id uuid references auth.users(id) on delete cascade;
+  add column if not exists user_id uuid references auth.users(id) on delete cascade,
+  add column if not exists reply_id uuid;
 
 alter table public.blog_comment_reports
-  add column if not exists user_id uuid references auth.users(id) on delete cascade;
+  add column if not exists user_id uuid references auth.users(id) on delete cascade,
+  add column if not exists reply_id uuid;
+
+alter table public.blog_comment_votes
+  drop constraint if exists blog_comment_votes_reply_id_fkey;
+alter table public.blog_comment_votes
+  add constraint blog_comment_votes_reply_id_fkey
+  foreign key (reply_id)
+  references public.blog_comment_replies(id) on delete cascade;
+
+alter table public.blog_comment_reports
+  drop constraint if exists blog_comment_reports_reply_id_fkey;
+alter table public.blog_comment_reports
+  add constraint blog_comment_reports_reply_id_fkey
+  foreign key (reply_id)
+  references public.blog_comment_replies(id) on delete cascade;
 
 alter table public.blog_comment_replies enable row level security;
 
@@ -84,13 +102,25 @@ create index if not exists blog_comment_replies_parent_created_idx
   on public.blog_comment_replies (parent_reply_id, created_at, id)
   where parent_reply_id is not null;
 
+alter table public.blog_comment_votes
+  drop constraint if exists blog_comment_votes_comment_id_visitor_id_key;
+drop index if exists public.blog_comment_votes_comment_user_idx;
 create unique index if not exists blog_comment_votes_comment_user_idx
   on public.blog_comment_votes (comment_id, user_id)
-  where user_id is not null;
+  where user_id is not null and reply_id is null;
+create unique index if not exists blog_comment_votes_reply_user_idx
+  on public.blog_comment_votes (reply_id, user_id)
+  where user_id is not null and reply_id is not null;
 
+alter table public.blog_comment_reports
+  drop constraint if exists blog_comment_reports_comment_id_visitor_id_key;
+drop index if exists public.blog_comment_reports_comment_user_idx;
 create unique index if not exists blog_comment_reports_comment_user_idx
   on public.blog_comment_reports (comment_id, user_id)
-  where user_id is not null;
+  where user_id is not null and reply_id is null;
+create unique index if not exists blog_comment_reports_reply_user_idx
+  on public.blog_comment_reports (reply_id, user_id)
+  where user_id is not null and reply_id is not null;
 
 alter table public.blog_comment_reports
   add column if not exists reporter_name text not null default '',
@@ -223,7 +253,18 @@ drop policy if exists "authenticated users can vote" on public.blog_comment_vote
 create policy "authenticated users can vote"
   on public.blog_comment_votes for insert
   to authenticated
-  with check (auth.uid() = user_id and vote in (-1, 1));
+  with check (
+    auth.uid() = user_id
+    and vote in (-1, 1)
+    and (
+      reply_id is null
+      or exists (
+        select 1 from public.blog_comment_replies as target_reply
+        where target_reply.id = blog_comment_votes.reply_id
+          and target_reply.comment_id = blog_comment_votes.comment_id
+      )
+    )
+  );
 
 drop policy if exists "visitors can change their vote" on public.blog_comment_votes;
 drop policy if exists "authenticated users can change their vote" on public.blog_comment_votes;
@@ -259,9 +300,9 @@ grant insert (post_id, author_name, body, user_id) on public.blog_comments to au
 grant update (body) on public.blog_comments to authenticated;
 grant delete on public.blog_comments to authenticated;
 revoke select, insert, update, delete on public.blog_comment_votes from public, anon, authenticated;
-grant select (comment_id, vote) on public.blog_comment_votes to anon;
-grant select (comment_id, user_id, vote) on public.blog_comment_votes to authenticated;
-grant insert (comment_id, visitor_id, vote, user_id) on public.blog_comment_votes to authenticated;
+grant select (comment_id, reply_id, vote) on public.blog_comment_votes to anon;
+grant select (comment_id, reply_id, user_id, vote) on public.blog_comment_votes to authenticated;
+grant insert (comment_id, reply_id, visitor_id, vote, user_id) on public.blog_comment_votes to authenticated;
 grant update (vote) on public.blog_comment_votes to authenticated;
 grant delete on public.blog_comment_votes to authenticated;
 revoke all on public.blog_comment_reports from anon, authenticated;
